@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 512" width="1720" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <!-- ikon, skala 0.5 dari dikompres-icon.svg -->
+  <g transform="scale(0.5)">
+    <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg)"/>
+    <rect x="232" y="250" width="560" height="56" rx="28" fill="#FFFFFF"/>
+    <rect x="232" y="718" width="560" height="56" rx="28" fill="#FFFFFF"/>
+    <path d="M312 378a32 32 0 0 1 32-32H616L712 442V646a32 32 0 0 1-32 32H344a32 32 0 0 1-32-32Z" fill="#FFFFFF"/>
+    <path d="M616 346V410a32 32 0 0 0 32 32H712Z" fill="#BAE6FD"/>
+    <rect x="368" y="470" width="220" height="28" rx="14" fill="#2563EB"/>
+    <rect x="368" y="530" width="288" height="28" rx="14" fill="#2563EB"/>
+    <rect x="368" y="590" width="180" height="28" rx="14" fill="#2563EB"/>
+    <g fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" opacity="0.75">
+      <path d="M262 470q-28 42 0 84"/>
+      <path d="M762 470q28 42 0 84"/>
+    </g>
+  </g>
+  <!-- teks: "di" ringan, "kompres" tebal -->
+  <text x="560" y="300" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="200" letter-spacing="-4"><tspan font-weight="400" fill="#2563EB">di</tspan><tspan font-weight="700" fill="#0F172A">kompres</tspan></text>
+  <text x="566" y="390" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="58" font-weight="500" fill="#475569">Berkas jadi kecil, privasi tetap utuh</text>
+</svg>
