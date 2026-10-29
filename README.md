@@ -10,6 +10,11 @@
   </p>
 </div>
 
+<p align="center">
+  English |
+  <a href="docs/readme/README.id.md">Bahasa Indonesia</a>
+</p>
+
 ---
 
 Dikompres is an open-source desktop app for compressing images and PDFs, built with Tauri 2, Rust and React 19. Everything runs locally: files never leave your device, and the app works without an internet connection. No account, no telemetry.
