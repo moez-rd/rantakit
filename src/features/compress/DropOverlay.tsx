@@ -1,31 +1,33 @@
-import { Ban, ImageDown } from "lucide-react";
-import type { DragState } from "@/lib/fileDrop";
+import { Ban, FileDown } from "lucide-react";
+import { FILE_KINDS, type DropPlan } from "./fileKinds";
 
 interface DropOverlayProps {
-  drag: DragState;
+  plan: DropPlan;
   /** A batch is running, so drops are ignored. */
   isBusy: boolean;
 }
 
 /** Full-window hint shown while files are dragged over the app. */
-export function DropOverlay({ drag, isBusy }: DropOverlayProps) {
-  const canDrop = !isBusy && drag.accepted > 0;
-  const Icon = canDrop ? ImageDown : Ban;
+export function DropOverlay({ plan, isBusy }: DropOverlayProps) {
+  const canDrop = !isBusy && plan.kind !== null;
+  const Icon = canDrop ? FileDown : Ban;
 
-  let message = `Lepaskan untuk menambahkan ${drag.accepted} gambar`;
-  let detail = drag.accepted < drag.total ? `${drag.total - drag.accepted} berkas lain akan dilewati` : undefined;
+  let message: string;
+  let detail: string | undefined;
   if (isBusy) {
     message = "Tunggu kompresi selesai";
-    detail = undefined;
-  } else if (drag.accepted === 0) {
+  } else if (plan.kind === null) {
     message = "Format tidak didukung";
-    detail = "Hanya JPG dan PNG untuk saat ini";
+    detail = "Hanya JPG, PNG, dan PDF untuk saat ini";
+  } else {
+    message = `Lepaskan untuk menambahkan ${plan.paths.length} ${FILE_KINDS[plan.kind].noun}`;
+    if (plan.skipped > 0) detail = `${plan.skipped} berkas lain akan dilewati`;
   }
 
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed inset-0 z-50 flex p-3 bg-background/80 backdrop-blur-sm"
+      className="pointer-events-none fixed inset-0 z-50 flex bg-background/80 p-3 backdrop-blur-sm"
     >
       <div
         className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed text-center ${

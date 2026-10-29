@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import type { Page } from "@/components/layout/navigation";
-import { ImageJobView } from "@/features/compress/ImageJobView";
-import { ImageSetupView } from "@/features/compress/ImageSetupView";
 import { DropOverlay } from "@/features/compress/DropOverlay";
-import { isImagePath, pickImages } from "@/features/compress/imageApi";
-import { useImageSettings } from "@/features/compress/imageSettings";
-import { useImageJob } from "@/features/compress/useImageJob";
+import { FILE_KINDS, planDrop, type FileKind } from "@/features/compress/fileKinds";
+import { compressImage } from "@/features/compress/imageApi";
+import { ImageOptions } from "@/features/compress/ImageOptions";
+import { toImageRequest, useImageSettings } from "@/features/compress/imageSettings";
+import { JobView } from "@/features/compress/JobView";
+import { compressPdf } from "@/features/compress/pdfApi";
+import { PdfOptions } from "@/features/compress/PdfOptions";
+import { toPdfRequest, usePdfSettings } from "@/features/compress/pdfSettings";
+import { SetupView } from "@/features/compress/SetupView";
+import { useCompressJob } from "@/features/compress/useCompressJob";
 import { HomePage } from "@/features/home/HomePage";
 import { RecentsPage } from "@/features/recents/RecentsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
@@ -14,9 +19,18 @@ import { hasSettingsWindow, openSettingsWindow } from "@/features/settings/setti
 import { useFileDrop } from "@/lib/fileDrop";
 import { useMenuEvents } from "@/lib/menuEvents";
 
+/** Picked files waiting for the user to choose settings. */
+interface Selection {
+  kind: FileKind;
+  paths: string[];
+}
+
 function App() {
   const [page, setPage] = useState<Page>("home");
-  const imageJob = useImageJob();
+  const job = useCompressJob();
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const [imageSettings, updateImageSettings] = useImageSettings();
+  const [pdfSettings, updatePdfSettings] = usePdfSettings();
 
   const navigate = (next: Page) => {
     if (next === "settings" && hasSettingsWindow) {
@@ -26,49 +40,38 @@ function App() {
     }
   };
 
-  // Picked images waiting for the user to choose settings; empty when not reviewing.
-  const [selected, setSelected] = useState<string[]>([]);
-  const [imageSettings, updateImageSettings] = useImageSettings();
-
-  /** Add images to the selection and show the settings, from the picker or a drop. */
-  const addImages = (paths: string[]) => {
-    if (imageJob.isRunning || paths.length === 0) return;
-    imageJob.clear();
-    setSelected((prev) => [...new Set([...prev, ...paths])]);
+  /** Add files to the selection and show the settings, from a picker or a drop. */
+  const addFiles = (kind: FileKind, paths: string[]) => {
+    if (job.isRunning || paths.length === 0) return;
+    job.clear();
+    // Files of another kind start a new selection; a batch holds one kind.
+    setSelection((prev) => ({
+      kind,
+      paths: prev?.kind === kind ? [...new Set([...prev.paths, ...paths])] : paths,
+    }));
     setPage("home");
   };
 
-  const pickImagesToCompress = async () => {
-    if (imageJob.isRunning) return;
-    addImages(await pickImages());
+  const pickFiles = async (kind: FileKind) => {
+    if (job.isRunning) return;
+    addFiles(kind, await FILE_KINDS[kind].pick());
   };
 
-  const drag = useFileDrop(isImagePath, addImages);
-
-  const startImageJob = () => {
-    imageJob.start(selected, imageSettings);
-    setSelected([]);
+  const startJob = () => {
+    if (!selection) return;
+    const { kind, paths } = selection;
+    job.start(kind, paths, (path) =>
+      kind === "image"
+        ? compressImage(toImageRequest(path, imageSettings))
+        : compressPdf(toPdfRequest(path, pdfSettings)),
+    );
+    setSelection(null);
   };
 
-  const homeView = () => {
-    if (imageJob.items.length > 0) {
-      return <ImageJobView job={imageJob} onCompressMore={pickImagesToCompress} />;
-    }
-    if (selected.length > 0) {
-      return (
-        <ImageSetupView
-          paths={selected}
-          settings={imageSettings}
-          onSettingsChange={updateImageSettings}
-          onAddMore={pickImagesToCompress}
-          onRemove={(path) => setSelected((prev) => prev.filter((p) => p !== path))}
-          onCancel={() => setSelected([])}
-          onStart={startImageJob}
-        />
-      );
-    }
-    return <HomePage onCompressImage={pickImagesToCompress} />;
-  };
+  const dragging = useFileDrop((paths) => {
+    const plan = planDrop(paths, selection?.kind ?? null);
+    if (plan.kind) addFiles(plan.kind, plan.paths);
+  });
 
   useMenuEvents((id) => {
     switch (id) {
@@ -79,19 +82,46 @@ function App() {
       case "open_settings":
         return navigate("settings");
       case "compress_image":
-        return pickImagesToCompress();
+        return pickFiles("image");
       case "compress_pdf":
-        // TODO: open the PDF picker once PDF compression exists.
-        return navigate("home");
+        return pickFiles("pdf");
     }
   });
+
+  const homeView = () => {
+    if (job.items.length > 0) {
+      return <JobView job={job} onCompressMore={() => pickFiles(job.kind)} />;
+    }
+    if (selection && selection.paths.length > 0) {
+      const { kind, paths } = selection;
+      return (
+        <SetupView
+          kind={kind}
+          paths={paths}
+          onAddMore={() => pickFiles(kind)}
+          onRemove={(path) => setSelection({ kind, paths: paths.filter((p) => p !== path) })}
+          onCancel={() => setSelection(null)}
+          onStart={startJob}
+        >
+          {kind === "image" ? (
+            <ImageOptions settings={imageSettings} onChange={updateImageSettings} />
+          ) : (
+            <PdfOptions settings={pdfSettings} onChange={updatePdfSettings} />
+          )}
+        </SetupView>
+      );
+    }
+    return <HomePage onCompressImage={() => pickFiles("image")} onCompressPdf={() => pickFiles("pdf")} />;
+  };
 
   return (
     <AppShell page={page} onNavigate={navigate}>
       {page === "home" && homeView()}
       {page === "recents" && <RecentsPage />}
       {page === "settings" && <SettingsPage />}
-      {drag && <DropOverlay drag={drag} isBusy={imageJob.isRunning} />}
+      {dragging && (
+        <DropOverlay plan={planDrop(dragging, selection?.kind ?? null)} isBusy={job.isRunning} />
+      )}
     </AppShell>
   );
 }

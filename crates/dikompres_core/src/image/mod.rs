@@ -1,6 +1,6 @@
 mod encode;
 pub mod options;
-mod resize;
+pub(crate) mod resize;
 mod target_size;
 
 use std::io::Cursor;

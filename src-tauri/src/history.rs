@@ -28,10 +28,11 @@ pub struct Entry {
     pub output_path: PathBuf,
     pub original_bytes: u64,
     pub compressed_bytes: u64,
-    /// "jpeg" or "png".
+    /// "jpeg", "png" or "pdf".
     pub format: String,
-    pub width: u32,
-    pub height: u32,
+    /// Pixel size for images; `None` for PDFs.
+    pub width: Option<u32>,
+    pub height: Option<u32>,
     pub quality: Option<u8>,
 }
 
@@ -140,8 +141,8 @@ mod tests {
             original_bytes: 100,
             compressed_bytes: 50,
             format: "jpeg".into(),
-            width: 1,
-            height: 1,
+            width: Some(1),
+            height: Some(1),
             quality: Some(80),
         }
     }

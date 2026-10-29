@@ -9,9 +9,10 @@ export interface HistoryItem {
   outputPath: string;
   originalBytes: number;
   compressedBytes: number;
-  format: "jpeg" | "png";
-  width: number;
-  height: number;
+  format: "jpeg" | "png" | "pdf";
+  /** Pixel size for images; null for PDFs. */
+  width: number | null;
+  height: number | null;
   quality: number | null;
   /** False when the compressed copy was moved or deleted since. */
   outputExists: boolean;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { Clock, FolderOpen, Image, TriangleAlert, X } from "lucide-react";
+import { Clock, FileText, FolderOpen, Image, TriangleAlert, X } from "lucide-react";
 import { DialogTrigger } from "react-aria-components";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
@@ -84,10 +84,11 @@ export function RecentsPage() {
 
 function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => void }) {
   const smaller = item.compressedBytes < item.originalBytes;
+  const Icon = item.format === "pdf" ? FileText : Image;
 
   return (
     <li className="flex items-center gap-3 py-3 ps-4 pe-2">
-      <Image aria-hidden className={`size-5 shrink-0 ${item.outputExists ? "text-muted" : "text-border"}`} />
+      <Icon aria-hidden className={`size-5 shrink-0 ${item.outputExists ? "text-muted" : "text-border"}`} />
       <div className="min-w-0 flex-1">
         <p
           className={`truncate text-sm font-medium ${item.outputExists ? "" : "text-muted line-through"}`}

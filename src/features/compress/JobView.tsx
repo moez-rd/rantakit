@@ -2,15 +2,18 @@ import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { CheckCircle2, Circle, FolderOpen, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatBytes, formatChange } from "@/lib/format";
-import type { ImageJob, JobItem } from "./useImageJob";
+import { FILE_KINDS } from "./fileKinds";
+import type { CompressJob, JobItem } from "./useCompressJob";
 
-interface ImageJobViewProps {
-  job: ImageJob;
+interface JobViewProps {
+  job: CompressJob;
   onCompressMore: () => void;
 }
 
-export function ImageJobView({ job, onCompressMore }: ImageJobViewProps) {
+/** Progress and results of the current batch. */
+export function JobView({ job, onCompressMore }: JobViewProps) {
   const { items, isRunning } = job;
+  const { noun } = FILE_KINDS[job.kind];
   const finished = items.filter((item) => item.status === "done" || item.status === "failed");
 
   return (
@@ -18,9 +21,7 @@ export function ImageJobView({ job, onCompressMore }: ImageJobViewProps) {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-medium">
-            {isRunning
-              ? `Mengompres ${finished.length + 1} dari ${items.length} gambar…`
-              : "Selesai"}
+            {isRunning ? `Mengompres ${finished.length + 1} dari ${items.length} ${noun}…` : "Selesai"}
           </h1>
           <p className="text-sm text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
         </div>

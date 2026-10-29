@@ -35,9 +35,10 @@ function CompressCard({ icon: Icon, title, description, onPress }: CompressCardP
 
 interface HomePageProps {
   onCompressImage: () => void;
+  onCompressPdf: () => void;
 }
 
-export function HomePage({ onCompressImage }: HomePageProps) {
+export function HomePage({ onCompressImage, onCompressPdf }: HomePageProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6">
       <div className="flex w-full max-w-sm flex-col gap-3">
@@ -47,7 +48,12 @@ export function HomePage({ onCompressImage }: HomePageProps) {
           description="JPG dan PNG"
           onPress={onCompressImage}
         />
-        <CompressCard icon={FileText} title="Kompres PDF" description="Dokumen PDF" />
+        <CompressCard
+          icon={FileText}
+          title="Kompres PDF"
+          description="Dokumen PDF"
+          onPress={onCompressPdf}
+        />
       </div>
       <p className="hidden text-xs text-muted pointer-fine:block">atau seret berkas ke sini</p>
     </div>

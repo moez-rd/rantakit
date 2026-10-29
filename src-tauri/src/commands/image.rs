@@ -1,15 +1,15 @@
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use dikompres_core::{ImageFormat, ImageOptions, OutputFormat, Target};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
+use super::output::output_path;
+use super::{Finished, record};
 use crate::error::Result;
-use crate::history::{self, Entry, History};
+use crate::history::History;
 
-/// Appended to the file name of every compressed copy.
-const OUTPUT_SUFFIX: &str = "-dikompres";
 const DEFAULT_QUALITY: u8 = 80;
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -63,22 +63,19 @@ pub async fn compress_image(
     // Decoding and encoding are CPU-bound; keep them off the async runtime.
     let result = tauri::async_runtime::spawn_blocking(move || compress_blocking(request)).await??;
 
-    // The file is already saved, so a history failure shouldn't fail the command.
-    let created_at = history::now_ms();
-    if let Err(err) = history.add(Entry {
-        id: history::new_id(created_at),
-        created_at,
-        input_path: result.input_path.clone(),
-        output_path: result.output_path.clone(),
-        original_bytes: result.original_bytes,
-        compressed_bytes: result.compressed_bytes,
-        format: result.format.into(),
-        width: result.width,
-        height: result.height,
-        quality: result.quality,
-    }) {
-        eprintln!("failed to record history: {err}");
-    }
+    record(
+        &history,
+        Finished {
+            input_path: result.input_path.clone(),
+            output_path: result.output_path.clone(),
+            original_bytes: result.original_bytes,
+            compressed_bytes: result.compressed_bytes,
+            format: result.format,
+            width: Some(result.width),
+            height: Some(result.height),
+            quality: result.quality,
+        },
+    );
 
     Ok(result)
 }
@@ -100,58 +97,21 @@ fn compress_blocking(request: ImageRequest) -> Result<ImageResult> {
     };
     let compressed = dikompres_core::compress_image(&input, &opts)?;
 
-    let output_path = output_path(&request.path, compressed.format);
+    let (format, ext) = match compressed.format {
+        ImageFormat::Jpeg => ("jpeg", "jpg"),
+        ImageFormat::Png => ("png", "png"),
+    };
+    let output_path = output_path(&request.path, ext);
     fs::write(&output_path, &compressed.bytes)?;
 
     Ok(ImageResult {
         input_path: request.path,
         output_path,
-        format: match compressed.format {
-            ImageFormat::Jpeg => "jpeg",
-            ImageFormat::Png => "png",
-        },
+        format,
         original_bytes: input.len() as u64,
         compressed_bytes: compressed.bytes.len() as u64,
         width: compressed.width,
         height: compressed.height,
         quality: compressed.quality,
     })
-}
-
-/// `photo.jpg` → `photo-dikompres.jpg`, then `photo-dikompres-2.jpg`, … if taken.
-fn output_path(input: &Path, format: ImageFormat) -> PathBuf {
-    let ext = match format {
-        ImageFormat::Jpeg => "jpg",
-        ImageFormat::Png => "png",
-    };
-    let stem = input.file_stem().unwrap_or_default().to_string_lossy();
-    let dir = input.parent().unwrap_or(Path::new(""));
-
-    let mut candidate = dir.join(format!("{stem}{OUTPUT_SUFFIX}.{ext}"));
-    let mut n = 2;
-    while candidate.exists() {
-        candidate = dir.join(format!("{stem}{OUTPUT_SUFFIX}-{n}.{ext}"));
-        n += 1;
-    }
-    candidate
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn output_path_adds_suffix_and_matches_format() {
-        let dir = std::env::temp_dir().join("dikompres-output-path-test");
-        let _ = fs::remove_dir_all(&dir);
-        fs::create_dir_all(&dir).unwrap();
-        let input = dir.join("photo.png");
-
-        assert_eq!(output_path(&input, ImageFormat::Jpeg), dir.join("photo-dikompres.jpg"));
-
-        fs::write(dir.join("photo-dikompres.jpg"), b"").unwrap();
-        assert_eq!(output_path(&input, ImageFormat::Jpeg), dir.join("photo-dikompres-2.jpg"));
-
-        fs::remove_dir_all(&dir).unwrap();
-    }
 }
