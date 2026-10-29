@@ -1,0 +1,72 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@plugin "tailwindcss-react-aria-components";
+
+/* Dark mode follows <html data-theme>, set from preferences (light, dark, or system). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Dikompres design tokens.
+ * The React Aria starter kit uses Tailwind's blue-* as its accent. The logo's
+ * brand blue (#2563EB) is exactly blue-600, so the kit already matches the brand.
+ * Use these semantic tokens in Dikompres' own components.
+ */
+@theme inline {
+  --color-primary: var(--color-blue-600);
+  --color-primary-hover: var(--color-blue-700);
+  --color-primary-soft: var(--color-sky-400);
+  --color-accent-soft: var(--color-sky-200);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --color-success: var(--color-emerald-600);
+  --color-warning: var(--color-amber-500);
+  --color-danger: var(--color-red-700);
+}
+
+:root {
+  color-scheme: light;
+  --background: var(--color-neutral-50);
+  --surface: var(--color-white);
+  --foreground: var(--color-neutral-900);
+  --muted: var(--color-neutral-500);
+  --border: rgb(0 0 0 / 0.1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: var(--color-neutral-950);
+  --surface: var(--color-neutral-900);
+  --foreground: var(--color-neutral-100);
+  --muted: var(--color-neutral-400);
+  --border: rgb(255 255 255 / 0.1);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    /* keep content clear of notches and gesture bars on mobile */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+  }
+}
+
+/* iOS zooms into inputs smaller than 16px; unlayered so it wins over utilities */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
