@@ -2,7 +2,7 @@
   <img src="public/rantakit.svg" width="128" height="128" alt="Rantakit" />
   <h1>Rantakit</h1>
 
-  <p><strong>Compress your files on your device. No uploads, no internet, no bloat.</strong></p>
+  <p><strong>All your file tools, no internet needed, free & open source.</strong></p>
 
   <p>
     <img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="license" />
@@ -17,41 +17,30 @@
 
 ---
 
-Rantakit is an open-source desktop app for compressing images and PDFs, built with Tauri 2, Rust and React 19. Everything runs locally: files never leave your device, and the app works without an internet connection. No account, no telemetry.
+Rantakit is free, open source file toolkit, it keeps everything you need in one place: compress files, convert formats, work in PDFs, scan documents, and extract text out of images.
+
+Everything runs on your device. That means it works with no internet connection.
+
+> [!WARNING]
+> Rantakit is in early development and is not stable yet. Features and behavior may change at any time.
 
 ## Features
 
-| Type | Formats | Status |
-|---|---|---|
-| Image | JPG, PNG | Preview |
-| PDF | PDF | Preview |
-| Video | | Not implemented yet |
-| Audio | | Not implemented yet |
-| Office document | | Not implemented yet |
-| GIF | GIF | Not implemented yet |
-| Web file | HTML, CSS, JS, SVG | Not implemented yet |
+| Type                     | Status              | Type                     | Status              |
+| ------------------------ | ------------------- | ------------------------ | ------------------- |
+| Compress image           | Preview (JPG, PNG)  | Rotate PDF pages         | Not implemented yet |
+| Compress PDF             | Preview             | Reorder PDF pages        | Not implemented yet |
+| Compress GIF             | Not implemented yet | Capture documents        | Not implemented yet |
+| Compress video           | Not implemented yet | Extract text from images | Not implemented yet |
+| Compress audio           | Not implemented yet | Batch processing         | Preview             |
+| Compress office document | Not implemented yet | History of recent jobs   | Preview             |
+| Image format conversions | Preview (JPG ↔ PNG) | Windows support          | Preview             |
+| Images to PDF            | Not implemented yet | macOS support            | Preview             |
+| PDF to images            | Not implemented yet | Linux support            | Preview             |
+| Merge PDFs               | Not implemented yet | Android support          | Not implemented yet |
+| Split PDFs               | Not implemented yet | iOS support              | Not implemented yet |
+| Extract PDF pages        | Not implemented yet |                          |                     |
 
-### Images
-
-- **JPG and PNG** input
-- **Quality or target size:** pick a quality from 1 to 100, or set a maximum size per image and let Rantakit find the best quality that fits
-- **Convert** between JPG and PNG
-- **Resize** to a maximum longest side (4K, Full HD, …)
-- **EXIF orientation** is applied, so rotated phone photos stay upright
-
-### PDF
-
-- **Re-encodes JPEG photos** inside the PDF and optionally downscales them
-- **Cleans up** unused objects and writes a more compact file structure
-- Text and vector graphics are left untouched
-
-### App
-
-- **Batch** compression with per-file progress and results
-- **Drag and drop** files onto the window, or pick them from the native file dialog
-- **Never overwrites:** results are saved next to the original as `name-dikompres.ext`
-- **History** of recent compressions, with a shortcut to open the containing folder
-- **Settings** for theme (light, dark, system), UI zoom and language
 
 ## Install
 
@@ -70,7 +59,7 @@ There is no release yet. For now, [build from source](#build-from-source).
 ```bash
 bun install
 bun run tauri dev       # development
-bun run tauri build     # production bundle, written to target/release/bundle/
+bun run tauri build     # production bundle
 ```
 
 **Checks**

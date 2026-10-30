@@ -2,7 +2,7 @@
   <img src="../../public/rantakit.svg" width="128" height="128" alt="Rantakit" />
   <h1>Rantakit</h1>
 
-  <p><strong>Kompres berkasmu langsung di perangkatmu. Tanpa unggah, tanpa internet, tanpa beban.</strong></p>
+  <p><strong>Semua alat berkas, tanpa internet, gratis & open source.</strong></p>
 
   <p>
     <img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="lisensi" />
@@ -17,41 +17,29 @@
 
 ---
 
-Rantakit adalah aplikasi desktop open source untuk mengompres gambar dan PDF, dibangun dengan Tauri 2, Rust, dan React 19. Semua proses berjalan secara lokal: berkas tidak pernah meninggalkan perangkatmu, dan aplikasi tetap berfungsi tanpa koneksi internet. Tanpa akun, tanpa telemetri.
+Rantakit adalah kotak alat berkas yang gratis dan open source. Semua yang kamu butuhkan ada di satu tempat: kompres berkas, ubah format, olah PDF, pindai dokumen, dan ambil teks dari gambar.
+
+Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneksi internet.
+
+> [!WARNING]
+> Rantakit masih dalam tahap awal pengembangan dan belum stabil. Fitur dan perilaku aplikasi bisa berubah sewaktu-waktu.
 
 ## Fitur
 
-| Jenis | Format | Status |
-|---|---|---|
-| Gambar | JPG, PNG | Pratinjau |
-| PDF | PDF | Pratinjau |
-| Video | | Belum tersedia |
-| Audio | | Belum tersedia |
-| Dokumen Office | | Belum tersedia |
-| GIF | GIF | Belum tersedia |
-| Berkas web | HTML, CSS, JS, SVG | Belum tersedia |
-
-### Gambar
-
-- Input **JPG dan PNG**
-- **Kualitas atau ukuran target:** pilih kualitas dari 1 sampai 100, atau tentukan ukuran maksimal per gambar dan biarkan Rantakit mencari kualitas terbaik yang muat
-- **Konversi** antara JPG dan PNG
-- **Perkecil** sampai batas sisi terpanjang (4K, Full HD, …)
-- **Orientasi EXIF** diterapkan, jadi foto ponsel yang diputar tetap tegak
-
-### PDF
-
-- **Mengompres ulang foto JPEG** di dalam PDF, dan bisa sekaligus memperkecilnya
-- **Merapikan** objek yang tidak terpakai dan menyimpan struktur berkas yang lebih ringkas
-- Teks dan grafik vektor tidak diubah
-
-### Aplikasi
-
-- Kompres **banyak berkas sekaligus**, dengan progres dan hasil per berkas
-- **Seret dan lepas** berkas ke jendela aplikasi, atau pilih lewat dialog berkas bawaan sistem
-- **Tidak pernah menimpa:** hasil disimpan di sebelah berkas asli sebagai `nama-dikompres.ext`
-- **Riwayat** kompresi terbaru, dengan pintasan untuk membuka foldernya
-- **Pengaturan** tema (terang, gelap, sistem), ukuran tampilan, dan bahasa
+| Jenis                  | Status                | Jenis                          | Status         |
+| ---------------------- | --------------------- | ------------------------------ | -------------- |
+| Kompres gambar         | Pratinjau (JPG, PNG)  | Putar halaman PDF              | Belum tersedia |
+| Kompres PDF            | Pratinjau             | Urutkan ulang halaman PDF      | Belum tersedia |
+| Kompres GIF            | Belum tersedia        | Pindai dokumen                 | Belum tersedia |
+| Kompres video          | Belum tersedia        | Ambil teks dari gambar         | Belum tersedia |
+| Kompres audio          | Belum tersedia        | Proses banyak berkas sekaligus | Pratinjau      |
+| Kompres dokumen Office | Belum tersedia        | Riwayat proses terbaru         | Pratinjau      |
+| Konversi format gambar | Pratinjau (JPG ↔ PNG) | Dukungan Windows               | Pratinjau      |
+| Gambar ke PDF          | Belum tersedia        | Dukungan macOS                 | Pratinjau      |
+| PDF ke gambar          | Belum tersedia        | Dukungan Linux                 | Pratinjau      |
+| Gabung PDF             | Belum tersedia        | Dukungan Android               | Belum tersedia |
+| Pisah PDF              | Belum tersedia        | Dukungan iOS                   | Belum tersedia |
+| Ambil halaman PDF      | Belum tersedia        |                                |                |
 
 ## Instalasi
 
@@ -70,7 +58,7 @@ Belum ada rilis. Untuk sementara, [build dari kode sumber](#build-dari-kode-sumb
 ```bash
 bun install
 bun run tauri dev       # pengembangan
-bun run tauri build     # bundle produksi, ditulis ke target/release/bundle/
+bun run tauri build     # bundle produksi
 ```
 
 **Pengecekan**
