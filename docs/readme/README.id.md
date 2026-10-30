@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="../../public/dikompres.svg" width="128" height="128" alt="Dikompres" />
-  <h1>Dikompres</h1>
+  <img src="../../public/rantakit.svg" width="128" height="128" alt="Rantakit" />
+  <h1>Rantakit</h1>
 
   <p><strong>Kompres berkasmu langsung di perangkatmu. Tanpa unggah, tanpa internet, tanpa beban.</strong></p>
 
@@ -17,7 +17,7 @@
 
 ---
 
-Dikompres adalah aplikasi desktop open source untuk mengompres gambar dan PDF, dibangun dengan Tauri 2, Rust, dan React 19. Semua proses berjalan secara lokal: berkas tidak pernah meninggalkan perangkatmu, dan aplikasi tetap berfungsi tanpa koneksi internet. Tanpa akun, tanpa telemetri.
+Rantakit adalah aplikasi desktop open source untuk mengompres gambar dan PDF, dibangun dengan Tauri 2, Rust, dan React 19. Semua proses berjalan secara lokal: berkas tidak pernah meninggalkan perangkatmu, dan aplikasi tetap berfungsi tanpa koneksi internet. Tanpa akun, tanpa telemetri.
 
 ## Fitur
 
@@ -34,7 +34,7 @@ Dikompres adalah aplikasi desktop open source untuk mengompres gambar dan PDF, d
 ### Gambar
 
 - Input **JPG dan PNG**
-- **Kualitas atau ukuran target:** pilih kualitas dari 1 sampai 100, atau tentukan ukuran maksimal per gambar dan biarkan Dikompres mencari kualitas terbaik yang muat
+- **Kualitas atau ukuran target:** pilih kualitas dari 1 sampai 100, atau tentukan ukuran maksimal per gambar dan biarkan Rantakit mencari kualitas terbaik yang muat
 - **Konversi** antara JPG dan PNG
 - **Perkecil** sampai batas sisi terpanjang (4K, Full HD, …)
 - **Orientasi EXIF** diterapkan, jadi foto ponsel yang diputar tetap tegak
@@ -84,7 +84,7 @@ cargo clippy --workspace --all-targets
 ## Struktur proyek
 
 ```
-crates/dikompres_core/   mesin kompresi (gambar dan PDF), tanpa dependensi Tauri
+crates/rantakit_core/   mesin kompresi (gambar dan PDF), tanpa dependensi Tauri
 src-tauri/               aplikasi desktop: command, riwayat, menu native
 src/                     frontend React
 ```
@@ -99,4 +99,4 @@ Issue dan pull request sangat diterima.
 
 ## Lisensi
 
-Dikompres adalah perangkat lunak bebas yang dirilis di bawah [GNU Affero General Public License v3.0 atau versi yang lebih baru](../../LICENSE) (`AGPL-3.0-or-later`).
+Rantakit adalah perangkat lunak bebas yang dirilis di bawah [GNU Affero General Public License v3.0 atau versi yang lebih baru](../../LICENSE) (`AGPL-3.0-or-later`).

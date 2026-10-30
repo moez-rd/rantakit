@@ -7,10 +7,10 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
- * Dikompres design tokens.
+ * Rantakit design tokens.
  * The React Aria starter kit uses Tailwind's blue-* as its accent. The logo's
  * brand blue (#2563EB) is exactly blue-600, so the kit already matches the brand.
- * Use these semantic tokens in Dikompres' own components.
+ * Use these semantic tokens in Rantakit' own components.
  */
 @theme inline {
   --color-primary: var(--color-blue-600);

@@ -15,9 +15,16 @@ import { useCompressJob } from "@/features/compress/useCompressJob";
 import { HomePage } from "@/features/home/HomePage";
 import { RecentsPage } from "@/features/recents/RecentsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
-import { hasSettingsWindow, openSettingsWindow } from "@/features/settings/settingsWindow";
+import {
+  hasSettingsWindow,
+  openSettingsWindow,
+  type SettingsTab,
+} from "@/features/settings/settingsWindow";
+import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
+import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
 import { useMenuEvents } from "@/lib/menuEvents";
+import { isMacApp } from "@/lib/platform";
 
 /** Picked files waiting for the user to choose settings. */
 interface Selection {
@@ -32,10 +39,15 @@ function App() {
   const [imageSettings, updateImageSettings] = useImageSettings();
   const [pdfSettings, updatePdfSettings] = usePdfSettings();
 
-  const navigate = (next: Page) => {
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
+
+  const navigate = (next: Page) => openPage(next, "general");
+
+  const openPage = (next: Page, tab: SettingsTab) => {
     if (next === "settings" && hasSettingsWindow) {
-      openSettingsWindow();
+      openSettingsWindow(tab);
     } else {
+      if (next === "settings") setSettingsTab(tab);
       setPage(next);
     }
   };
@@ -73,20 +85,31 @@ function App() {
     if (plan.kind) addFiles(plan.kind, plan.paths);
   });
 
-  useMenuEvents((id) => {
-    switch (id) {
+  /** Commands from the macOS menu bar, the in-app menu and the Ctrl shortcuts. */
+  const runCommand = (command: AppCommand) => {
+    switch (command) {
       case "go_home":
         return navigate("home");
       case "go_recents":
         return navigate("recents");
       case "open_settings":
         return navigate("settings");
+      case "open_about":
+        return openPage("settings", "about");
       case "compress_image":
         return pickFiles("image");
       case "compress_pdf":
         return pickFiles("pdf");
+      case "open_source":
+        return openExternal(SOURCE_URL);
+      case "open_license":
+        return openExternal(LICENSE_URL);
     }
-  });
+  };
+
+  useMenuEvents(runCommand);
+  // On macOS the menu bar handles these as Cmd shortcuts.
+  useShortcuts(runCommand, !isMacApp);
 
   const homeView = () => {
     if (job.items.length > 0) {
@@ -115,10 +138,10 @@ function App() {
   };
 
   return (
-    <AppShell page={page} onNavigate={navigate}>
+    <AppShell page={page} onNavigate={navigate} onCommand={runCommand}>
       {page === "home" && homeView()}
       {page === "recents" && <RecentsPage />}
-      {page === "settings" && <SettingsPage />}
+      {page === "settings" && <SettingsPage tab={settingsTab} onTabChange={setSettingsTab} />}
       {dragging && (
         <DropOverlay plan={planDrop(dragging, selection?.kind ?? null)} isBusy={job.isRunning} />
       )}

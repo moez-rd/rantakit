@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use dikompres_core::{ImageFormat, ImageOptions, OutputFormat, Target};
+use rantakit_core::{ImageFormat, ImageOptions, OutputFormat, Target};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
@@ -95,7 +95,7 @@ fn compress_blocking(request: ImageRequest) -> Result<ImageResult> {
         },
         max_dimension: request.max_dimension,
     };
-    let compressed = dikompres_core::compress_image(&input, &opts)?;
+    let compressed = rantakit_core::compress_image(&input, &opts)?;
 
     let (format, ext) = match compressed.format {
         ImageFormat::Jpeg => ("jpeg", "jpg"),

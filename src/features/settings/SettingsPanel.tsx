@@ -1,16 +1,15 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { Link } from "@/components/ui/Link";
 import { Select, SelectItem } from "@/components/ui/Select";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
+import { LICENSE_URL, openExternal } from "@/lib/links";
 import { usePreferences, ZOOM_LEVELS, type Language, type Theme } from "./preferences";
-
-const LICENSE_URL = "https://www.gnu.org/licenses/agpl-3.0.html";
+import type { SettingsTab } from "./settingsWindow";
 
 function Row({ label, description, children }: { label: string; description?: string; children: ReactNode }) {
   return (
@@ -86,27 +85,30 @@ function AboutTab() {
     if (isTauri()) getVersion().then(setVersion).catch(() => {});
   }, []);
 
-  const open = (url: string) => (isTauri() ? openUrl(url) : window.open(url, "_blank"));
-
   return (
     <div className="flex flex-col items-center gap-3 py-6 text-center">
-      <img src="/dikompres.svg" alt="" className="size-16" />
+      <img src="/rantakit.svg" alt="" className="size-16" />
       <div className="flex flex-col">
-        <span className="text-lg font-semibold">Dikompres</span>
+        <span className="text-lg font-semibold">Rantakit</span>
         <span className="text-sm text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
       </div>
       <p className="max-w-xs text-sm">Kompres berkas, tetap di perangkatmu.</p>
       <p className="max-w-xs text-xs text-muted">
         Perangkat lunak bebas di bawah lisensi AGPL-3.0-or-later.{" "}
-        <Link onPress={() => open(LICENSE_URL)}>Lihat lisensi</Link>
+        <Link onPress={() => openExternal(LICENSE_URL)}>Lihat lisensi</Link>
       </p>
     </div>
   );
 }
 
-export function SettingsPanel() {
+interface SettingsPanelProps {
+  tab: SettingsTab;
+  onTabChange: (tab: SettingsTab) => void;
+}
+
+export function SettingsPanel({ tab, onTabChange }: SettingsPanelProps) {
   return (
-    <Tabs>
+    <Tabs selectedKey={tab} onSelectionChange={(key) => onTabChange(key as SettingsTab)}>
       <TabList aria-label="Pengaturan">
         <Tab id="general">Umum</Tab>
         <Tab id="about">Tentang</Tab>

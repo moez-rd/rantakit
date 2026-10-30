@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="public/dikompres.svg" width="128" height="128" alt="Dikompres" />
-  <h1>Dikompres</h1>
+  <img src="public/rantakit.svg" width="128" height="128" alt="Rantakit" />
+  <h1>Rantakit</h1>
 
   <p><strong>Compress your files on your device. No uploads, no internet, no bloat.</strong></p>
 
@@ -17,7 +17,7 @@
 
 ---
 
-Dikompres is an open-source desktop app for compressing images and PDFs, built with Tauri 2, Rust and React 19. Everything runs locally: files never leave your device, and the app works without an internet connection. No account, no telemetry.
+Rantakit is an open-source desktop app for compressing images and PDFs, built with Tauri 2, Rust and React 19. Everything runs locally: files never leave your device, and the app works without an internet connection. No account, no telemetry.
 
 ## Features
 
@@ -34,7 +34,7 @@ Dikompres is an open-source desktop app for compressing images and PDFs, built w
 ### Images
 
 - **JPG and PNG** input
-- **Quality or target size:** pick a quality from 1 to 100, or set a maximum size per image and let Dikompres find the best quality that fits
+- **Quality or target size:** pick a quality from 1 to 100, or set a maximum size per image and let Rantakit find the best quality that fits
 - **Convert** between JPG and PNG
 - **Resize** to a maximum longest side (4K, Full HD, …)
 - **EXIF orientation** is applied, so rotated phone photos stay upright
@@ -84,7 +84,7 @@ cargo clippy --workspace --all-targets
 ## Project structure
 
 ```
-crates/dikompres_core/   compression engine (images and PDF), no Tauri dependency
+crates/rantakit_core/   compression engine (images and PDF), no Tauri dependency
 src-tauri/               desktop app: commands, history, native menu
 src/                     React frontend
 ```
@@ -99,4 +99,4 @@ Issues and pull requests are welcome.
 
 ## License
 
-Dikompres is free software, licensed under the [GNU Affero General Public License v3.0 or later](LICENSE) (`AGPL-3.0-or-later`).
+Rantakit is free software, licensed under the [GNU Affero General Public License v3.0 or later](LICENSE) (`AGPL-3.0-or-later`).

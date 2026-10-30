@@ -1,7 +1,7 @@
 mod commands;
 mod error;
 mod history;
-#[cfg(desktop)]
+#[cfg(target_os = "macos")]
 mod menu;
 
 use tauri::Manager;
@@ -17,16 +17,9 @@ pub fn run() {
             Ok(())
         });
 
-    #[cfg(desktop)]
-    let builder = builder
-        .menu(menu::build)
-        .on_menu_event(menu::handle_event)
-        // Windows and Linux attach the app menu to every window; settings doesn't need it.
-        .on_page_load(|webview, _| {
-            if webview.label() == "settings" {
-                let _ = webview.window().remove_menu();
-            }
-        });
+    // Only macOS gets a native menu bar; Windows and Linux use the in-app menu.
+    #[cfg(target_os = "macos")]
+    let builder = builder.menu(menu::build).on_menu_event(menu::handle_event);
 
     builder
         .invoke_handler(tauri::generate_handler![

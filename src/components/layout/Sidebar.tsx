@@ -1,6 +1,9 @@
 import { Link } from "react-aria-components";
 import { tv } from "tailwind-variants";
+import type { AppCommand } from "@/lib/appCommands";
+import { isMacApp } from "@/lib/platform";
 import { focusRing } from "@/lib/react-aria-utils";
+import { AppMenu } from "./AppMenu";
 import { MAIN_NAV, SETTINGS_NAV, type NavItem, type Page } from "./navigation";
 
 const navLink = tv({
@@ -17,9 +20,10 @@ const navLink = tv({
 interface SidebarProps {
   page: Page;
   onNavigate: (page: Page) => void;
+  onCommand: (command: AppCommand) => void;
 }
 
-export function Sidebar({ page, onNavigate }: SidebarProps) {
+export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
   const item = ({ id, label, icon: Icon }: NavItem) => (
     <Link
       key={id}
@@ -34,9 +38,11 @@ export function Sidebar({ page, onNavigate }: SidebarProps) {
 
   return (
     <nav aria-label="Navigasi utama" className="hidden w-52 shrink-0 flex-col gap-1 p-3 md:flex">
-      <div className="mb-4 flex items-center gap-2 px-2 pt-1">
-        <img src="/dikompres.svg" alt="" className="size-7" />
-        <span className="font-semibold">Dikompres</span>
+      <div className="mb-4 flex items-center gap-2 ps-2 pt-1">
+        <img src="/rantakit.svg" alt="" className="size-7" />
+        <span className="flex-1 font-semibold">Rantakit</span>
+        {/* macOS has these in the menu bar. */}
+        {!isMacApp && <AppMenu onCommand={onCommand} />}
       </div>
       {MAIN_NAV.map(item)}
       <div className="mt-auto">{item(SETTINGS_NAV)}</div>

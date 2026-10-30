@@ -7,7 +7,7 @@ pub enum Error {
     Io(#[from] std::io::Error),
 
     #[error(transparent)]
-    Core(#[from] dikompres_core::Error),
+    Core(#[from] rantakit_core::Error),
 
     #[error(transparent)]
     Tauri(#[from] tauri::Error),
@@ -15,7 +15,7 @@ pub enum Error {
     #[error(transparent)]
     Json(#[from] serde_json::Error),
 
-    #[error("history was saved by a newer version of Dikompres (format {0})")]
+    #[error("history was saved by a newer version of Rantakit (format {0})")]
     NewerHistory(u32),
 }
 

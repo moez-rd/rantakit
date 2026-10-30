@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn adds_suffix_and_skips_taken_names() {
-        let dir = std::env::temp_dir().join("dikompres-output-path-test");
+        let dir = std::env::temp_dir().join("rantakit-output-path-test");
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         let input = dir.join("photo.png");

@@ -148,7 +148,7 @@ mod tests {
     }
 
     fn temp_history(name: &str) -> (History, PathBuf) {
-        let dir = std::env::temp_dir().join(format!("dikompres-history-{name}"));
+        let dir = std::env::temp_dir().join(format!("rantakit-history-{name}"));
         let _ = fs::remove_dir_all(&dir);
         (History::new(dir.join("history.json")), dir)
     }

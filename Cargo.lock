@@ -861,29 +861,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dikompres"
-version = "0.1.0"
-dependencies = [
- "dikompres_core",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "dikompres_core"
-version = "0.1.0"
-dependencies = [
- "image",
- "lopdf",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "dirs"
 version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2972,6 +2949,29 @@ name = "rangemap"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a611d15b50743feb4c76b7d03edcb0e64f399c26961e4efe6975bc398be6aa3d"
+
+[[package]]
+name = "rantakit"
+version = "0.1.0"
+dependencies = [
+ "rantakit_core",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-opener",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "rantakit_core"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "lopdf",
+ "thiserror 2.0.21",
+]
 
 [[package]]
 name = "raw-window-handle"

@@ -1,5 +1,8 @@
-//! Native application menu. Links are opened here; the other items are
-//! forwarded to the main window as a `menu` event carrying the item id.
+//! Native menu bar, macOS only. Windows and Linux get an in-app menu instead,
+//! see `src/components/layout/AppMenu.tsx`.
+//!
+//! Links are opened here; the other items are forwarded to the main window as
+//! a `menu` event carrying the item id.
 
 use tauri::menu::{AboutMetadata, Menu, MenuEvent, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{AppHandle, Emitter, Runtime};
@@ -21,17 +24,32 @@ const LICENSE_URL: &str = "https://www.gnu.org/licenses/agpl-3.0.html";
 pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let about = PredefinedMenuItem::about(
         app,
-        Some("Tentang Dikompres"),
+        Some("Tentang Rantakit"),
         Some(AboutMetadata {
-            name: Some("Dikompres".into()),
+            name: Some("Rantakit".into()),
             version: Some(app.package_info().version.to_string()),
             comments: Some("Kompres berkas, tetap di perangkatmu.".into()),
             license: Some("AGPL-3.0-or-later".into()),
             ..Default::default()
         }),
     )?;
-    let quit = PredefinedMenuItem::quit(app, Some("Keluar"))?;
-    let settings = MenuItem::with_id(app, OPEN_SETTINGS, "Pengaturan…", true, Some("CmdOrCtrl+,"))?;
+
+    let app_menu = Submenu::with_items(
+        app,
+        "Rantakit",
+        true,
+        &[
+            &about,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, OPEN_SETTINGS, "Pengaturan…", true, Some("CmdOrCtrl+,"))?,
+            &PredefinedMenuItem::separator(app)?,
+            &PredefinedMenuItem::hide(app, Some("Sembunyikan Rantakit"))?,
+            &PredefinedMenuItem::hide_others(app, Some("Sembunyikan lainnya"))?,
+            &PredefinedMenuItem::show_all(app, Some("Tampilkan semua"))?,
+            &PredefinedMenuItem::separator(app)?,
+            &PredefinedMenuItem::quit(app, Some("Keluar dari Rantakit"))?,
+        ],
+    )?;
 
     let file = Submenu::with_items(
         app,
@@ -43,7 +61,7 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         ],
     )?;
 
-    // Needed so copy/paste shortcuts work inside text fields, especially on macOS.
+    // Without these, copy and paste shortcuts don't work in text fields on macOS.
     let edit = Submenu::with_items(
         app,
         "Edit",
@@ -66,6 +84,19 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         ],
     )?;
 
+    // Gives Cmd+M and Cmd+W their usual meaning.
+    let window = Submenu::with_items(
+        app,
+        "Jendela",
+        true,
+        &[
+            &PredefinedMenuItem::minimize(app, Some("Perkecil"))?,
+            &PredefinedMenuItem::maximize(app, Some("Perbesar"))?,
+            &PredefinedMenuItem::separator(app)?,
+            &PredefinedMenuItem::close_window(app, Some("Tutup jendela"))?,
+        ],
+    )?;
+
     let help = Submenu::with_items(
         app,
         "Bantuan",
@@ -76,35 +107,7 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         ],
     )?;
 
-    // macOS puts About and Quit in the app menu; other platforms keep them in File and Help.
-    #[cfg(target_os = "macos")]
-    {
-        let app_menu = Submenu::with_items(
-            app,
-            "Dikompres",
-            true,
-            &[
-                &about,
-                &PredefinedMenuItem::separator(app)?,
-                &settings,
-                &PredefinedMenuItem::separator(app)?,
-                &quit,
-            ],
-        )?;
-        Menu::with_items(app, &[&app_menu, &file, &edit, &view, &help])
-    }
-
-    #[cfg(not(target_os = "macos"))]
-    {
-        file.append_items(&[
-            &PredefinedMenuItem::separator(app)?,
-            &settings,
-            &PredefinedMenuItem::separator(app)?,
-            &quit,
-        ])?;
-        help.append_items(&[&PredefinedMenuItem::separator(app)?, &about])?;
-        Menu::with_items(app, &[&file, &edit, &view, &help])
-    }
+    Menu::with_items(app, &[&app_menu, &file, &edit, &view, &window, &help])
 }
 
 pub fn handle_event<R: Runtime>(app: &AppHandle<R>, event: MenuEvent) {

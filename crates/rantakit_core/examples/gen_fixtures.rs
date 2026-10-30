@@ -1,7 +1,7 @@
 //! Generate synthetic test images in `tests/fixtures/`.
 //!
 //! Run from the workspace root:
-//!     cargo run -p dikompres_core --example gen_fixtures
+//!     cargo run -p rantakit_core --example gen_fixtures
 
 use std::fs;
 use std::path::Path;

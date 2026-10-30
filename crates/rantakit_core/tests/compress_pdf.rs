@@ -1,4 +1,4 @@
-use dikompres_core::{Error, PdfOptions, compress_pdf};
+use rantakit_core::{Error, PdfOptions, compress_pdf};
 use lopdf::{Document, Object, Stream, dictionary};
 
 const PHOTO: &[u8] = include_bytes!("fixtures/photo.jpg");

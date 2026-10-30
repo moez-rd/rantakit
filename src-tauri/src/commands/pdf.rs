@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use dikompres_core::PdfOptions;
+use rantakit_core::PdfOptions;
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
@@ -72,7 +72,7 @@ fn compress_blocking(request: PdfRequest) -> Result<PdfResult> {
         quality: request.quality,
         max_dimension: request.max_dimension,
     };
-    let compressed = dikompres_core::compress_pdf(&input, &opts)?;
+    let compressed = rantakit_core::compress_pdf(&input, &opts)?;
 
     let output_path = output_path(&request.path, "pdf");
     fs::write(&output_path, &compressed.bytes)?;
