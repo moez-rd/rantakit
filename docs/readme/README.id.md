@@ -43,7 +43,22 @@ Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneks
 
 ## Instalasi
 
-Belum ada rilis. Untuk sementara, [build dari kode sumber](#build-dari-kode-sumber).
+Unduh versi terbaru dari [halaman Releases](https://github.com/moez-rd/rantakit/releases).
+
+| OS | Berkas |
+|---|---|
+| Windows | `Rantakit_<versi>_x64-setup.exe` (atau `.msi`) |
+| Debian, Ubuntu | `Rantakit_<versi>_amd64.deb` |
+| Fedora, openSUSE | `Rantakit-<versi>-1.x86_64.rpm` |
+| Distro Linux lain | `Rantakit_<versi>_amd64.AppImage` |
+
+**Windows:** installer belum ditandatangani (*code signing*), jadi Windows SmartScreen mungkin menampilkan "Windows protected your PC". Klik **More info**, lalu **Run anyway**.
+
+**Linux (.deb):** `sudo apt install ./Rantakit_<versi>_amd64.deb`
+
+**Linux (AppImage):** jalankan `chmod +x` pada berkasnya, lalu buka. Di Ubuntu 22.04 ke atas, AppImage juga butuh `libfuse2` (`sudo apt install libfuse2`).
+
+macOS belum ada rilis. Kamu juga bisa [build dari kode sumber](#build-dari-kode-sumber).
 
 ## Build dari kode sumber
 

@@ -44,7 +44,22 @@ Everything runs on your device. That means it works with no internet connection.
 
 ## Install
 
-There is no release yet. For now, [build from source](#build-from-source).
+Download the latest version from the [Releases page](https://github.com/moez-rd/rantakit/releases).
+
+| OS | File |
+|---|---|
+| Windows | `Rantakit_<version>_x64-setup.exe` (or the `.msi`) |
+| Debian, Ubuntu | `Rantakit_<version>_amd64.deb` |
+| Fedora, openSUSE | `Rantakit-<version>-1.x86_64.rpm` |
+| Other Linux distros | `Rantakit_<version>_amd64.AppImage` |
+
+**Windows:** the installer is not code-signed yet, so Windows SmartScreen may show "Windows protected your PC". Click **More info**, then **Run anyway**.
+
+**Linux (.deb):** `sudo apt install ./Rantakit_<version>_amd64.deb`
+
+**Linux (AppImage):** run `chmod +x` on the file, then open it. On Ubuntu 22.04 and newer, AppImages also need `libfuse2` (`sudo apt install libfuse2`).
+
+macOS has not have release yet. You can also [build from source](#build-from-source).
 
 ## Build from source
 
