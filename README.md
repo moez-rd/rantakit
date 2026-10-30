@@ -6,7 +6,7 @@
 
   <p>
     <img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="license" />
-    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="platform" />
+    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey" alt="platform" />
   </p>
 </div>
 
@@ -35,7 +35,7 @@ Everything runs on your device. That means it works with no internet connection.
 | Compress audio           | Not implemented yet | Batch processing         | Preview             |
 | Compress office document | Not implemented yet | History of recent jobs   | Preview             |
 | Image format conversions | Preview (JPG ↔ PNG) | Windows support          | Preview             |
-| Images to PDF            | Not implemented yet | macOS support            | Preview             |
+| Images to PDF            | Not implemented yet | macOS support            | Not implemented yet |
 | PDF to images            | Not implemented yet | Linux support            | Preview             |
 | Merge PDFs               | Not implemented yet | Android support          | Not implemented yet |
 | Split PDFs               | Not implemented yet | iOS support              | Not implemented yet |

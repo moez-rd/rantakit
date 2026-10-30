@@ -3,10 +3,10 @@
 use std::path::{Path, PathBuf};
 
 /// Appended to the file name of every compressed copy.
-const OUTPUT_SUFFIX: &str = "-dikompres";
+const OUTPUT_SUFFIX: &str = "-rantakit";
 
-/// `photo.jpg` → `photo-dikompres.<ext>` next to the input, then
-/// `photo-dikompres-2.<ext>`, … so an existing file is never overwritten.
+/// `photo.jpg` → `photo-rantakit.<ext>` next to the input, then
+/// `photo-rantakit-2.<ext>`, … so an existing file is never overwritten.
 pub fn output_path(input: &Path, ext: &str) -> PathBuf {
     let stem = input.file_stem().unwrap_or_default().to_string_lossy();
     let dir = input.parent().unwrap_or(Path::new(""));
@@ -33,10 +33,10 @@ mod tests {
         fs::create_dir_all(&dir).unwrap();
         let input = dir.join("photo.png");
 
-        assert_eq!(output_path(&input, "jpg"), dir.join("photo-dikompres.jpg"));
+        assert_eq!(output_path(&input, "jpg"), dir.join("photo-rantakit.jpg"));
 
-        fs::write(dir.join("photo-dikompres.jpg"), b"").unwrap();
-        assert_eq!(output_path(&input, "jpg"), dir.join("photo-dikompres-2.jpg"));
+        fs::write(dir.join("photo-rantakit.jpg"), b"").unwrap();
+        assert_eq!(output_path(&input, "jpg"), dir.join("photo-rantakit-2.jpg"));
 
         fs::remove_dir_all(&dir).unwrap();
     }

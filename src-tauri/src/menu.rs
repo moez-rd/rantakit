@@ -18,7 +18,7 @@ pub const OPEN_SETTINGS: &str = "open_settings";
 
 /// Event the main window listens to for the items it handles.
 const MENU_EVENT: &str = "menu";
-const SOURCE_URL: &str = "https://github.com/moez-rd/dikompres";
+const SOURCE_URL: &str = "https://github.com/moez-rd/rantakit";
 const LICENSE_URL: &str = "https://www.gnu.org/licenses/agpl-3.0.html";
 
 pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {

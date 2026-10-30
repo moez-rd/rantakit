@@ -53,7 +53,7 @@ pub struct ImageResult {
     pub quality: Option<u8>,
 }
 
-/// Compress one image and save it next to the original as `<name>-dikompres.<ext>`.
+/// Compress one image and save it next to the original as `<name>-rantakit.<ext>`.
 /// The original is never overwritten. Successful runs are added to the history.
 #[tauri::command]
 pub async fn compress_image(

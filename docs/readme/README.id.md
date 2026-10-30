@@ -6,7 +6,7 @@
 
   <p>
     <img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="lisensi" />
-    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="platform" />
+    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey" alt="platform" />
   </p>
 </div>
 
@@ -35,7 +35,7 @@ Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneks
 | Kompres audio          | Belum tersedia        | Proses banyak berkas sekaligus | Pratinjau      |
 | Kompres dokumen Office | Belum tersedia        | Riwayat proses terbaru         | Pratinjau      |
 | Konversi format gambar | Pratinjau (JPG ↔ PNG) | Dukungan Windows               | Pratinjau      |
-| Gambar ke PDF          | Belum tersedia        | Dukungan macOS                 | Pratinjau      |
+| Gambar ke PDF          | Belum tersedia        | Dukungan macOS                 | Belum tersedia |
 | PDF ke gambar          | Belum tersedia        | Dukungan Linux                 | Pratinjau      |
 | Gabung PDF             | Belum tersedia        | Dukungan Android               | Belum tersedia |
 | Pisah PDF              | Belum tersedia        | Dukungan iOS                   | Belum tersedia |

@@ -23,7 +23,7 @@ function parse(stored: unknown): PdfSettings {
 
 /** PDF settings that are remembered for the next batch. */
 export function usePdfSettings() {
-  return useStoredState("dikompres.pdfSettings", parse);
+  return useStoredState("rantakit.pdfSettings", parse);
 }
 
 export function toPdfRequest(path: string, settings: PdfSettings): PdfRequest {

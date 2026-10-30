@@ -41,7 +41,7 @@ function parse(stored: unknown): ImageSettings {
 
 /** Image settings that are remembered for the next batch. */
 export function useImageSettings() {
-  return useStoredState("dikompres.imageSettings", parse);
+  return useStoredState("rantakit.imageSettings", parse);
 }
 
 export function toImageRequest(path: string, settings: ImageSettings): ImageRequest {

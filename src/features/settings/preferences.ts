@@ -14,8 +14,8 @@ export interface Preferences {
 
 export const ZOOM_LEVELS = [0.8, 0.9, 1, 1.1, 1.25, 1.5];
 
-const STORAGE_KEY = "dikompres.preferences";
-const CHANGE_EVENT = "dikompres:preferences";
+const STORAGE_KEY = "rantakit.preferences";
+const CHANGE_EVENT = "rantakit:preferences";
 const DEFAULTS: Preferences = { theme: "system", zoom: 1, language: "id" };
 
 export function loadPreferences(): Preferences {

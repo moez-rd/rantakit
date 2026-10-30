@@ -26,6 +26,13 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "moez-rd",
+    "copyright": "Copyright © 2026 moez-rd",
+    "category": "Utility",
+    "license": "AGPL-3.0-or-later",
+    "homepage": "https://github.com/moez-rd/rantakit",
+    "shortDescription": "Free, open-source file toolkit that works offline",
+    "longDescription": "Rantakit keeps your file tools in one place: compress files, convert formats, work with PDFs, scan documents and extract text from images. Everything runs on your device, so it works without an internet connection.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

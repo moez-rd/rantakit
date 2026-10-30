@@ -40,7 +40,7 @@ pub struct PdfResult {
     pub images_recompressed: usize,
 }
 
-/// Compress one PDF and save it next to the original as `<name>-dikompres.pdf`.
+/// Compress one PDF and save it next to the original as `<name>-rantakit.pdf`.
 /// The original is never overwritten. Successful runs are added to the history.
 #[tauri::command]
 pub async fn compress_pdf(history: State<'_, History>, request: PdfRequest) -> Result<PdfResult> {

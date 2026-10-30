@@ -137,7 +137,7 @@ mod tests {
             id: id.into(),
             created_at: 0,
             input_path: "in.jpg".into(),
-            output_path: "in-dikompres.jpg".into(),
+            output_path: "in-rantakit.jpg".into(),
             original_bytes: 100,
             compressed_bytes: 50,
             format: "jpeg".into(),

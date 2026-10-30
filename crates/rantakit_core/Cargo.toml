@@ -1,6 +1,10 @@
 [package]
 name = "rantakit_core"
 version = "0.1.0"
+description = "Compression engine for Rantakit (images and PDF), no Tauri dependency"
+authors = ["moez-rd"]
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/moez-rd/rantakit"
 edition = "2024"
 
 [dependencies]
