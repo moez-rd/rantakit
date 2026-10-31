@@ -4,9 +4,12 @@
 
 This is the product and design plan for Rantakit: who it is for, what it does, what it will never do, how it looks and behaves on each platform, and how we know it is working. It deliberately says nothing about code architecture.
 
+Indonesian is the app's home language, so Tool names, UI text, and examples of what users type are quoted in Indonesian, with an English translation in brackets where they first appear.
+
 Related documents:
 
 - [GLOSSARY.md](GLOSSARY.md): the words we use (Tool, Task, Original, Result, Size limit, Preset, History, …)
+- [ROADMAP.md](ROADMAP.md): the order in which the Tools and platforms below are delivered
 - [ADR 0001](docs/adr/0001-files-never-leave-the-device.md): files never leave the device, and there is no telemetry
 - [ADR 0002](docs/adr/0002-free-forever-no-feature-gating.md): free forever, with no feature gating
 - [ADR 0003](docs/adr/0003-no-institution-presets.md): no built-in institution presets
@@ -25,7 +28,7 @@ These are the reasons Rantakit exists. Every decision below must keep them.
 
 | | Who | What they need from Rantakit |
 |---|---|---|
-| **Primary** | Everyday non-technical people: students, job and CPNS applicants, office and admin staff, small business owners. Today they use iLovePDF, Smallpdf, or random "kompres PDF online" sites. | Get a file *accepted somewhere*, without understanding file formats. |
+| **Primary** | Everyday non-technical people: students, job and CPNS (civil service) applicants, office and admin staff, small business owners. Today they use iLovePDF, Smallpdf, or random "kompres PDF online" (compress PDF online) sites. | Get a file *accepted somewhere*, without understanding file formats. |
 | **Secondary** | Privacy-sensitive professionals: legal, HR, healthcare, finance staff who handle confidential documents and are not allowed to upload them. | The same tools, with certainty that nothing leaves the device, and a little more control. Their needs set the quality bar. |
 | **Not a target** | Power users and developers. | They already have command-line tools. Designing for them would make Rantakit worse for the primary user. |
 
@@ -33,11 +36,11 @@ These are the reasons Rantakit exists. Every decision below must keep them.
 
 The five Jobs users hire Rantakit for, in priority order:
 
-1. **Make my file acceptable where I'm sending it.** A form or portal has a rule ("pas foto JPG, maks 200 KB", "ijazah PDF, maks 1 MB") or a chat app has a size limit.
-2. **Turn paper into a clean PDF.** Photograph a KTP, KK, ijazah, or receipt, crop and straighten it, save it as one PDF.
+1. **Make my file acceptable where I'm sending it.** A form or portal has a rule ("pas foto JPG, maks 200 KB" (ID photo, JPG, max 200 KB), "ijazah PDF, maks 1 MB" (diploma, PDF, max 1 MB)) or a chat app has a size limit.
+2. **Turn paper into a clean PDF.** Photograph a KTP (ID card), KK (family card), ijazah (diploma), or receipt, crop and straighten it, save it as one PDF.
 3. **Put documents together the way they're asked for.** Merge, split, extract, reorder, rotate, or delete pages.
 4. **Get the text out** of a photo or a scanned PDF.
-5. **Share it without it being misused.** Watermark an ID copy for one purpose ("Hanya untuk verifikasi Bank X, 31/10/2026"), remove location and camera info from photos, and later protect or redact PDFs.
+5. **Share it without it being misused.** Watermark an ID copy for one purpose ("Hanya untuk verifikasi Bank X, 31/10/2026" (Only for Bank X verification, 31/10/2026)), remove location and camera info from photos, and later protect or redact PDFs.
 
 ## 4. Tool catalogue
 
@@ -45,13 +48,13 @@ Tools are named with the words people search for (Kompres PDF, not invented name
 
 | Job | MVP | Later |
 |---|---|---|
-| 1. Make it acceptable | Kompres Foto, Kompres PDF (both with Size limit mode), convert photos (JPG, PNG, HEIC, WebP → JPG or PNG), resize photo | Compress video, audio, and office documents |
-| 2. Paper → PDF | **Android:** Scan Dokumen (camera, automatic edge detection, crop, straighten, clean up, multiple pages into one PDF). **Desktop:** JPG ke PDF, with crop and straighten | |
-| 3. Arrange documents | Gabung PDF, Pisah PDF, Atur Halaman PDF (reorder, rotate, delete, extract pages), PDF ke JPG | |
-| 4. Get text | | Ambil Teks dari Gambar/PDF, with Indonesian and English included in the app |
-| 5. Share safely | Beri Watermark (photos and PDFs), Hapus Info Lokasi (photo location and camera info) | Password-protect PDF, redaction, a simple drawn signature |
+| 1. Make it acceptable | Kompres Foto and Kompres PDF (compress photo, compress PDF; both with Size limit mode), convert photos (JPG, PNG, HEIC, WebP → JPG or PNG), resize photo, compress office documents (Word, Excel, PowerPoint), compress and convert audio, compress video, Word ke PDF (Word to PDF), Excel ke PDF (Excel to PDF) | |
+| 2. Paper → PDF | **All platforms:** JPG ke PDF (JPG to PDF), with crop and straighten. **Android:** Scan Dokumen (scan document: camera, automatic edge detection, crop, straighten, clean up, multiple pages into one PDF) | |
+| 3. Arrange documents | Gabung PDF (merge PDF), Pisah PDF (split PDF), Atur Halaman PDF (arrange PDF pages: reorder, rotate, delete, extract), PDF ke JPG (PDF to JPG) | |
+| 4. Get text | | Ambil Teks dari Gambar/PDF (get text from an image or PDF), with Indonesian and English included in the app |
+| 5. Share safely | Beri Watermark (add a watermark to photos and PDFs), Hapus Info Lokasi (remove location and camera info from photos) | Password-protect PDF, redaction, a simple drawn signature |
 
-HEIC is in the MVP because users often receive iPhone photos through WhatsApp or Drive. OCR (Job 4) comes in the first release after the MVP, because it carries the most risk: app size, accuracy for Indonesian, and speed on low-end phones.
+HEIC is in the MVP because users often receive iPhone photos through WhatsApp or Drive. The heavy formats (HEIC and WebP, office documents, audio, video, Word and Excel to PDF) are in the MVP only if they pass the size gate (see [App size](#app-size)). OCR (Job 4) comes in the first release after the MVP, because it carries the most risk: app size, accuracy for Indonesian, and speed on low-end phones.
 
 ## 5. Non-goals
 
@@ -65,7 +68,7 @@ Rantakit will not:
 - Offer cloud sync or accounts
 - Provide certified or legal e-signatures
 - Offer plugins or scripting for power users
-- Ship presets for institutions such as CPNS or LPDP ([ADR 0003](docs/adr/0003-no-institution-presets.md))
+- Ship presets for institutions such as CPNS (civil service recruitment) or LPDP (government scholarship) ([ADR 0003](docs/adr/0003-no-institution-presets.md))
 - Support macOS or iOS until there is a funded Apple developer account
 
 ## 6. UX rules
@@ -87,19 +90,20 @@ Every Tool, including community-contributed ones, is reviewed against these:
 - **The rule:** a word is fine if it appears in the user's world, and jargon if it only exists inside file tools. JPG, PNG, PDF, KB, and MB are fine, because portals use them. Quality percentages, DPI, pixel dimensions, lossless, EXIF, metadata, and OCR are jargon. The full list lives in [GLOSSARY.md](GLOSSARY.md).
 - **Tool names** use search vocabulary: "Kompres PDF", "Gabung PDF", "JPG ke PDF", "Scan Dokumen", "Ambil Teks dari Gambar", "Beri Watermark".
 - **Compression is controlled by outcome, not by a quality slider:**
-  - **Sesuaikan batas ukuran** (default): the user types the Size limit from the portal and Rantakit finds the best quality that fits. If the limit can't be reached, Rantakit says so and offers the next step ("Can only reach 240 KB. Also shrink the image dimensions?").
-  - **Kecilkan saja:** three choices, *Paling kecil*, *Seimbang*, *Paling jernih*.
+  - **Sesuaikan batas ukuran** (Fit a size limit, the default): the user types the Size limit from the portal and Rantakit finds the best quality that fits. If the limit can't be reached, Rantakit says so and offers the next step ("Can only reach 240 KB. Also shrink the image dimensions?").
+  - **Kecilkan saja** (Just make it smaller): three choices, *Paling kecil* (Smallest), *Seimbang* (Balanced), *Paling jernih* (Clearest).
 - **Advanced options** are collapsed in every Tool, every option has a safe default, and the app remembers whether the user left the section open.
 
 ### Size limits and Presets
 
 - The last 5 Size limits the user typed are offered as quick choices.
-- Users can save their own named Presets ("Pas foto CPNS: JPG, 200 KB").
+- Users can save their own named Presets ("Pas foto CPNS: JPG, 200 KB" (CPNS ID photo: JPG, 200 KB)).
 - Rantakit ships no institution presets.
 
 ### Ways into the app
 
-- **Tool-first (home screen):** "Terakhir dipakai" (Recent tools) above "Semua alat" (All tools). All tools are grouped by Job (*Kecilkan & Ubah*, *Scan*, *Atur PDF*, *Ambil Teks*, *Bagikan dengan Aman*), and a search box finds Tools by name ("kompres" finds Kompres PDF and Kompres Foto).
+- **Tool-first (home screen):** "Terakhir dipakai" (Recent tools) above "Semua alat" (All tools). All tools are grouped by Job (*Kecilkan & Ubah* (Shrink & Convert), *Scan*, *Atur PDF* (Arrange PDF), *Ambil Teks* (Get Text), *Bagikan dengan Aman* (Share Safely)), and a search box finds Tools by name ("kompres" (compress) finds Kompres PDF and Kompres Foto).
+- **Coming soon:** MVP Tools that are not built yet appear in All tools and in search, greyed out with a "Segera hadir" (Coming soon) badge. They cannot be tapped and show no message, a screen reader reads them as "Kompres Video, segera hadir", they follow the platform (Scan Dokumen only on Android), and they disappear once the Tool ships. Tools in the Later column are never shown.
 - **File-first:** drop files on the desktop window, or use **Share → Rantakit** on Android from WhatsApp, Gallery, or Files. Rantakit then shows only the Tools that fit those files. On Android this is expected to be the main way in.
 - **History ("Riwayat"):** past Tasks and their Results, to reopen or share again.
 
@@ -108,8 +112,8 @@ Every Tool, including community-contributed ones, is reviewed against these:
 Every Tool follows the same layout:
 
 1. **Files:** pick, drop, or share. Shows thumbnails, sizes, and page counts.
-2. **Options:** defaults already filled in, Advanced options collapsed, one main button ("Kompres", "Gabungkan").
-3. **Result:** before and after (size, preview), then **Open / Share / Show in folder**, then "Proses file lain".
+2. **Options:** defaults already filled in, Advanced options collapsed, one main button ("Kompres" (Compress), "Gabungkan" (Merge)).
+3. **Result:** before and after (size, preview), then **Open / Share / Show in folder**, then "Proses file lain" (Process another file).
 
 On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are stacked, and the Result is its own screen.
 
@@ -133,13 +137,13 @@ On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are st
 ### History
 
 - On by default; keeps the last 30 days.
-- **Hapus riwayat** clears it in one click. It never deletes Results, and the page says so plainly.
-- **Simpan riwayat** in Settings turns History off completely, for shared computers and privacy-sensitive users.
+- **Hapus riwayat** (Clear history) clears it in one click. It never deletes Results, and the page says so plainly.
+- **Simpan riwayat** (Keep history) in Settings turns History off completely, for shared computers and privacy-sensitive users.
 
 ### First launch and language
 
-- No onboarding tour, no sign-up, no questions. The app opens on the home screen with one quiet line: "Semua proses di perangkatmu. Tanpa internet." The first Tool is one tap away.
-- The language follows the operating system. Settings offers "Ikuti sistem" (default), Bahasa Indonesia, and English.
+- No onboarding tour, no sign-up, no questions. The app opens on the home screen with one quiet line: "Semua proses di perangkatmu. Tanpa internet." (Everything happens on your device. No internet.) The first Tool is one tap away.
+- The language follows the operating system. Settings offers "Ikuti sistem" (Follow system, the default), Bahasa Indonesia, and English.
 
 ## 7. Multiplatform design
 
@@ -175,11 +179,13 @@ The in-app update check is on by default, shows a quiet "update available" notic
 
 Keep the app as small as possible, because many users download it over prepaid mobile data. When a feature would make the app noticeably bigger, the lighter way to build it wins, even if it is slightly less clever. Indonesian and English language data are included; other languages are optional downloads the user asks for.
 
+**The size gate.** Before a heavy format (HEIC and WebP, office documents, audio, video, Word and Excel to PDF) is planned in detail, a throwaway prototype measures how much it adds to the installed app on each platform. A size budget is set from the measured size of v0.1.0. A format over budget moves to after 1.0 until a lighter way is found; it is never offered as an optional download ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)).
+
 ## 8. Design system
 
 ### Personality
 
-**Calm, trustworthy, warm, local.** Closer to a neat, friendly service counter than a flashy online converter full of ads. Lots of space, big clear buttons, no mascots, no decorative gradients. Reassurance ("File tetap di perangkatmu") appears quietly where it matters.
+**Calm, trustworthy, warm, local.** Closer to a neat, friendly service counter than a flashy online converter full of ads. Lots of space, big clear buttons, no mascots, no decorative gradients. Reassurance ("File tetap di perangkatmu" (Your files stay on your device)) appears quietly where it matters.
 
 ### Color
 
@@ -227,17 +233,18 @@ The app cannot measure anything itself ([ADR 0001](docs/adr/0001-files-never-lea
 ## 10. Open questions
 
 - Where in the app donations are mentioned (ADR 0002 says one quiet place; the place is not decided yet).
-- Whether to also publish on the Microsoft Store in addition to the SignPath-signed installer.
+- Distribution: when each channel opens, whether to also publish on the Microsoft Store, and whether 1.0 requires the stores.
+- The size budget, set after measuring v0.1.0.
 - Which additional OCR languages to offer as downloads first.
-- The exact dark-mode palette that pairs with teal and cream.
-- The Advanced options for each Tool.
+
+The dark-mode palette is decided in v0.2, and each Tool's Advanced options are decided at the start of its epic ([ROADMAP.md](ROADMAP.md)).
 
 ## 11. Changes from v0.1.0
 
 v0.1.0 was experimental. Moving to this plan means:
 
 - The main UI color changes from blue to teal, matching the icon.
-- The "Terbaru" page becomes **Riwayat** (History), and the home screen gains Recent tools and All tools.
+- The "Terbaru" (Latest) page becomes **Riwayat** (History), and the home screen gains Recent tools and All tools.
 - The 1–100 quality setting is replaced by Size limit and *Paling kecil / Seimbang / Paling jernih*, with the number moved to Advanced options.
 - Result names change from `name-rantakit.ext` to descriptive English suffixes.
 - English is added next to Indonesian, with a language choice in Settings.
