@@ -26,32 +26,32 @@ Everything runs on your device. That means it works with no internet connection.
 
 ## Features
 
-| Type                     | Status              | Type                     | Status              |
-| ------------------------ | ------------------- | ------------------------ | ------------------- |
-| Compress image           | Preview (JPG, PNG)  | Rotate PDF pages         | Not implemented yet |
-| Compress PDF             | Preview             | Reorder PDF pages        | Not implemented yet |
-| Compress GIF             | Not implemented yet | Capture documents        | Not implemented yet |
-| Compress video           | Not implemented yet | Extract text from images | Not implemented yet |
-| Compress audio           | Not implemented yet | Batch processing         | Preview             |
-| Compress office document | Not implemented yet | History of recent jobs   | Preview             |
-| Image format conversions | Preview (JPG ↔ PNG) | Windows support          | Preview             |
-| Images to PDF            | Not implemented yet | macOS support            | Not implemented yet |
-| PDF to images            | Not implemented yet | Linux support            | Preview             |
-| Merge PDFs               | Not implemented yet | Android support          | Not implemented yet |
-| Split PDFs               | Not implemented yet | iOS support              | Not implemented yet |
-| Extract PDF pages        | Not implemented yet |                          |                     |
+| Type                         | Status                | Type                         | Status                |
+| ---------------------------- | --------------------- | ---------------------------- | --------------------- |
+| **Compress image**           | 🧪 Preview (JPG, PNG)  | **Rotate PDF pages**         | ❌ Not implemented yet |
+| **Compress PDF**             | 🧪 Preview             | **Reorder PDF pages**        | ❌ Not implemented yet |
+| **Compress GIF**             | ❌ Not implemented yet | **Capture documents**        | ❌ Not implemented yet |
+| **Compress video**           | ❌ Not implemented yet | **Extract text from images** | ❌ Not implemented yet |
+| **Compress audio**           | ❌ Not implemented yet | **Batch processing**         | 🧪 Preview             |
+| **Compress office document** | ❌ Not implemented yet | **History of recent jobs**   | 🧪 Preview             |
+| **Image format conversions** | 🧪 Preview (JPG ↔ PNG) | **Windows support**          | 🧪 Preview             |
+| **Images to PDF**            | ❌ Not implemented yet | **macOS support**            | ❌ Not implemented yet |
+| **PDF to images**            | ❌ Not implemented yet | **Linux support**            | 🧪 Preview             |
+| **Merge PDFs**               | ❌ Not implemented yet | **Android support**          | ❌ Not implemented yet |
+| **Split PDFs**               | ❌ Not implemented yet | **iOS support**              | ❌ Not implemented yet |
+| **Extract PDF pages**        | ❌ Not implemented yet |                              |                       |
 
 
 ## Install
 
 Download the latest version from the [Releases page](https://github.com/moez-rd/rantakit/releases).
 
-| OS | File |
-|---|---|
-| Windows | `Rantakit_<version>_x64-setup.exe` (or the `.msi`) |
-| Debian, Ubuntu | `Rantakit_<version>_amd64.deb` |
-| Fedora, openSUSE | `Rantakit-<version>-1.x86_64.rpm` |
-| Other Linux distros | `Rantakit_<version>_amd64.AppImage` |
+| OS                  | File                                               |
+| ------------------- | -------------------------------------------------- |
+| Windows             | `Rantakit_<version>_x64-setup.exe` (or the `.msi`) |
+| Debian, Ubuntu      | `Rantakit_<version>_amd64.deb`                     |
+| Fedora, openSUSE    | `Rantakit-<version>-1.x86_64.rpm`                  |
+| Other Linux distros | `Rantakit_<version>_amd64.AppImage`                |
 
 **Windows:** the installer is not code-signed yet, so Windows SmartScreen may show "Windows protected your PC". Click **More info**, then **Run anyway**.
 

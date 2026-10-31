@@ -26,31 +26,31 @@ Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneks
 
 ## Fitur
 
-| Jenis                  | Status                | Jenis                          | Status         |
-| ---------------------- | --------------------- | ------------------------------ | -------------- |
-| Kompres gambar         | Pratinjau (JPG, PNG)  | Putar halaman PDF              | Belum tersedia |
-| Kompres PDF            | Pratinjau             | Urutkan ulang halaman PDF      | Belum tersedia |
-| Kompres GIF            | Belum tersedia        | Pindai dokumen                 | Belum tersedia |
-| Kompres video          | Belum tersedia        | Ambil teks dari gambar         | Belum tersedia |
-| Kompres audio          | Belum tersedia        | Proses banyak berkas sekaligus | Pratinjau      |
-| Kompres dokumen Office | Belum tersedia        | Riwayat proses terbaru         | Pratinjau      |
-| Konversi format gambar | Pratinjau (JPG ↔ PNG) | Dukungan Windows               | Pratinjau      |
-| Gambar ke PDF          | Belum tersedia        | Dukungan macOS                 | Belum tersedia |
-| PDF ke gambar          | Belum tersedia        | Dukungan Linux                 | Pratinjau      |
-| Gabung PDF             | Belum tersedia        | Dukungan Android               | Belum tersedia |
-| Pisah PDF              | Belum tersedia        | Dukungan iOS                   | Belum tersedia |
-| Ambil halaman PDF      | Belum tersedia        |                                |                |
+| Jenis                      | Status                  | Jenis                              | Status           |
+| -------------------------- | ----------------------- | ---------------------------------- | ---------------- |
+| **Kompres gambar**         | 🧪 Pratinjau (JPG, PNG)  | **Putar halaman PDF**              | ❌ Belum tersedia |
+| **Kompres PDF**            | 🧪 Pratinjau             | **Urutkan ulang halaman PDF**      | ❌ Belum tersedia |
+| **Kompres GIF**            | ❌ Belum tersedia        | **Pindai dokumen**                 | ❌ Belum tersedia |
+| **Kompres video**          | ❌ Belum tersedia        | **Ambil teks dari gambar**         | ❌ Belum tersedia |
+| **Kompres audio**          | ❌ Belum tersedia        | **Proses banyak berkas sekaligus** | 🧪 Pratinjau      |
+| **Kompres dokumen Office** | ❌ Belum tersedia        | **Riwayat proses terbaru**         | 🧪 Pratinjau      |
+| **Konversi format gambar** | 🧪 Pratinjau (JPG ↔ PNG) | **Dukungan Windows**               | 🧪 Pratinjau      |
+| **Gambar ke PDF**          | ❌ Belum tersedia        | **Dukungan macOS**                 | ❌ Belum tersedia |
+| **PDF ke gambar**          | ❌ Belum tersedia        | **Dukungan Linux**                 | 🧪 Pratinjau      |
+| **Gabung PDF**             | ❌ Belum tersedia        | **Dukungan Android**               | ❌ Belum tersedia |
+| **Pisah PDF**              | ❌ Belum tersedia        | **Dukungan iOS**                   | ❌ Belum tersedia |
+| **Ambil halaman PDF**      | ❌ Belum tersedia        |                                    |                  |
 
 ## Instalasi
 
 Unduh versi terbaru dari [halaman Releases](https://github.com/moez-rd/rantakit/releases).
 
-| OS | Berkas |
-|---|---|
-| Windows | `Rantakit_<versi>_x64-setup.exe` (atau `.msi`) |
-| Debian, Ubuntu | `Rantakit_<versi>_amd64.deb` |
-| Fedora, openSUSE | `Rantakit-<versi>-1.x86_64.rpm` |
-| Distro Linux lain | `Rantakit_<versi>_amd64.AppImage` |
+| OS                | Berkas                                         |
+| ----------------- | ---------------------------------------------- |
+| Windows           | `Rantakit_<versi>_x64-setup.exe` (atau `.msi`) |
+| Debian, Ubuntu    | `Rantakit_<versi>_amd64.deb`                   |
+| Fedora, openSUSE  | `Rantakit-<versi>-1.x86_64.rpm`                |
+| Distro Linux lain | `Rantakit_<versi>_amd64.AppImage`              |
 
 **Windows:** installer belum ditandatangani (*code signing*), jadi Windows SmartScreen mungkin menampilkan "Windows protected your PC". Klik **More info**, lalu **Run anyway**.
 
