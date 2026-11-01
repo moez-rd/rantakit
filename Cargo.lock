@@ -2991,6 +2991,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "rantakit-tasks"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "lopdf",
+ "rantakit-core",
+ "rantakit-image",
+ "rantakit-pdf",
+]
+
+[[package]]
 name = "raw-window-handle"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
