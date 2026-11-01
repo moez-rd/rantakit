@@ -1,15 +1,10 @@
-import { isInt, useStoredState } from "@/lib/storedState";
+import { useStoredState } from "@/lib/storedState";
+import { limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
 
-export type SizeMode = "quality" | "target";
 export type OutputFormat = "same" | "jpeg" | "png";
 
-export interface ImageSettings {
-  mode: SizeMode;
-  /** 1–100, used when `mode` is "quality". */
-  quality: number;
-  /** Per-image size limit in KB, used when `mode` is "target". */
-  targetKb: number;
+export interface ImageSettings extends ShrinkSettings {
   format: OutputFormat;
   /** Longest side in pixels; 0 keeps the original size. */
   maxDimension: number;
@@ -17,39 +12,26 @@ export interface ImageSettings {
 
 export const MAX_DIMENSIONS = [0, 3840, 2560, 1920, 1280];
 
-const DEFAULTS: ImageSettings = {
-  mode: "quality",
-  quality: 80,
-  targetKb: 500,
-  format: "same",
-  maxDimension: 0,
-};
-
 /** Falls back to the defaults for anything missing or invalid. */
 function parse(stored: unknown): ImageSettings {
   const s = (stored ?? {}) as Partial<Record<keyof ImageSettings, unknown>>;
   return {
-    mode: s.mode === "target" ? "target" : DEFAULTS.mode,
-    quality: isInt(s.quality, 1, 100) ? s.quality : DEFAULTS.quality,
-    targetKb: isInt(s.targetKb, 1, 1_000_000) ? s.targetKb : DEFAULTS.targetKb,
-    format: s.format === "jpeg" || s.format === "png" ? s.format : DEFAULTS.format,
-    maxDimension: MAX_DIMENSIONS.includes(s.maxDimension as number)
-      ? (s.maxDimension as number)
-      : DEFAULTS.maxDimension,
+    ...parseShrink(stored),
+    format: s.format === "jpeg" || s.format === "png" ? s.format : "same",
+    maxDimension: MAX_DIMENSIONS.includes(s.maxDimension as number) ? (s.maxDimension as number) : 0,
   };
 }
 
-/** Image settings that are remembered for the next batch. */
+/** Kompres Foto's options, remembered for the next visit. */
 export function useImageSettings() {
-  return useStoredState("rantakit.imageSettings", parse);
+  return useStoredState("rantakit.kompresFoto", parse);
 }
 
 export function toImageOptions(settings: ImageSettings): ToolOptions {
   return {
     tool: "kompres-foto",
     format: settings.format === "same" ? undefined : settings.format,
-    quality: settings.quality,
-    maxBytes: settings.mode === "target" ? settings.targetKb * 1024 : undefined,
+    limit: limitBytes(settings),
     maxDimension: settings.maxDimension || undefined,
   };
 }
@@ -62,7 +44,7 @@ const SHRINK_STEPS = [1920, 1280, 960, 640];
  * images. Null when the options have no Size limit or can't shrink further.
  */
 export function withSmallerImages(options: ToolOptions): ToolOptions | null {
-  if (options.tool !== "kompres-foto" || options.maxBytes === undefined) return null;
+  if (options.tool !== "kompres-foto" || options.limit === undefined) return null;
   const current = options.maxDimension ?? Infinity;
   const next = SHRINK_STEPS.find((side) => side < current);
   return next === undefined ? null : { ...options, maxDimension: next };

@@ -1,35 +1,30 @@
-import { isInt, useStoredState } from "@/lib/storedState";
+import { useStoredState } from "@/lib/storedState";
 import { MAX_DIMENSIONS } from "./imageSettings";
+import { limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
 
-export interface PdfSettings {
-  /** JPEG quality for images inside the PDF, 1–100. */
-  quality: number;
+export interface PdfSettings extends ShrinkSettings {
   /** Longest side of images inside the PDF; 0 keeps them as they are. */
   maxDimension: number;
 }
 
-const DEFAULTS: PdfSettings = { quality: 70, maxDimension: 0 };
-
 function parse(stored: unknown): PdfSettings {
   const s = (stored ?? {}) as Partial<Record<keyof PdfSettings, unknown>>;
   return {
-    quality: isInt(s.quality, 1, 100) ? s.quality : DEFAULTS.quality,
-    maxDimension: MAX_DIMENSIONS.includes(s.maxDimension as number)
-      ? (s.maxDimension as number)
-      : DEFAULTS.maxDimension,
+    ...parseShrink(stored),
+    maxDimension: MAX_DIMENSIONS.includes(s.maxDimension as number) ? (s.maxDimension as number) : 0,
   };
 }
 
-/** PDF settings that are remembered for the next batch. */
+/** Kompres PDF's options, remembered for the next visit. */
 export function usePdfSettings() {
-  return useStoredState("rantakit.pdfSettings", parse);
+  return useStoredState("rantakit.kompresPdf", parse);
 }
 
 export function toPdfOptions(settings: PdfSettings): ToolOptions {
   return {
     tool: "kompres-pdf",
-    quality: settings.quality,
+    limit: limitBytes(settings),
     maxDimension: settings.maxDimension || undefined,
   };
 }

@@ -80,6 +80,7 @@ fn kompres_pdf() -> ToolOptions {
     ToolOptions::KompresPdf(PdfOptions {
         quality: 50,
         max_dimension: None,
+        max_bytes: None,
     })
 }
 

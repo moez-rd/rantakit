@@ -312,6 +312,7 @@ mod tests {
             tool: ToolOptions::KompresPdf(crate::PdfOptions {
                 quality: 150,
                 max_dimension: None,
+                max_bytes: None,
             }),
             originals: vec!["a.pdf".into(), "b.pdf".into(), "c.pdf".into()],
             results_folder: None,

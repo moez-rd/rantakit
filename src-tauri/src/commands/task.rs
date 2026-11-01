@@ -4,8 +4,8 @@ use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
-    CancelToken, ErrorKind, FileOutcome, History, ImageFormat, ImageOptions, OutputFormat,
-    PdfOptions, Progress, Target, Task, TaskEvent, ToolOptions, run_task,
+    CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, OutputFormat, Progress,
+    Task, TaskEvent, ToolOptions, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -55,20 +55,12 @@ pub enum OptionsRequest {
         /// Output format; `None` keeps the Original's format.
         #[serde(default)]
         format: Option<Format>,
-        #[serde(default = "default_photo_quality")]
-        quality: u8,
-        /// When set, aim for this Size limit instead of a fixed quality.
-        #[serde(default)]
-        max_bytes: Option<u64>,
-        #[serde(default)]
-        max_dimension: Option<u32>,
+        #[serde(flatten)]
+        compression: CompressionRequest,
     },
     KompresPdf {
-        /// JPEG quality for images inside the PDF.
-        #[serde(default = "default_pdf_quality")]
-        quality: u8,
-        #[serde(default)]
-        max_dimension: Option<u32>,
+        #[serde(flatten)]
+        compression: CompressionRequest,
     },
 }
 
@@ -79,12 +71,28 @@ pub enum Format {
     Png,
 }
 
-fn default_photo_quality() -> u8 {
-    80
+/// The compress Tools' Options; `rantakit_tasks::Compression` turns them into engine options.
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompressionRequest {
+    /// The Size limit in bytes; omit to compress without one.
+    #[serde(default)]
+    pub limit: Option<u64>,
+    /// The exact quality from Advanced options.
+    #[serde(default)]
+    pub quality: Option<u8>,
+    #[serde(default)]
+    pub max_dimension: Option<u32>,
 }
 
-fn default_pdf_quality() -> u8 {
-    70
+impl From<CompressionRequest> for Compression {
+    fn from(request: CompressionRequest) -> Self {
+        Self {
+            limit: request.limit,
+            quality: request.quality,
+            max_dimension: request.max_dimension,
+        }
+    }
 }
 
 impl From<OptionsRequest> for ToolOptions {
@@ -92,28 +100,15 @@ impl From<OptionsRequest> for ToolOptions {
         match request {
             OptionsRequest::KompresFoto {
                 format,
-                quality,
-                max_bytes,
-                max_dimension,
-            } => Self::KompresFoto(ImageOptions {
-                format: match format {
-                    None => OutputFormat::Same,
-                    Some(Format::Jpeg) => OutputFormat::To(ImageFormat::Jpeg),
-                    Some(Format::Png) => OutputFormat::To(ImageFormat::Png),
-                },
-                target: match max_bytes {
-                    Some(bytes) => Target::MaxBytes(bytes),
-                    None => Target::Quality(quality),
-                },
-                max_dimension,
-            }),
-            OptionsRequest::KompresPdf {
-                quality,
-                max_dimension,
-            } => Self::KompresPdf(PdfOptions {
-                quality,
-                max_dimension,
-            }),
+                compression,
+            } => Self::KompresFoto(Compression::from(compression).photo(match format {
+                None => OutputFormat::Same,
+                Some(Format::Jpeg) => OutputFormat::To(ImageFormat::Jpeg),
+                Some(Format::Png) => OutputFormat::To(ImageFormat::Png),
+            })),
+            OptionsRequest::KompresPdf { compression } => {
+                Self::KompresPdf(Compression::from(compression).pdf())
+            }
         }
     }
 }
@@ -260,6 +255,7 @@ pub fn cancel_task(running: State<'_, RunningTasks>, id: u64) {
 
 #[cfg(test)]
 mod tests {
+    use rantakit_tasks::{ImageOptions, Target};
     use serde_json::json;
 
     use super::*;
@@ -267,7 +263,7 @@ mod tests {
     #[test]
     fn frontend_request_becomes_tool_options() {
         let request: TaskRequest = serde_json::from_value(json!({
-            "options": { "tool": "kompres-foto", "quality": 60, "maxBytes": 200000 },
+            "options": { "tool": "kompres-foto", "limit": 200000 },
             "paths": ["C:/Users/ani/ktp.jpg"],
         }))
         .unwrap();

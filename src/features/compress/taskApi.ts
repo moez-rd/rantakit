@@ -6,22 +6,24 @@ export type ToolOptions =
       tool: "kompres-foto";
       /** Output format; omit to keep the Original's format. */
       format?: "jpeg" | "png";
-      /** 1–100, defaults to 80 on the Rust side. */
+      /** The Size limit in bytes; omit to compress without one. */
+      limit?: number;
+      /** Exact quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
-      /** Aim for this Size limit instead of a fixed quality. */
-      maxBytes?: number;
       maxDimension?: number;
     }
   | {
       tool: "kompres-pdf";
-      /** JPEG quality for images inside the PDF, 1–100; defaults to 70 on the Rust side. */
+      /** The Size limit in bytes; omit to compress without one. */
+      limit?: number;
+      /** Exact image quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
       maxDimension?: number;
     };
 
 /** The Size limit in bytes these options aim for, if any. */
 export function limitOf(options: ToolOptions): number | undefined {
-  return options.tool === "kompres-foto" ? options.maxBytes : undefined;
+  return options.limit;
 }
 
 /** Mirrors `TaskRequest` in `src-tauri/src/commands/task.rs`. */

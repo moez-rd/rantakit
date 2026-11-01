@@ -1,3 +1,4 @@
+use std::io::Write;
 use std::path::Path;
 
 use ::image::codecs::jpeg::JpegEncoder;
@@ -11,15 +12,27 @@ use crate::resize::fit_within;
 
 const MAX_DECOMPRESSED_BYTES: usize = 256 * 1024 * 1024;
 
-/// Progress once the PDF is loaded, its images are done, and it is repacked.
+/// Progress once the PDF is loaded, its images are decoded, and it is repacked.
 const LOADED: f32 = 0.1;
-const IMAGES_DONE: f32 = 0.8;
+const DECODED: f32 = 0.3;
 const REPACKED: f32 = 0.9;
+
+/// Lowest image quality tried for a Size limit.
+const MIN_QUALITY: u8 = 10;
+
+/// Longest image sides tried, in order, when a Size limit can't be reached at
+/// the original resolution: 300, 200, 150, 100 and 72 dpi on an A4 page.
+const SHRINK_STEPS: [u32; 5] = [3508, 2339, 1754, 1170, 842];
 
 #[derive(Debug, Clone)]
 pub struct PdfOptions {
+    /// JPEG quality for images inside the PDF. With `max_bytes`, the highest
+    /// quality tried.
     pub quality: u8,
+    /// Longest side of images inside the PDF, in pixels.
     pub max_dimension: Option<u32>,
+    /// A Size limit: search image quality, then resolution, until the PDF fits.
+    pub max_bytes: Option<u64>,
 }
 
 #[derive(Debug, Clone)]
@@ -50,7 +63,7 @@ pub fn compress_pdf(
         max_decompressed_size: Some(MAX_DECOMPRESSED_BYTES),
         ..Default::default()
     };
-    let mut doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
+    let doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
     drop(original);
 
     if doc.was_encrypted() || doc.is_encrypted() {
@@ -58,43 +71,35 @@ pub fn compress_pdf(
     }
     tracker.step(LOADED)?;
 
-    let quality = opts.quality.clamp(1, 100);
-    let image_ids: Vec<ObjectId> = doc
+    let images = doc
         .objects
-        .iter()
-        .filter(|(_, object)| matches!(object, Object::Stream(stream) if is_image(stream)))
-        .map(|(id, _)| *id)
-        .collect();
-    let images = image_ids.len();
-    let mut images_recompressed = 0;
+        .values()
+        .filter(|object| matches!(object, Object::Stream(stream) if is_image(stream)))
+        .count();
+    let candidates = decode_images(&doc, &mut tracker)?;
+    let quality = opts.quality.clamp(1, 100);
 
-    for (done, id) in image_ids.iter().enumerate() {
-        tracker.step(LOADED + (IMAGES_DONE - LOADED) * done as f32 / images as f32)?;
-        let Some(Object::Stream(stream)) = doc.objects.get_mut(id) else {
-            continue;
-        };
-        if recompress_jpeg(stream, quality, opts.max_dimension) {
-            images_recompressed += 1;
+    let packed = match opts.max_bytes {
+        None => {
+            let packed = pack(doc, &candidates, quality, opts.max_dimension)?;
+            tracker.step(REPACKED)?;
+            packed
         }
-    }
-    tracker.step(IMAGES_DONE)?;
+        Some(limit) => fit_limit(
+            doc,
+            &candidates,
+            quality,
+            opts.max_dimension,
+            limit,
+            &mut tracker,
+        )?,
+    };
 
-    doc.prune_objects();
-    doc.compress();
-    tracker.step(REPACKED)?;
-
-    let save = SaveOptions::builder()
-        .use_object_streams(true)
-        .use_xref_streams(true)
-        .build();
-    let size = write_result(output, &mut tracker, |file| {
-        doc.save_with_options(file, save)
-    })?;
-
+    let size = write_result(output, &mut tracker, |file| file.write_all(&packed.bytes))?;
     Ok(CompressedPdf {
         size,
         images,
-        images_recompressed,
+        images_recompressed: packed.recompressed,
     })
 }
 
@@ -110,6 +115,145 @@ pub fn page_count(path: &Path) -> Result<usize> {
     };
     let doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
     Ok(doc.get_pages().len())
+}
+
+/// An image the engine can recompress, decoded once for every attempt.
+struct Candidate {
+    id: ObjectId,
+    image: DynamicImage,
+    gray: bool,
+    /// Masked images keep their size so the mask still lines up.
+    masked: bool,
+    original_len: usize,
+}
+
+fn decode_images(doc: &Document, tracker: &mut Tracker<'_>) -> Result<Vec<Candidate>> {
+    let ids: Vec<ObjectId> = doc
+        .objects
+        .iter()
+        .filter(|(_, object)| matches!(object, Object::Stream(stream) if is_image(stream)))
+        .map(|(id, _)| *id)
+        .collect();
+    let mut candidates = Vec::new();
+    for (done, id) in ids.iter().enumerate() {
+        tracker.step(LOADED + (DECODED - LOADED) * done as f32 / ids.len() as f32)?;
+        if let Some(Object::Stream(stream)) = doc.objects.get(id)
+            && let Some((image, gray)) = decode_jpeg(stream)
+        {
+            candidates.push(Candidate {
+                id: *id,
+                image,
+                gray,
+                masked: stream.dict.has(b"SMask") || stream.dict.has(b"Mask"),
+                original_len: stream.content.len(),
+            });
+        }
+    }
+    tracker.step(DECODED)?;
+    Ok(candidates)
+}
+
+struct Packed {
+    bytes: Vec<u8>,
+    recompressed: usize,
+}
+
+/// The whole PDF with every candidate re-encoded at `quality` and
+/// `max_dimension`, wherever that makes the image smaller.
+fn pack(
+    mut doc: Document,
+    candidates: &[Candidate],
+    quality: u8,
+    max_dimension: Option<u32>,
+) -> Result<Packed> {
+    let mut recompressed = 0;
+    for candidate in candidates {
+        let Some(Object::Stream(stream)) = doc.objects.get_mut(&candidate.id) else {
+            continue;
+        };
+        let image = match max_dimension {
+            Some(max) if !candidate.masked => fit_within(candidate.image.clone(), max),
+            _ => candidate.image.clone(),
+        };
+        let Some(bytes) = encode_jpeg(&image, quality, candidate.gray) else {
+            continue;
+        };
+        if bytes.len() >= candidate.original_len {
+            continue;
+        }
+        stream.dict.set("Width", image.width() as i64);
+        stream.dict.set("Height", image.height() as i64);
+        stream.dict.set("BitsPerComponent", 8);
+        stream.dict.remove(b"DecodeParms");
+        stream.set_content(bytes);
+        recompressed += 1;
+    }
+
+    doc.prune_objects();
+    doc.compress();
+    let save = SaveOptions::builder()
+        .use_object_streams(true)
+        .use_xref_streams(true)
+        .build();
+    let mut bytes = Vec::new();
+    doc.save_with_options(&mut bytes, save)
+        .map_err(|_| ErrorKind::Damaged)?;
+    Ok(Packed {
+        bytes,
+        recompressed,
+    })
+}
+
+/// The best quality that fits `limit`, at the original resolution first and
+/// then at each smaller step. Fails with the smallest size reached.
+fn fit_limit(
+    doc: Document,
+    candidates: &[Candidate],
+    max_quality: u8,
+    max_dimension: Option<u32>,
+    limit: u64,
+    tracker: &mut Tracker<'_>,
+) -> Result<Packed> {
+    let fits = |packed: &Packed| packed.bytes.len() as u64 <= limit;
+    let min_quality = MIN_QUALITY.min(max_quality);
+    let mut sides = vec![max_dimension];
+    sides.extend(
+        SHRINK_STEPS
+            .iter()
+            .filter(|&&side| max_dimension.is_none_or(|max| side < max))
+            .map(|&side| Some(side)),
+    );
+    // Without images to work on, every attempt gives the same file.
+    if candidates.is_empty() {
+        sides.truncate(1);
+    }
+
+    let mut best = u64::MAX;
+    for (step, side) in sides.iter().enumerate() {
+        tracker.step(DECODED + (REPACKED - DECODED) * step as f32 / sides.len() as f32)?;
+        let smallest = pack(doc.clone(), candidates, min_quality, *side)?;
+        best = best.min(smallest.bytes.len() as u64);
+        if !fits(&smallest) {
+            continue;
+        }
+
+        // The highest quality that still fits; `found` always fits at `low`.
+        let (mut low, mut high, mut found) = (min_quality, max_quality, smallest);
+        while low < high {
+            tracker.check()?;
+            let mid = low + (high - low).div_ceil(2);
+            let packed = pack(doc.clone(), candidates, mid, *side)?;
+            if fits(&packed) {
+                low = mid;
+                found = packed;
+            } else {
+                high = mid - 1;
+            }
+        }
+        tracker.step(REPACKED)?;
+        return Ok(found);
+    }
+    Err(ErrorKind::SizeLimitUnreachable { best })
 }
 
 /// PDF readers accept the `%PDF-` header anywhere in the first 1024 bytes.
@@ -133,44 +277,23 @@ fn is_image(stream: &Stream) -> bool {
     )
 }
 
-fn recompress_jpeg(stream: &mut Stream, quality: u8, max_dimension: Option<u32>) -> bool {
+/// The image as pixels, and whether it is gray, when it is a plain RGB or
+/// gray JPEG this engine knows how to re-encode.
+fn decode_jpeg(stream: &Stream) -> Option<(DynamicImage, bool)> {
     match stream.filters() {
         Ok(filters) if filters == [b"DCTDecode".as_slice()] => {}
-        _ => return false,
+        _ => return None,
     }
-
     let gray = match stream.dict.get(b"ColorSpace").and_then(Object::as_name) {
         Ok(b"DeviceRGB") => false,
         Ok(b"DeviceGray") => true,
-        _ => return false,
+        _ => return None,
     };
     if stream.dict.has(b"Decode") {
-        return false;
+        return None;
     }
-
-    let Ok(img) = ::image::load_from_memory_with_format(&stream.content, RawFormat::Jpeg) else {
-        return false;
-    };
-
-    let masked = stream.dict.has(b"SMask") || stream.dict.has(b"Mask");
-    let img = match max_dimension {
-        Some(max) if !masked => fit_within(img, max),
-        _ => img,
-    };
-
-    let Some(bytes) = encode_jpeg(&img, quality, gray) else {
-        return false;
-    };
-    if bytes.len() >= stream.content.len() {
-        return false;
-    }
-
-    stream.dict.set("Width", img.width() as i64);
-    stream.dict.set("Height", img.height() as i64);
-    stream.dict.set("BitsPerComponent", 8);
-    stream.dict.remove(b"DecodeParms");
-    stream.set_content(bytes);
-    true
+    let image = ::image::load_from_memory_with_format(&stream.content, RawFormat::Jpeg).ok()?;
+    Some((image, gray))
 }
 
 fn encode_jpeg(img: &DynamicImage, quality: u8, gray: bool) -> Option<Vec<u8>> {
