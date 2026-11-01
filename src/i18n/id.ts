@@ -78,6 +78,11 @@ export const id = {
   "home.recent": "Terakhir dipakai",
   "home.all": "Semua alat",
   "home.comingSoon": "Segera hadir",
+  "home.search": "Cari alat",
+  "home.search.placeholder": "Cari alat, misalnya “kompres”",
+  "home.search.clear": "Hapus pencarian",
+  "home.search.results": "Hasil pencarian",
+  "home.search.none": "Alat tidak ditemukan",
 
   // Files and Options
   "setup.selected": "{files} dipilih",
