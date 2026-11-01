@@ -1,4 +1,4 @@
-use rantakit_core::{Error, ImageFormat, ImageOptions, OutputFormat, Target, compress_image};
+use rantakit_image::{Error, ImageFormat, ImageOptions, OutputFormat, Target, compress_image};
 
 const PHOTO: &[u8] = include_bytes!("fixtures/photo.jpg");
 const TRANSPARENT: &[u8] = include_bytes!("fixtures/transparent.png");

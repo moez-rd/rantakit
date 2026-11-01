@@ -1,7 +1,7 @@
 [package]
-name = "rantakit_core"
+name = "rantakit-image"
 version = "0.1.0"
-description = "Compression engine for Rantakit (images and PDF), no Tauri dependency"
+description = "Image engine for Rantakit (JPG and PNG), no Tauri dependency"
 authors = ["moez-rd"]
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/moez-rd/rantakit"
@@ -9,5 +9,4 @@ edition = "2024"
 
 [dependencies]
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
-lopdf = { version = "0.46", default-features = false }
 thiserror = "2.0.21"

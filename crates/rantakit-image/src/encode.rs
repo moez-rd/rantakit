@@ -2,7 +2,7 @@ use ::image::codecs::jpeg::JpegEncoder;
 use ::image::codecs::png::{CompressionType, FilterType as PngFilter, PngEncoder};
 use ::image::{DynamicImage, ExtendedColorType, ImageEncoder, Rgb, RgbImage};
 
-use super::options::ImageFormat;
+use crate::options::ImageFormat;
 use crate::error::{Error, Result};
 
 pub(crate) fn clamp_quality(quality: u8) -> u8 {

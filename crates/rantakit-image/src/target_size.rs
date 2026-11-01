@@ -1,8 +1,8 @@
 use ::image::DynamicImage;
 
-use super::encode::encode;
-use super::options::ImageFormat;
-use super::resize::scale_by;
+use crate::encode::encode;
+use crate::options::ImageFormat;
+use crate::resize::scale_by;
 use crate::error::{Error, Result};
 
 const MIN_QUALITY: u8 = 10;

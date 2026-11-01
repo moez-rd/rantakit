@@ -1,6 +1,6 @@
 # Rantakit
 
-Rantakit is a free, open source, offline file toolkit for everyday Indonesian users: a Tauri 2 app with a React frontend in `src/`, the app shell in `src-tauri/`, and the file engine in `crates/rantakit_core/`.
+Rantakit is a free, open source, offline file toolkit for everyday Indonesian users: a Tauri 2 app with a React frontend in `src/`, the app shell in `src-tauri/`, and the file engines in `crates/` (`rantakit-image`, `rantakit-pdf`).
 
 ## Read before deciding
 

@@ -101,7 +101,8 @@ cargo clippy --workspace --all-targets
 ## Struktur proyek
 
 ```
-crates/rantakit_core/   mesin kompresi (gambar dan PDF), tanpa dependensi Tauri
+crates/rantakit-image/   mesin gambar (JPG dan PNG), tanpa dependensi Tauri
+crates/rantakit-pdf/     mesin PDF, tanpa dependensi Tauri
 src-tauri/               aplikasi desktop: command, riwayat, menu native
 src/                     frontend React
 ```

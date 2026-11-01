@@ -3,7 +3,7 @@ use ::image::{DynamicImage, ExtendedColorType, ImageEncoder, ImageFormat as RawF
 use lopdf::{Document, LoadOptions, Object, SaveOptions, Stream};
 
 use crate::error::{Error, Result};
-use crate::image::resize::fit_within;
+use crate::resize::fit_within;
 
 const MAX_DECOMPRESSED_BYTES: usize = 256 * 1024 * 1024;
 
