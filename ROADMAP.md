@@ -57,7 +57,7 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 **Epics:**
 
 - **Engine foundation** (first, before the other epics): split `rantakit_core` into `rantakit-image` and `rantakit-pdf`, create `rantakit-tasks`, move Result naming and History out of `src-tauri`, and give every engine progress, cancel, and error kinds ([ARCHITECTURE.md](ARCHITECTURE.md)). Add a CI workflow that runs the Rust tests and the frontend type check on every push and pull request.
-- **New look:** teal and cream, Fredoka and Plus Jakarta Sans, Keyline Icons (rounded), light and dark themes with the dark palette decided.
+- **New look:** clean and minimalist, teal on white, Fredoka and Plus Jakarta Sans, Keyline Icons (rounded), light and dark themes with the dark palette decided.
 - **Home screen:** "Terakhir dipakai" (Recent tools) above "Semua alat" (All tools), All tools grouped by Job, and Tool search.
 - **Coming soon cards:** every Tool planned before 1.0 that is not built yet appears in All tools and in search, greyed out with a "Segera hadir" (Coming soon) badge. It cannot be tapped, a screen reader reads it as "<Tool name>, segera hadir", it follows the platform (Scan Dokumen only on Android), and it disappears when the Tool ships.
 - **Three-step Tool layout:** Files, Options, Result, with desktop steps 1 and 2 side by side and Open / Show in folder on the Result (plus Share on Windows).
@@ -75,7 +75,7 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - Text and buttons meet WCAG AA contrast in light and dark themes.
 - Usability test with 5 people from the primary audience passes (RANTAKIT.md §9).
 
-**Open decisions:** the light and dark color values, which come from the Figma design step.
+**Open decisions:** the light and dark color values, which come from the design step (a design board made as a Claude Artifact).
 
 ## v0.3 Android
 

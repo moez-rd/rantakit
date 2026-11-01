@@ -185,18 +185,18 @@ Keep the app as small as possible, because many users download it over prepaid m
 
 ### Personality
 
-**Calm, trustworthy, warm, local.** Closer to a neat, friendly service counter than a flashy online converter full of ads. Lots of space, big clear buttons, no mascots, no decorative gradients. Reassurance ("File tetap di perangkatmu" (Your files stay on your device)) appears quietly where it matters.
+**Calm, trustworthy, warm, local.** Closer to a neat, friendly service counter than a flashy online converter full of ads. The look is clean and minimalist: white space, thin lines instead of shadows, big clear buttons, no mascots, no decorative gradients. Reassurance ("File tetap di perangkatmu" (Your files stay on your device)) appears quietly where it matters.
 
 ### Color
 
 - **Teal `#14B8A6`** is the brand color, taken from the icon. A darker teal is used for text and buttons wherever needed to reach WCAG AA contrast.
-- **Cream `#FFF8EC`** is the warm background in light mode.
+- **White `#FFFFFF`** is the background in light mode, with neutral greys for lines, the sidebar, and secondary text.
 - **Red, amber, and green** are used only for status (error, warning, success).
 - Themes: light, dark, and follow system.
 
 ### Typography
 
-- **Fredoka** (the logo font): wordmark, page titles, and large headings only, such as "Kompres PDF" at the top of a Tool page or the home greeting.
+- **Fredoka** (the logo font): wordmark, page titles, and large headings only, such as "Kompres PDF" at the top of a Tool page.
 - **Plus Jakarta Sans**: everything else, including Tool cards, buttons, options, file names, and numbers.
 - Both fonts are bundled with the app, so nothing is downloaded.
 - Base text size is **16 px**, larger than typical desktop apps, for older users and small, cheap screens.
