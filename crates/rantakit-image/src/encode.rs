@@ -1,9 +1,9 @@
 use ::image::codecs::jpeg::JpegEncoder;
 use ::image::codecs::png::{CompressionType, FilterType as PngFilter, PngEncoder};
 use ::image::{DynamicImage, ExtendedColorType, ImageEncoder, Rgb, RgbImage};
+use rantakit_core::{ErrorKind, Result};
 
 use crate::options::ImageFormat;
-use crate::error::{Error, Result};
 
 pub(crate) fn clamp_quality(quality: u8) -> u8 {
     quality.clamp(1, 100)
@@ -31,7 +31,7 @@ fn encode_jpeg(img: &DynamicImage, quality: u8) -> Result<Vec<u8>> {
             rgb.height(),
             ExtendedColorType::Rgb8,
         )
-        .map_err(Error::Encode)?;
+        .map_err(|_| ErrorKind::Damaged)?;
 
     Ok(buf)
 }
@@ -41,7 +41,8 @@ fn encode_png(img: &DynamicImage) -> Result<Vec<u8>> {
     let encoder =
         PngEncoder::new_with_quality(&mut buf, CompressionType::Best, PngFilter::Adaptive);
 
-    img.write_with_encoder(encoder).map_err(Error::Encode)?;
+    img.write_with_encoder(encoder)
+        .map_err(|_| ErrorKind::Damaged)?;
 
     Ok(buf)
 }

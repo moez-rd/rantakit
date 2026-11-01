@@ -1,11 +1,20 @@
+use std::path::Path;
+
 use ::image::codecs::jpeg::JpegEncoder;
 use ::image::{DynamicImage, ExtendedColorType, ImageEncoder, ImageFormat as RawFormat};
-use lopdf::{Document, LoadOptions, Object, SaveOptions, Stream};
+use lopdf::{Document, LoadOptions, Object, ObjectId, SaveOptions, Stream};
+use rantakit_core::{
+    CancelToken, ErrorKind, Progress, Result, Tracker, read_original, write_result,
+};
 
-use crate::error::{Error, Result};
 use crate::resize::fit_within;
 
 const MAX_DECOMPRESSED_BYTES: usize = 256 * 1024 * 1024;
+
+/// Progress once the PDF is loaded, its images are done, and it is repacked.
+const LOADED: f32 = 0.1;
+const IMAGES_DONE: f32 = 0.8;
+const REPACKED: f32 = 0.9;
 
 #[derive(Debug, Clone)]
 pub struct PdfOptions {
@@ -15,55 +24,92 @@ pub struct PdfOptions {
 
 #[derive(Debug, Clone)]
 pub struct CompressedPdf {
-    pub bytes: Vec<u8>,
+    /// Size of the Result in bytes.
+    pub size: u64,
     pub images: usize,
     pub images_recompressed: usize,
 }
 
-pub fn compress_pdf(input: &[u8], opts: &PdfOptions) -> Result<CompressedPdf> {
+/// Compresses the PDF at `input` and writes the Result to `output`, which
+/// must not exist yet. Progress is a fraction, because the work goes image by
+/// image, not page by page.
+pub fn compress_pdf(
+    input: &Path,
+    output: &Path,
+    opts: &PdfOptions,
+    progress: &mut dyn FnMut(Progress),
+    cancel: &CancelToken,
+) -> Result<CompressedPdf> {
+    let mut tracker = Tracker::new(progress, cancel);
+
+    let original = read_original(input)?;
+    if !is_pdf(&original) {
+        return Err(ErrorKind::UnsupportedFormat);
+    }
     let load = LoadOptions {
         max_decompressed_size: Some(MAX_DECOMPRESSED_BYTES),
         ..Default::default()
     };
-    let mut doc = Document::load_mem_with_options(input, load).map_err(Error::PdfLoad)?;
+    let mut doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
+    drop(original);
 
     if doc.was_encrypted() || doc.is_encrypted() {
-        return Err(Error::EncryptedPdf);
+        return Err(ErrorKind::PasswordProtected);
     }
+    tracker.step(LOADED)?;
 
     let quality = opts.quality.clamp(1, 100);
-    let mut images = 0;
+    let image_ids: Vec<ObjectId> = doc
+        .objects
+        .iter()
+        .filter(|(_, object)| matches!(object, Object::Stream(stream) if is_image(stream)))
+        .map(|(id, _)| *id)
+        .collect();
+    let images = image_ids.len();
     let mut images_recompressed = 0;
 
-    for object in doc.objects.values_mut() {
-        let Object::Stream(stream) = object else {
+    for (done, id) in image_ids.iter().enumerate() {
+        tracker.step(LOADED + (IMAGES_DONE - LOADED) * done as f32 / images as f32)?;
+        let Some(Object::Stream(stream)) = doc.objects.get_mut(id) else {
             continue;
         };
-        if !is_image(stream) {
-            continue;
-        }
-        images += 1;
         if recompress_jpeg(stream, quality, opts.max_dimension) {
             images_recompressed += 1;
         }
     }
+    tracker.step(IMAGES_DONE)?;
 
     doc.prune_objects();
     doc.compress();
+    tracker.step(REPACKED)?;
 
-    let mut bytes = Vec::new();
     let save = SaveOptions::builder()
         .use_object_streams(true)
         .use_xref_streams(true)
         .build();
-    doc.save_with_options(&mut bytes, save)
-        .map_err(Error::PdfSave)?;
+    let size = write_result(output, &mut tracker, |file| {
+        doc.save_with_options(file, save)
+    })?;
 
     Ok(CompressedPdf {
-        bytes,
+        size,
         images,
         images_recompressed,
     })
+}
+
+/// PDF readers accept the `%PDF-` header anywhere in the first 1024 bytes.
+fn is_pdf(bytes: &[u8]) -> bool {
+    bytes[..bytes.len().min(1024)]
+        .windows(5)
+        .any(|window| window == b"%PDF-")
+}
+
+fn load_error(err: lopdf::Error) -> ErrorKind {
+    match err {
+        lopdf::Error::Decryption(_) | lopdf::Error::InvalidPassword => ErrorKind::PasswordProtected,
+        _ => ErrorKind::Damaged,
+    }
 }
 
 fn is_image(stream: &Stream) -> bool {

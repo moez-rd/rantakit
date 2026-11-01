@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use rantakit_pdf::PdfOptions;
+use rantakit_pdf::{CancelToken, PdfOptions};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
@@ -66,23 +66,28 @@ pub async fn compress_pdf(history: State<'_, History>, request: PdfRequest) -> R
 }
 
 fn compress_blocking(request: PdfRequest) -> Result<PdfResult> {
-    let input = fs::read(&request.path)?;
-
     let opts = PdfOptions {
         quality: request.quality,
         max_dimension: request.max_dimension,
     };
-    let compressed = rantakit_pdf::compress_pdf(&input, &opts)?;
-
     let output_path = output_path(&request.path, "pdf");
-    fs::write(&output_path, &compressed.bytes)?;
+
+    // Progress and cancel are not wired to the frontend yet.
+    let compressed = rantakit_pdf::compress_pdf(
+        &request.path,
+        &output_path,
+        &opts,
+        &mut |_| {},
+        &CancelToken::new(),
+    )?;
+    let original_bytes = fs::metadata(&request.path)?.len();
 
     Ok(PdfResult {
         input_path: request.path,
         output_path,
         format: "pdf",
-        original_bytes: input.len() as u64,
-        compressed_bytes: compressed.bytes.len() as u64,
+        original_bytes,
+        compressed_bytes: compressed.size,
         images: compressed.images,
         images_recompressed: compressed.images_recompressed,
     })

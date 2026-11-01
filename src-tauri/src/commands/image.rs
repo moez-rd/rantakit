@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target};
+use rantakit_image::{CancelToken, ImageFormat, ImageOptions, OutputFormat, Target};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
@@ -81,8 +81,6 @@ pub async fn compress_image(
 }
 
 fn compress_blocking(request: ImageRequest) -> Result<ImageResult> {
-    let input = fs::read(&request.path)?;
-
     let opts = ImageOptions {
         format: match request.format {
             None => OutputFormat::Same,
@@ -95,21 +93,33 @@ fn compress_blocking(request: ImageRequest) -> Result<ImageResult> {
         },
         max_dimension: request.max_dimension,
     };
-    let compressed = rantakit_image::compress_image(&input, &opts)?;
-
-    let (format, ext) = match compressed.format {
+    // The output name needs the Result's format before the engine runs.
+    let output_format = match opts.format {
+        OutputFormat::To(f) => f,
+        OutputFormat::Same => rantakit_image::detect_format(&request.path)?,
+    };
+    let (format, ext) = match output_format {
         ImageFormat::Jpeg => ("jpeg", "jpg"),
         ImageFormat::Png => ("png", "png"),
     };
     let output_path = output_path(&request.path, ext);
-    fs::write(&output_path, &compressed.bytes)?;
+
+    // Progress and cancel are not wired to the frontend yet.
+    let compressed = rantakit_image::compress_image(
+        &request.path,
+        &output_path,
+        &opts,
+        &mut |_| {},
+        &CancelToken::new(),
+    )?;
+    let original_bytes = fs::metadata(&request.path)?.len();
 
     Ok(ImageResult {
         input_path: request.path,
         output_path,
         format,
-        original_bytes: input.len() as u64,
-        compressed_bytes: compressed.bytes.len() as u64,
+        original_bytes,
+        compressed_bytes: compressed.size,
         width: compressed.width,
         height: compressed.height,
         quality: compressed.quality,

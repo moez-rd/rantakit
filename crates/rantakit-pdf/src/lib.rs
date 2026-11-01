@@ -1,6 +1,5 @@
 mod compress;
-pub mod error;
 mod resize;
 
 pub use compress::{CompressedPdf, PdfOptions, compress_pdf};
-pub use error::{Error, Result};
+pub use rantakit_core::{CancelToken, ErrorKind, Progress, Result};

@@ -2,12 +2,13 @@
 
 This is the code map for Rantakit: which part owns what, the contract every engine follows, and which library or platform backend does each job. The product rules it serves live in [RANTAKIT.md](RANTAKIT.md), the order of work in [ROADMAP.md](ROADMAP.md), and the reasons behind the hard-to-reverse choices in the ADRs linked below.
 
-Some of this is the target, not today's code. Today only `rantakit-image` and `rantakit-pdf` exist, they do not yet follow the engine contract below, and Result naming and History live in `src-tauri`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
+Some of this is the target, not today's code. Today only `rantakit-core`, `rantakit-image`, and `rantakit-pdf` exist, and Result naming and History live in `src-tauri`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
 
 ## Parts
 
 | Part | Folder | Owns |
 |---|---|---|
+| `rantakit-core` | `crates/rantakit-core` | The engine contract every engine shares: error kinds, progress, the cancel token, and writing a Result safely. No file-format code |
 | `rantakit-image` | `crates/rantakit-image` | JPG and PNG, HEIC and WebP input, resize, watermark on photos, removing location and camera info |
 | `rantakit-pdf` | `crates/rantakit-pdf` | Compress, merge, split, arrange pages, watermark on PDFs, render pages to JPG |
 | `rantakit-office` | `crates/rantakit-office` | Compress Word, Excel, and PowerPoint files; Word and Excel to PDF |
@@ -23,12 +24,12 @@ The app shell pulls in each engine crate through a cargo feature, so a platform 
 
 ## Engine contract
 
-Every engine function follows the same shape:
+Every engine function follows the same shape, using the types in `rantakit-core`:
 
-- **File in, file out.** It reads one or more local input files and writes its Result to a local output path chosen by `rantakit-tasks`. Large inputs (video, audio, big PDFs) are streamed, never held whole in memory; image engines may load a whole photo internally.
-- **Progress.** It reports progress through a callback, as a fraction or as "page *n* of *m*".
-- **Cancel.** It checks a cancel token and stops promptly. A cancelled Task leaves no partial Result behind.
-- **Error kinds, not messages.** It returns a typed error kind such as `PasswordProtected`, `Damaged`, `UnsupportedFormat`, `SizeLimitUnreachable { best }`, or `NotEnoughSpace`. The shell passes the kind to the frontend as a code, and the frontend turns it into an Indonesian or English message that says what to do next (RANTAKIT.md §6, principle 6).
+- **File in, file out.** It reads one or more local input files and writes its Result to a local output path chosen by `rantakit-tasks`, never over an existing file. Large inputs (video, audio, big PDFs) are streamed, never held whole in memory; image engines may load a whole photo internally.
+- **Progress.** It reports progress through a callback, as a fraction that only goes up, or as "page *n* of *m*".
+- **Cancel.** It checks a cancel token between steps and stops promptly. The Result is written to a temporary file and renamed only when complete, so a cancelled or failed file leaves no partial Result behind.
+- **Error kinds, not messages.** It returns a typed error kind such as `PasswordProtected`, `Damaged`, `UnsupportedFormat`, `SizeLimitUnreachable { best }`, `NotEnoughSpace`, or `Cancelled`. The shell passes the kind to the frontend as a code, and the frontend turns it into an Indonesian or English message that says what to do next (RANTAKIT.md §6, principle 6).
 - **File kinds from content.** Engines detect what a file is from its bytes, not its extension.
 
 ## `rantakit-tasks` and the shell

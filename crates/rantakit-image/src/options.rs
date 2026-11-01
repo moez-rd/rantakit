@@ -25,7 +25,8 @@ pub struct ImageOptions {
 
 #[derive(Debug, Clone)]
 pub struct Compressed {
-    pub bytes: Vec<u8>,
+    /// Size of the Result in bytes.
+    pub size: u64,
     pub format: ImageFormat,
     pub width: u32,
     pub height: u32,
