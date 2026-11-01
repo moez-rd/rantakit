@@ -72,7 +72,7 @@ export function MenuSection<T>(props: MenuSectionProps<T>) {
       {...props}
       className="first:-mt-[5px] after:content-[''] after:block after:h-[5px]">
       {props.title && (
-        <Header className="text-sm font-semibold text-text-muted px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-panel backdrop-blur-md supports-[-moz-appearance:none]:bg-badge-bg border-y border-y-border [&+*]:mt-1">
+        <Header className="text-small font-semibold text-text-muted px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-panel backdrop-blur-md supports-[-moz-appearance:none]:bg-badge-bg border-y border-y-border [&+*]:mt-1">
           {props.title}
         </Header>
       )}

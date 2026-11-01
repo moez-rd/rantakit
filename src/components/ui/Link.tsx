@@ -1,8 +1,7 @@
 'use client';
 import {Link as AriaLink, type LinkProps as AriaLinkProps} from 'react-aria-components/Link';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {tv} from 'tailwind-variants';
-import {focusRing} from '@/lib/react-aria-utils';
+import {focusRing, tv} from '@/lib/react-aria-utils';
 
 interface LinkProps extends AriaLinkProps {
   variant?: 'primary' | 'secondary';

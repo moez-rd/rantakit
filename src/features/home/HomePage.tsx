@@ -1,7 +1,6 @@
 import { FileText, Image, type LucideIcon } from "lucide-react";
 import { Button } from "react-aria-components";
-import { tv } from "tailwind-variants";
-import { focusRing } from "@/lib/react-aria-utils";
+import { focusRing, tv } from "@/lib/react-aria-utils";
 
 const card = tv({
   extend: focusRing,
@@ -27,7 +26,7 @@ function CompressCard({ icon: Icon, title, description, onPress }: CompressCardP
       </span>
       <span className="flex flex-col">
         <span className="font-medium">{title}</span>
-        <span className="text-sm text-text-muted">{description}</span>
+        <span className="text-small text-text-muted">{description}</span>
       </span>
     </Button>
   );
@@ -55,7 +54,7 @@ export function HomePage({ onCompressImage, onCompressPdf }: HomePageProps) {
           onPress={onCompressPdf}
         />
       </div>
-      <p className="hidden text-xs text-text-muted pointer-fine:block">atau seret berkas ke sini</p>
+      <p className="hidden text-small text-text-muted pointer-fine:block">atau seret berkas ke sini</p>
     </div>
   );
 }

@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Bundled fonts (N2); Latin and Latin Extended cover Indonesian and English. */
+@import "@fontsource/fredoka/latin-600.css";
+@import "@fontsource/fredoka/latin-ext-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-400.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-400.css";
+@import "@fontsource/plus-jakarta-sans/latin-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-700.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-700.css";
+
 @plugin "tailwindcss-react-aria-components";
 
 /* Dark mode follows <html data-theme>, set from preferences (light, dark, or system). */
@@ -42,10 +54,41 @@
   --color-on-danger: #ffffff;
   /* Behind dialogs. */
   --color-backdrop: rgb(17 24 39 / 0.32);
+
+  /*
+   * The six text styles (N2). Sizes follow the text size chosen in Settings
+   * through --text-scale; Tailwind's own sizes are removed.
+   */
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Fredoka", system-ui, sans-serif;
+
+  --text-*: initial;
+  --text-title: calc(32px * var(--text-scale));
+  --text-title--line-height: calc(40px * var(--text-scale));
+  --text-title--font-weight: 600;
+  --text-dialog: calc(26px * var(--text-scale));
+  --text-dialog--line-height: calc(34px * var(--text-scale));
+  --text-dialog--font-weight: 600;
+  --text-section: calc(18px * var(--text-scale));
+  --text-section--line-height: calc(26px * var(--text-scale));
+  --text-section--font-weight: 700;
+  --text-body: calc(16px * var(--text-scale));
+  --text-body--line-height: calc(24px * var(--text-scale));
+  --text-label: calc(15px * var(--text-scale));
+  --text-label--line-height: calc(22px * var(--text-scale));
+  --text-label--font-weight: 600;
+  --text-small: calc(14px * var(--text-scale));
+  --text-small--line-height: calc(20px * var(--text-scale));
+  /* The sidebar wordmark belongs to the logo; it is not one of the six. */
+  --text-wordmark: calc(22px * var(--text-scale));
+  --text-wordmark--line-height: calc(28px * var(--text-scale));
+  --text-wordmark--font-weight: 600;
 }
 
 :root {
   color-scheme: light;
+  /* 1, or 18/16 for "Besar", or 20/16 for "Lebih besar"; set from preferences. */
+  --text-scale: 1;
 }
 
 :root[data-theme="dark"] {
@@ -87,7 +130,7 @@
   }
 
   body {
-    @apply bg-bg text-text font-sans antialiased;
+    @apply bg-bg text-text font-sans text-body antialiased;
     /* keep content clear of notches and gesture bars on mobile */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
       env(safe-area-inset-left);

@@ -1,15 +1,14 @@
 import { Link } from "react-aria-components";
-import { tv } from "tailwind-variants";
 import type { AppCommand } from "@/lib/appCommands";
 import { isMacApp } from "@/lib/platform";
-import { focusRing } from "@/lib/react-aria-utils";
+import { focusRing, tv } from "@/lib/react-aria-utils";
 import { AppMenu } from "./AppMenu";
 import { MAIN_NAV, SETTINGS_NAV, type NavItem, type Page } from "./navigation";
 
 const navLink = tv({
   extend: focusRing,
   base: [
-    "flex h-9 items-center gap-3 rounded-lg px-3 text-sm text-text-muted cursor-default select-none transition",
+    "flex h-9 items-center gap-3 rounded-lg px-3 text-small text-text-muted cursor-default select-none transition",
     "pointer-coarse:h-11",
     "hovered:bg-badge-bg hovered:text-text",
     "data-[current]:bg-brand-soft data-[current]:font-semibold data-[current]:text-brand-strong",
@@ -39,7 +38,7 @@ export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
     <nav aria-label="Navigasi utama" className="hidden w-52 shrink-0 flex-col gap-1 border-e border-border bg-sidebar p-3 md:flex">
       <div className="mb-4 flex items-center gap-2 ps-2 pt-1">
         <img src="/rantakit.svg" alt="" className="size-7" />
-        <span className="flex-1 font-semibold">Rantakit</span>
+        <span className="flex-1 font-display text-wordmark">Rantakit</span>
         {/* macOS has these in the menu bar. */}
         {!isMacApp && <AppMenu onCommand={onCommand} />}
       </div>

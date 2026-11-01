@@ -1,10 +1,10 @@
 'use client';
+import {tv} from '@/lib/react-aria-utils';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {
   ToggleButtonGroup as RACToggleButtonGroup,
   type ToggleButtonGroupProps
 } from 'react-aria-components/ToggleButtonGroup';
-import {tv} from 'tailwind-variants';
 
 const styles = tv({
   base: 'flex gap-1 rounded-xl bg-track p-1',

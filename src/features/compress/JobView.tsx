@@ -29,7 +29,7 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
                 ? "Dibatalkan"
                 : "Selesai"}
           </h1>
-          <p className="text-sm text-text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
+          <p className="text-small text-text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
         </div>
         <div className="flex shrink-0 gap-2">
           {isRunning ? (
@@ -61,10 +61,10 @@ function JobRow({ item }: { item: JobItem }) {
     <li className="flex items-center gap-3 px-4 py-3">
       <StatusIcon status={item.status} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium" title={item.path}>
+        <p className="truncate text-small font-medium" title={item.path}>
           {item.name}
         </p>
-        <p className="truncate text-xs text-text-muted">
+        <p className="truncate text-small text-text-muted">
           {item.status === "pending" && "Menunggu"}
           {item.status === "working" && `Memproses… ${Math.round(item.fraction * 100)}%`}
           {item.status === "cancelled" && "Dibatalkan"}

@@ -22,7 +22,7 @@ export function ProgressBar({label, ...props}: ProgressBarProps) {
         <>
           <div className="flex justify-between gap-2">
             <Label>{label}</Label>
-            <span className="text-sm text-text-muted">{valueText}</span>
+            <span className="text-small text-text-muted">{valueText}</span>
           </div>
           <div className="max-w-full h-2 rounded-full bg-track outline outline-1 -outline-offset-1 outline-transparent relative overflow-hidden">
             <div

@@ -25,7 +25,7 @@ export async function openSettingsWindow(tab: SettingsTab = "general") {
     url: `settings.html#${tab}`,
     title: "Pengaturan",
     width: 560,
-    height: 440,
+    height: 520,
     resizable: false,
     minimizable: false,
     maximizable: false,

@@ -1,12 +1,11 @@
 import { Link } from "react-aria-components";
-import { tv } from "tailwind-variants";
-import { focusRing } from "@/lib/react-aria-utils";
+import { focusRing, tv } from "@/lib/react-aria-utils";
 import { MAIN_NAV, SETTINGS_NAV, type Page } from "./navigation";
 
 const tabLink = tv({
   extend: focusRing,
   base: [
-    "flex h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg text-xs text-text-muted",
+    "flex h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg text-small text-text-muted",
     "cursor-default select-none [-webkit-tap-highlight-color:transparent]",
     "pressed:bg-badge-bg",
     "data-[current]:font-medium data-[current]:text-brand-strong",

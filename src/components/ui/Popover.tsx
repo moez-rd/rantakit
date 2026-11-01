@@ -1,4 +1,5 @@
 'use client';
+import {tv} from '@/lib/react-aria-utils';
 import {
   OverlayArrow,
   Popover as AriaPopover,
@@ -6,7 +7,6 @@ import {
 } from 'react-aria-components/Popover';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import React from 'react';
-import {tv} from 'tailwind-variants';
 
 export interface PopoverProps extends Omit<AriaPopoverProps, 'children'> {
   showArrow?: boolean;

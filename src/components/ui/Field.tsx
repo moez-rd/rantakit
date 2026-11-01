@@ -5,16 +5,14 @@ import {type InputProps, Input as RACInput} from 'react-aria-components/Input';
 import {type LabelProps, Label as RACLabel} from 'react-aria-components/Label';
 import {Text, type TextProps} from 'react-aria-components/Text';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {twMerge} from 'tailwind-merge';
-import {tv} from 'tailwind-variants';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
+import {composeTailwindRenderProps, focusRing, tv, twMerge} from '@/lib/react-aria-utils';
 
 export function Label(props: LabelProps) {
   return (
     <RACLabel
       {...props}
       className={twMerge(
-        'font-sans text-sm text-text-muted font-medium cursor-default w-fit',
+        'font-sans text-small text-text-muted font-medium cursor-default w-fit',
         props.className
       )}
     />
@@ -27,7 +25,7 @@ export function Description(props: TextProps) {
       {...props}
       slot="description"
       className={twMerge(
-        'text-xs text-text-muted group-disabled:text-text-disabled contain-inline-size',
+        'text-small text-text-muted group-disabled:text-text-disabled contain-inline-size',
         props.className
       )}
     />
@@ -40,7 +38,7 @@ export function FieldError(props: FieldErrorProps) {
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        'text-xs text-danger contain-inline-size forced-colors:text-[Mark]'
+        'text-small text-danger contain-inline-size forced-colors:text-[Mark]'
       )}
     />
   );
@@ -86,7 +84,7 @@ export function Input(props: InputProps) {
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        'px-3 py-0 min-h-9 flex-1 min-w-0 border-0 outline outline-0 bg-surface font-sans text-sm text-text placeholder:text-text-muted disabled:text-text-disabled disabled:placeholder:text-text-disabled [-webkit-tap-highlight-color:transparent]'
+        'px-3 py-0 min-h-9 flex-1 min-w-0 border-0 outline outline-0 bg-surface font-sans text-body text-text placeholder:text-text-muted disabled:text-text-disabled disabled:placeholder:text-text-disabled [-webkit-tap-highlight-color:transparent]'
       )}
     />
   );

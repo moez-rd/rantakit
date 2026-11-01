@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
 import {
   Slider as AriaSlider,
   type SliderProps as AriaSliderProps,
@@ -7,9 +8,7 @@ import {
   SliderTrack,
   SliderFill
 } from 'react-aria-components/Slider';
-import {tv} from 'tailwind-variants';
 import {Label} from '@/components/ui/Field';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 const trackStyles = tv({
   base: 'relative rounded-full',
@@ -75,7 +74,7 @@ export function Slider<T extends number | number[]>({
         'font-sans orientation-horizontal:grid orientation-vertical:flex grid-cols-[1fr_auto] flex-col items-center gap-2 orientation-horizontal:w-64 orientation-horizontal:max-w-[calc(100%-10px)]'
       )}>
       <Label>{label}</Label>
-      <SliderOutput className="text-sm text-text-muted orientation-vertical:hidden" />
+      <SliderOutput className="text-small text-text-muted orientation-vertical:hidden" />
       <SliderTrack className="group col-span-2 orientation-horizontal:h-5 orientation-vertical:w-5 orientation-vertical:h-38 flex items-center">
         {({state, ...renderProps}) => (
           <>

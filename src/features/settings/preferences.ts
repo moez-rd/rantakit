@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
-import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export type Theme = "light" | "dark" | "system";
 export type Language = "id" | "en";
+export type TextSize = "normal" | "large" | "larger";
 
 export interface Preferences {
   theme: Theme;
-  zoom: number;
+  textSize: TextSize;
   language: Language;
 }
 
-export const ZOOM_LEVELS = [0.8, 0.9, 1, 1.1, 1.25, 1.5];
+/** "Besar" scales every text style by 18/16 and "Lebih besar" by 20/16. */
+export const TEXT_SCALES: Record<TextSize, number> = { normal: 1, large: 18 / 16, larger: 20 / 16 };
 
 const STORAGE_KEY = "rantakit.preferences";
 const CHANGE_EVENT = "rantakit:preferences";
-const DEFAULTS: Preferences = { theme: "system", zoom: 1, language: "id" };
+const DEFAULTS: Preferences = { theme: "system", textSize: "normal", language: "id" };
 
 export function loadPreferences(): Preferences {
   let stored: Partial<Preferences> = {};
@@ -27,7 +28,7 @@ export function loadPreferences(): Preferences {
   }
   return {
     theme: ["light", "dark", "system"].includes(stored.theme as string) ? stored.theme! : DEFAULTS.theme,
-    zoom: ZOOM_LEVELS.includes(stored.zoom as number) ? stored.zoom! : DEFAULTS.zoom,
+    textSize: ["normal", "large", "larger"].includes(stored.textSize as string) ? stored.textSize! : DEFAULTS.textSize,
     language: stored.language === "en" ? "en" : DEFAULTS.language,
   };
 }
@@ -50,17 +51,13 @@ export function applyPreferences(prefs: Preferences) {
   const dark = prefs.theme === "dark" || (prefs.theme === "system" && systemDark.matches);
   root.dataset.theme = dark ? "dark" : "light";
   root.lang = prefs.language;
+  root.style.setProperty("--text-scale", String(TEXT_SCALES[prefs.textSize]));
 
   if (isTauri()) {
     // native title bar follows the theme; null means "follow the OS"
     getCurrentWindow()
       .setTheme(prefs.theme === "system" ? null : prefs.theme)
       .catch(() => {});
-    getCurrentWebview()
-      .setZoom(prefs.zoom)
-      .catch(() => {});
-  } else {
-    root.style.zoom = prefs.zoom === 1 ? "" : String(prefs.zoom);
   }
 }
 

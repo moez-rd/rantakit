@@ -13,7 +13,7 @@ function Item({ id, children }: { id: AppCommand; children: string }) {
   return (
     <MenuItem id={id} textValue={children}>
       {children}
-      {shortcut && <Keyboard className="ms-auto ps-6 text-xs opacity-60">{shortcut.label}</Keyboard>}
+      {shortcut && <Keyboard className="ms-auto ps-6 text-small opacity-60">{shortcut.label}</Keyboard>}
     </MenuItem>
   );
 }

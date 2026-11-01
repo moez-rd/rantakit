@@ -1,4 +1,5 @@
 'use client';
+import {focusRing, tv, twMerge} from '@/lib/react-aria-utils';
 import {
   Tab as RACTab,
   TabList as RACTabList,
@@ -12,9 +13,6 @@ import {
   type TabsProps
 } from 'react-aria-components/Tabs';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {tv} from 'tailwind-variants';
-import {focusRing} from '@/lib/react-aria-utils';
-import {twMerge} from 'tailwind-merge';
 
 const tabsStyles = tv({
   base: 'flex gap-4 font-sans max-w-full',
@@ -60,7 +58,7 @@ export function TabList<T>(props: TabListProps<T>) {
 
 const tabProps = tv({
   extend: focusRing,
-  base: 'group relative flex items-center cursor-default rounded-full px-3 py-1.5 text-sm font-medium transition text-text-muted hover:text-text selected:bg-brand-soft selected:text-brand-strong forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
+  base: 'group relative flex items-center cursor-default rounded-full px-3 py-1.5 text-label font-medium transition text-text-muted hover:text-text selected:bg-brand-soft selected:text-brand-strong forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
       true: 'text-text-disabled forced-colors:text-[GrayText] selected:bg-badge-bg forced-colors:selected:text-[HighlightText] forced-colors:selected:bg-[GrayText]'
@@ -93,7 +91,7 @@ export function TabPanels<T>(props: TabPanelsProps<T>) {
 
 const tabPanelStyles = tv({
   extend: focusRing,
-  base: 'flex-1 box-border p-4 text-sm text-text transition entering:opacity-0 exiting:opacity-0 exiting:absolute exiting:top-0 exiting:left-0 exiting:w-full'
+  base: 'flex-1 box-border p-4 text-label text-text transition entering:opacity-0 exiting:opacity-0 exiting:absolute exiting:top-0 exiting:left-0 exiting:w-full'
 });
 
 export function TabPanel(props: TabPanelProps) {

@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
 import {type ReactNode} from 'react';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {
@@ -9,9 +10,7 @@ import {
   type RadioFieldProps,
   type ValidationResult
 } from 'react-aria-components/RadioGroup';
-import {tv} from 'tailwind-variants';
 import {Description, FieldError, Label} from '@/components/ui/Field';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 export interface RadioGroupProps extends Omit<RACRadioGroupProps, 'children'> {
   label?: string;
@@ -66,7 +65,7 @@ export function Radio(props: RadioProps) {
       <RadioButton
         className={composeTailwindRenderProps(
           props.className,
-          'flex relative gap-2 items-center group text-text disabled:text-text-disabled forced-colors:disabled:text-[GrayText] text-sm transition [-webkit-tap-highlight-color:transparent]'
+          'flex relative gap-2 items-center group text-text disabled:text-text-disabled forced-colors:disabled:text-[GrayText] text-small transition [-webkit-tap-highlight-color:transparent]'
         )}>
         {composeRenderProps(props.children, (children, renderProps) => (
           <>

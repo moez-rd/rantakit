@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
 import {Check} from 'lucide-react';
 import {
   ListBox as AriaListBox,
@@ -11,8 +12,6 @@ import {
   type ListBoxSectionProps
 } from 'react-aria-components/ListBox';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {tv} from 'tailwind-variants';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 interface ListBoxProps<T> extends Omit<AriaListBoxProps<T>, 'layout' | 'orientation'> {}
 
@@ -31,7 +30,7 @@ export function ListBox<T>({children, ...props}: ListBoxProps<T>) {
 
 export const itemStyles = tv({
   extend: focusRing,
-  base: 'group relative flex items-center gap-8 cursor-default select-none py-1.5 px-2.5 rounded-md will-change-transform text-sm forced-color-adjust-none',
+  base: 'group relative flex items-center gap-8 cursor-default select-none py-1.5 px-2.5 rounded-md will-change-transform text-label font-medium forced-color-adjust-none',
   variants: {
     isSelected: {
       false:
@@ -60,7 +59,7 @@ export function ListBoxItem(props: ListBoxItemProps) {
 }
 
 export const dropdownItemStyles = tv({
-  base: 'group flex items-center gap-4 cursor-default select-none py-2 pl-3 pr-3 selected:pr-1 rounded-lg outline outline-0 text-sm forced-color-adjust-none no-underline [&[href]]:cursor-pointer [-webkit-tap-highlight-color:transparent]',
+  base: 'group flex items-center gap-4 cursor-default select-none py-2 pl-3 pr-3 selected:pr-1 rounded-lg outline outline-0 text-label font-medium forced-color-adjust-none no-underline [&[href]]:cursor-pointer [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
       false: 'text-text',
@@ -109,7 +108,7 @@ export interface DropdownSectionProps<T> extends ListBoxSectionProps<T> {
 export function DropdownSection<T>(props: DropdownSectionProps<T>) {
   return (
     <ListBoxSection className="first:-mt-[5px] after:content-[''] after:block after:h-[5px] last:after:hidden">
-      <Header className="text-sm font-semibold text-text-muted px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-panel backdrop-blur-md supports-[-moz-appearance:none]:bg-badge-bg border-y border-y-border [&+*]:mt-1">
+      <Header className="text-small font-semibold text-text-muted px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-panel backdrop-blur-md supports-[-moz-appearance:none]:bg-badge-bg border-y border-y-border [&+*]:mt-1">
         {props.title}
       </Header>
       <Collection items={props.items}>{props.children}</Collection>

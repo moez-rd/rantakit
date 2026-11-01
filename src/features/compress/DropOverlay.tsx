@@ -36,7 +36,7 @@ export function DropOverlay({ plan, isBusy }: DropOverlayProps) {
       >
         <Icon aria-hidden className="size-10" />
         <p className="font-medium">{message}</p>
-        {detail && <p className="text-sm text-text-muted">{detail}</p>}
+        {detail && <p className="text-small text-text-muted">{detail}</p>}
       </div>
     </div>
   );

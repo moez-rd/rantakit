@@ -1,11 +1,10 @@
 'use client';
+import {focusRing, tv} from '@/lib/react-aria-utils';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {
   Button as RACButton,
   type ButtonProps as RACButtonProps
 } from 'react-aria-components/Button';
-import {tv} from 'tailwind-variants';
-import {focusRing} from '@/lib/react-aria-utils';
 
 export interface ButtonProps extends RACButtonProps {
   /** @default 'primary' */
@@ -14,7 +13,7 @@ export interface ButtonProps extends RACButtonProps {
 
 let button = tv({
   extend: focusRing,
-  base: 'relative inline-flex items-center justify-center gap-2 flex-shrink-0 border border-transparent h-9 box-border px-3.5 py-0 [&:has(>svg:only-child)]:px-0 [&:has(>svg:only-child)]:h-8 [&:has(>svg:only-child)]:w-8 font-sans text-sm text-center transition rounded-lg cursor-default [-webkit-tap-highlight-color:transparent]',
+  base: 'relative inline-flex items-center justify-center gap-2 flex-shrink-0 border border-transparent h-9 box-border px-3.5 py-0 [&:has(>svg:only-child)]:px-0 [&:has(>svg:only-child)]:h-8 [&:has(>svg:only-child)]:w-8 font-sans text-label text-center transition rounded-lg cursor-default [-webkit-tap-highlight-color:transparent]',
   variants: {
     variant: {
       primary: 'bg-primary hover:bg-primary-hover text-on-primary',

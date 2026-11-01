@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, tv} from '@/lib/react-aria-utils';
 import React, {useContext} from 'react';
 import {
   Disclosure as AriaDisclosure,
@@ -10,9 +11,7 @@ import {
 } from 'react-aria-components/Disclosure';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {Button} from '@/components/ui/Button';
-import {tv} from 'tailwind-variants';
 import {ChevronRight} from 'lucide-react';
-import {composeTailwindRenderProps} from '@/lib/react-aria-utils';
 
 const disclosure = tv({
   base: 'group min-w-50 font-sans rounded-lg text-text'
@@ -53,7 +52,7 @@ export interface DisclosureHeaderProps {
 export function DisclosureHeader({children}: DisclosureHeaderProps) {
   let {isExpanded} = useContext(DisclosureStateContext)!;
   return (
-    <Heading className="text-lg font-semibold m-0">
+    <Heading className="text-label m-0">
       <Button slot="trigger" variant="quiet" className="w-full justify-start font-medium">
         {({isDisabled}) => (
           <>

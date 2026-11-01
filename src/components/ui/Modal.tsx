@@ -1,6 +1,6 @@
 'use client';
 import {ModalOverlay, type ModalOverlayProps, Modal as RACModal} from 'react-aria-components/Modal';
-import {tv} from 'tailwind-variants';
+import {tv} from '@/lib/react-aria-utils';
 
 const overlayStyles = tv({
   base: 'absolute top-0 left-0 w-full h-(--page-height) isolate z-20 bg-backdrop text-center',

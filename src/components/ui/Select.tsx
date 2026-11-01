@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
 import {ChevronDown} from 'lucide-react';
 import React from 'react';
 import {
@@ -10,11 +11,9 @@ import {
   SelectValue,
   type ValidationResult
 } from 'react-aria-components/Select';
-import {tv} from 'tailwind-variants';
 import {Description, FieldError, Label} from '@/components/ui/Field';
 import {DropdownItem, DropdownSection, type DropdownSectionProps} from '@/components/ui/ListBox';
 import {Popover} from '@/components/ui/Popover';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 const styles = tv({
   extend: focusRing,
@@ -56,7 +55,7 @@ export function Select<T, M extends 'single' | 'multiple' = 'single'>({
       )}>
       {label && <Label>{label}</Label>}
       <Button className={styles}>
-        <SelectValue className="flex-1 text-sm">
+        <SelectValue className="flex-1 text-label font-medium">
           {({selectedText, defaultChildren}) => selectedText || defaultChildren}
         </SelectValue>
         <ChevronDown

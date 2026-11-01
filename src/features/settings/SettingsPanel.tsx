@@ -8,15 +8,15 @@ import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { LICENSE_URL, openExternal } from "@/lib/links";
-import { usePreferences, ZOOM_LEVELS, type Language, type Theme } from "./preferences";
+import { usePreferences, type Language, type TextSize, type Theme } from "./preferences";
 import type { SettingsTab } from "./settingsWindow";
 
 function Row({ label, description, children }: { label: string; description?: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="flex flex-col">
-        <span className="text-sm font-medium">{label}</span>
-        {description && <span className="text-xs text-text-muted">{description}</span>}
+        <span className="text-small font-medium">{label}</span>
+        {description && <span className="text-small text-text-muted">{description}</span>}
       </div>
       {children}
     </div>
@@ -36,31 +36,30 @@ function GeneralTab() {
           selectedKeys={[prefs.theme]}
           onSelectionChange={(keys) => update({ theme: [...keys][0] as Theme })}
         >
+          <ToggleButton id="system">
+            <Monitor aria-hidden className="size-4" /> Ikuti sistem
+          </ToggleButton>
           <ToggleButton id="light">
             <Sun aria-hidden className="size-4" /> Terang
           </ToggleButton>
           <ToggleButton id="dark">
             <Moon aria-hidden className="size-4" /> Gelap
           </ToggleButton>
-          <ToggleButton id="system">
-            <Monitor aria-hidden className="size-4" /> Sistem
-          </ToggleButton>
         </ToggleButtonGroup>
       </Row>
 
-      <Row label="Ukuran tampilan" description="Perbesar atau perkecil seluruh antarmuka.">
-        <Select
-          aria-label="Ukuran tampilan"
-          className="sm:w-36"
-          value={String(prefs.zoom)}
-          onChange={(key) => update({ zoom: Number(key) })}
+      <Row label="Ukuran teks">
+        <ToggleButtonGroup
+          aria-label="Ukuran teks"
+          selectionMode="single"
+          disallowEmptySelection
+          selectedKeys={[prefs.textSize]}
+          onSelectionChange={(keys) => update({ textSize: [...keys][0] as TextSize })}
         >
-          {ZOOM_LEVELS.map((z) => (
-            <SelectItem key={z} id={String(z)}>
-              {`${Math.round(z * 100)}%`}
-            </SelectItem>
-          ))}
-        </Select>
+          <ToggleButton id="normal">Normal</ToggleButton>
+          <ToggleButton id="large">Besar</ToggleButton>
+          <ToggleButton id="larger">Lebih besar</ToggleButton>
+        </ToggleButtonGroup>
       </Row>
 
       <Row label="Bahasa" description="Terjemahan bahasa Inggris segera hadir.">
@@ -89,11 +88,11 @@ function AboutTab() {
     <div className="flex flex-col items-center gap-3 py-6 text-center">
       <img src="/rantakit.svg" alt="" className="size-16" />
       <div className="flex flex-col">
-        <span className="text-lg font-semibold">Rantakit</span>
-        <span className="text-sm text-text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
+        <span className="text-section">Rantakit</span>
+        <span className="text-small text-text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
       </div>
-      <p className="max-w-xs text-sm">Kompres berkas, tetap di perangkatmu.</p>
-      <p className="max-w-xs text-xs text-text-muted">
+      <p className="max-w-xs text-small">Kompres berkas, tetap di perangkatmu.</p>
+      <p className="max-w-xs text-small text-text-muted">
         Perangkat lunak bebas di bawah lisensi AGPL-3.0-or-later.{" "}
         <Link onPress={() => openExternal(LICENSE_URL)}>Lihat lisensi</Link>
       </p>
