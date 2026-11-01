@@ -7,69 +7,80 @@ import {
 } from 'react-aria-components/Button';
 
 export interface ButtonProps extends RACButtonProps {
-  /** @default 'primary' */
-  variant?: 'primary' | 'secondary' | 'destructive' | 'quiet';
+  /**
+   * Primary is the one main action of a screen, Danger only confirms inside a
+   * dialog, Link is a quiet text action, and Icon is a 44 px icon-only button
+   * that needs an `aria-label`.
+   * @default 'primary'
+   */
+  variant?: 'primary' | 'secondary' | 'danger' | 'link' | 'icon';
+  /** Main actions are 48 px tall, actions inside a row 40 px. @default 'main' */
+  size?: 'main' | 'row';
 }
+
+const BOXED: ('primary' | 'secondary' | 'danger')[] = ['primary', 'secondary', 'danger'];
 
 let button = tv({
   extend: focusRing,
-  base: 'relative inline-flex items-center justify-center gap-2 flex-shrink-0 border border-transparent h-9 box-border px-3.5 py-0 [&:has(>svg:only-child)]:px-0 [&:has(>svg:only-child)]:h-8 [&:has(>svg:only-child)]:w-8 font-sans text-label text-center transition rounded-lg cursor-default [-webkit-tap-highlight-color:transparent]',
+  base: 'relative inline-flex items-center justify-center gap-2 shrink-0 box-border border border-transparent font-sans text-label text-center whitespace-nowrap transition-colors cursor-default [-webkit-tap-highlight-color:transparent]',
   variants: {
     variant: {
-      primary: 'bg-primary hover:bg-primary-hover text-on-primary',
+      primary: 'bg-primary hover:bg-primary-hover text-on-primary font-bold',
       secondary: 'border-border-strong bg-surface hover:bg-badge-bg text-text',
-      destructive: 'bg-danger hover:bg-danger-hover text-on-danger',
-      quiet: 'border-0 bg-transparent hover:bg-badge-bg text-text-muted hover:text-text'
+      danger: 'bg-danger hover:bg-danger-hover text-on-danger font-bold',
+      link: 'min-h-10 rounded-[10px] px-1 text-brand-strong hover:underline underline-offset-4',
+      icon: 'size-11 rounded-[10px] text-text-muted hover:bg-badge-bg hover:text-text'
+    },
+    size: {
+      main: '',
+      row: ''
     },
     isDisabled: {
-      true: 'border-transparent bg-badge-bg text-text-disabled forced-colors:text-[GrayText]'
-    },
-    isPending: {
-      true: 'text-transparent'
+      true: 'text-text-disabled hover:no-underline forced-colors:text-[GrayText]'
     }
-  },
-  defaultVariants: {
-    variant: 'primary'
   },
   compoundVariants: [
-    {
-      variant: 'quiet',
-      isDisabled: true,
-      class: 'bg-transparent'
-    }
-  ]
+    {variant: BOXED, size: 'main', class: 'min-h-12 rounded-xl px-5'},
+    {variant: BOXED, size: 'row', class: 'min-h-10 rounded-[10px] px-3.5'},
+    {variant: BOXED, isDisabled: true, class: 'border-transparent bg-badge-bg hover:bg-badge-bg'},
+    {variant: 'icon', isDisabled: true, class: 'hover:bg-transparent'}
+  ],
+  defaultVariants: {
+    variant: 'primary',
+    size: 'main'
+  }
 });
 
-export function Button(props: ButtonProps) {
+export function Button({variant, size, ...props}: ButtonProps) {
   return (
     <RACButton
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
-        button({...renderProps, variant: props.variant, className})
+        button({...renderProps, variant, size, className})
       )}>
       {composeRenderProps(props.children, (children, {isPending}) => (
         <>
+          {isPending && <Spinner />}
           {children}
-          {isPending && (
-            <span aria-hidden className="flex absolute inset-0 justify-center items-center">
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" strokeWidth="4" fill="none" className="opacity-25" />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  fill="none"
-                  pathLength="100"
-                  strokeDasharray="60 140"
-                  strokeDashoffset="0"
-                />
-              </svg>
-            </span>
-          )}
         </>
       ))}
     </RACButton>
+  );
+}
+
+/** The working state: a spinner before the label, which stays visible. */
+function Spinner() {
+  return (
+    <svg
+      aria-hidden
+      className="size-[18px] animate-spin"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" strokeOpacity="0.3" />
+      <path d="M21 12A9 9 0 0 0 12 3" />
+    </svg>
   );
 }

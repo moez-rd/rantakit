@@ -10,11 +10,18 @@ import {
   type ToolOptions,
 } from "./taskApi";
 
+interface ItemBase {
+  path: string;
+  name: string;
+  /** The options this file was last run with, so it can be tried again. */
+  options: ToolOptions;
+}
+
 export type JobItem =
-  | { path: string; name: string; status: "pending" | "cancelled" }
-  | { path: string; name: string; status: "working"; fraction: number }
-  | { path: string; name: string; status: "done"; result: TaskResult }
-  | { path: string; name: string; status: "failed"; error: TaskError };
+  | (ItemBase & { status: "pending" | "cancelled" })
+  | (ItemBase & { status: "working"; fraction: number })
+  | (ItemBase & { status: "done"; result: TaskResult })
+  | (ItemBase & { status: "failed"; error: TaskError });
 
 /** Runs one Task over a batch of files and tracks each file's status. */
 export function useCompressJob() {
@@ -23,6 +30,8 @@ export function useCompressJob() {
   const [isRunning, setIsRunning] = useState(false);
   const running = useRef(false);
   const taskId = useRef<number | null>(null);
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   const finish = useCallback(() => {
     running.current = false;
@@ -30,33 +39,33 @@ export function useCompressJob() {
     setIsRunning(false);
   }, []);
 
-  const start = useCallback(
-    async (kind: FileKind, paths: string[], options: ToolOptions) => {
-      // Ignore a new batch (e.g. from the menu) while one is still running.
-      if (running.current || paths.length === 0) return;
+  /** Run `options` over the items at `indexes`; the rest of the list stays as it is. */
+  const run = useCallback(
+    async (indexes: number[], options: ToolOptions) => {
       running.current = true;
       setIsRunning(true);
 
-      setKind(kind);
-      setItems(paths.map((path) => ({ path, name: fileName(path), status: "pending" })));
-      const update = (index: number, change: (item: JobItem) => JobItem) =>
+      const update = (index: number, change: (item: ItemBase) => JobItem) =>
         setItems((prev) => prev.map((old, i) => (i === index ? change(old) : old)));
+      const paths = indexes.map((i) => itemsRef.current[i].path);
 
       const onMessage = (message: TaskMessage) => {
         switch (message.event) {
           case "progress":
-            return update(message.file, ({ path, name }) => ({
+            return update(indexes[message.file], ({ path, name }) => ({
               path,
               name,
+              options,
               status: "working",
               fraction: message.fraction,
             }));
           case "fileDone": {
             const { outcome } = message;
-            return update(message.file, ({ path, name }) => {
-              if (outcome.status === "done") return { path, name, status: "done", result: outcome.result };
-              if (outcome.error.code === "cancelled") return { path, name, status: "cancelled" };
-              return { path, name, status: "failed", error: outcome.error };
+            return update(indexes[message.file], ({ path, name }) => {
+              const base = { path, name, options };
+              if (outcome.status === "done") return { ...base, status: "done", result: outcome.result };
+              if (outcome.error.code === "cancelled") return { ...base, status: "cancelled" };
+              return { ...base, status: "failed", error: outcome.error };
             });
           }
           case "finished":
@@ -70,11 +79,44 @@ export function useCompressJob() {
         if (running.current) taskId.current = id;
       } catch (error) {
         const failed = { code: (error as TaskError | undefined)?.code ?? "unexpected" };
-        setItems((prev) => prev.map(({ path, name }) => ({ path, name, status: "failed", error: failed })));
+        for (const index of indexes) {
+          update(index, ({ path, name }) => ({ path, name, options, status: "failed", error: failed }));
+        }
         finish();
       }
     },
     [finish],
+  );
+
+  const start = useCallback(
+    (kind: FileKind, paths: string[], options: ToolOptions) => {
+      // Ignore a new batch (e.g. from the menu) while one is still running.
+      if (running.current || paths.length === 0) return;
+      setKind(kind);
+      const fresh: JobItem[] = paths.map((path) => ({ path, name: fileName(path), options, status: "pending" }));
+      itemsRef.current = fresh;
+      setItems(fresh);
+      run(
+        paths.map((_, i) => i),
+        options,
+      );
+    },
+    [run],
+  );
+
+  /** Run one file again, with its last options or with `options`. */
+  const retry = useCallback(
+    (index: number, options?: ToolOptions) => {
+      const item = itemsRef.current[index];
+      if (running.current || !item) return;
+      const next = options ?? item.options;
+      itemsRef.current = itemsRef.current.map((old, i) =>
+        i === index ? { path: old.path, name: old.name, options: next, status: "pending" } : old,
+      );
+      setItems(itemsRef.current);
+      run([index], next);
+    },
+    [run],
   );
 
   /** Stops the running Task; finished Results stay. */
@@ -86,7 +128,7 @@ export function useCompressJob() {
     if (!running.current) setItems([]);
   }, []);
 
-  return { kind, items, isRunning, start, cancel, clear };
+  return { kind, items, isRunning, start, retry, cancel, clear };
 }
 
 export type CompressJob = ReturnType<typeof useCompressJob>;

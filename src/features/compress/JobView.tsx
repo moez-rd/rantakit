@@ -1,9 +1,12 @@
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { CircleCheck, Circle, CircleStop, CircleX, FolderOpen, LoaderCircle } from "@keyline-icons/react";
+import { FolderOpen } from "@keyline-icons/react";
+import { FileRow } from "@/components/blocks/FileRow";
+import { ProblemRow } from "@/components/blocks/ProblemRow";
 import { Button } from "@/components/ui/Button";
 import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
 import { FILE_KINDS } from "./fileKinds";
+import { withSmallerImages } from "./imageSettings";
 import type { CompressJob, JobItem } from "./useCompressJob";
 
 interface JobViewProps {
@@ -19,17 +22,19 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
   const cancelled = items.some((item) => item.status === "cancelled");
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-12 py-10">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="font-medium">
+          <h1 className="font-display text-title">
             {isRunning
               ? `Mengompres ${Math.min(finished.length + 1, items.length)} dari ${items.length} ${noun}…`
               : cancelled
                 ? "Dibatalkan"
                 : "Selesai"}
           </h1>
-          <p className="text-small text-text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
+          <p className="text-small text-text-muted">
+            {isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}
+          </p>
         </div>
         <div className="flex shrink-0 gap-2">
           {isRunning ? (
@@ -47,68 +52,82 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
         </div>
       </div>
 
-      <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface">
-        {items.map((item) => (
-          <JobRow key={item.path} item={item} />
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+        {items.map((item, index) => (
+          <JobRow
+            key={item.path}
+            item={item}
+            icon={FILE_KINDS[job.kind].icon}
+            canRetry={!isRunning}
+            onRetry={(options) => job.retry(index, options)}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-function JobRow({ item }: { item: JobItem }) {
-  return (
-    <li className="flex items-center gap-3 px-4 py-3">
-      <StatusIcon status={item.status} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-small font-medium" title={item.path}>
-          {item.name}
-        </p>
-        <p className="truncate text-small text-text-muted">
-          {item.status === "pending" && "Menunggu"}
-          {item.status === "working" && `Memproses… ${Math.round(item.fraction * 100)}%`}
-          {item.status === "cancelled" && "Dibatalkan"}
-          {item.status === "done" && (
-            <>
-              {formatBytes(item.result.originalBytes)} → {formatBytes(item.result.compressedBytes)}{" "}
-              <span
-                className={
-                  item.result.compressedBytes < item.result.originalBytes ? "text-success" : "text-warn"
-                }
-              >
-                {formatChange(item.result.originalBytes, item.result.compressedBytes)}
-              </span>
-            </>
-          )}
-          {item.status === "failed" && <span className="text-danger">Gagal: {errorMessage(item.error)}</span>}
-        </p>
-      </div>
-      {item.status === "done" && (
-        <Button
-          variant="quiet"
-          aria-label="Tampilkan di folder"
-          onPress={() => revealItemInDir(item.result.outputPath)}
-        >
-          <FolderOpen aria-hidden className="size-5" />
-        </Button>
-      )}
-    </li>
-  );
+interface JobRowProps {
+  item: JobItem;
+  icon: (typeof FILE_KINDS)["image"]["icon"];
+  canRetry: boolean;
+  onRetry: (options?: JobItem["options"]) => void;
 }
 
-function StatusIcon({ status }: { status: JobItem["status"] }) {
-  const className = "size-5 shrink-0";
-  switch (status) {
+function JobRow({ item, icon, canRetry, onRetry }: JobRowProps) {
+  const common = { name: item.name, title: item.path, icon };
+
+  switch (item.status) {
     case "pending":
-      return <Circle aria-hidden className={`${className} text-text-muted`} />;
+      return <FileRow {...common} status="waiting" note="Menunggu" />;
     case "working":
-      return <LoaderCircle aria-hidden className={`${className} animate-spin text-brand-strong`} />;
+      return (
+        <FileRow
+          {...common}
+          status="working"
+          fraction={item.fraction}
+          note={`Mengompres… ${Math.round(item.fraction * 100)}%`}
+        />
+      );
     case "done":
-      return <CircleCheck aria-hidden className={`${className} text-success`} />;
-    case "failed":
-      return <CircleX aria-hidden className={`${className} text-danger`} />;
+      return (
+        <FileRow
+          {...common}
+          status="done"
+          note={`Selesai · ${formatBytes(item.result.compressedBytes)} (${formatChange(
+            item.result.originalBytes,
+            item.result.compressedBytes,
+          )})`}
+          action={
+            <Button
+              variant="icon"
+              aria-label="Tampilkan di folder"
+              onPress={() => revealItemInDir(item.result.outputPath)}
+            >
+              <FolderOpen aria-hidden className="size-5" />
+            </Button>
+          }
+        />
+      );
     case "cancelled":
-      return <CircleStop aria-hidden className={`${className} text-text-muted`} />;
+      return <ProblemRow {...common} tone="cancelled" message="Dibatalkan" />;
+    case "failed": {
+      const smaller = item.error.code === "size-limit-unreachable" ? withSmallerImages(item.options) : null;
+      return (
+        <ProblemRow
+          {...common}
+          tone={smaller ? "limit" : "failed"}
+          message={errorMessage(item.error)}
+          action={
+            !canRetry
+              ? undefined
+              : smaller
+                ? { label: "Ya, kecilkan", onPress: () => onRetry(smaller) }
+                : { label: "Coba lagi", onPress: () => onRetry() }
+          }
+        />
+      );
+    }
   }
 }
 

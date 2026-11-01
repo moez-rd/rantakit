@@ -63,7 +63,7 @@ export function RecentsPage() {
           <Modal>
             <AlertDialog
               title="Hapus semua riwayat?"
-              variant="destructive"
+              variant="danger"
               actionLabel="Hapus semua"
               cancelLabel="Batal"
               onAction={clear}
@@ -114,14 +114,14 @@ function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => voi
       </div>
       {item.outputExists && (
         <Button
-          variant="quiet"
+          variant="icon"
           aria-label="Tampilkan di folder"
           onPress={() => revealItemInDir(item.outputPath)}
         >
           <FolderOpen aria-hidden className="size-5" />
         </Button>
       )}
-      <Button variant="quiet" aria-label="Hapus dari riwayat" onPress={onRemove}>
+      <Button variant="icon" aria-label="Hapus dari riwayat" onPress={onRemove}>
         <X aria-hidden className="size-5" />
       </Button>
     </li>

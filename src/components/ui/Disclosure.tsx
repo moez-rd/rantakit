@@ -53,7 +53,7 @@ export function DisclosureHeader({children}: DisclosureHeaderProps) {
   let {isExpanded} = useContext(DisclosureStateContext)!;
   return (
     <Heading className="text-label m-0">
-      <Button slot="trigger" variant="quiet" className="w-full justify-start font-medium">
+      <Button slot="trigger" variant="link" className="justify-start">
         {({isDisabled}) => (
           <>
             <ChevronRight aria-hidden className={chevron({isExpanded, isDisabled})} />

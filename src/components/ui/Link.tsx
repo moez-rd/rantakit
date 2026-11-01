@@ -3,32 +3,18 @@ import {Link as AriaLink, type LinkProps as AriaLinkProps} from 'react-aria-comp
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {focusRing, tv} from '@/lib/react-aria-utils';
 
-interface LinkProps extends AriaLinkProps {
-  variant?: 'primary' | 'secondary';
-}
-
 const styles = tv({
   extend: focusRing,
-  base: 'underline disabled:no-underline disabled:cursor-default forced-colors:disabled:text-[GrayText] transition rounded-xs [-webkit-tap-highlight-color:transparent]',
-  variants: {
-    variant: {
-      primary:
-        'text-brand-strong underline decoration-brand-strong/60 hover:decoration-brand-strong',
-      secondary:
-        'text-text underline decoration-text/50 hover:decoration-text'
-    }
-  },
-  defaultVariants: {
-    variant: 'primary'
-  }
+  base: 'inline-flex items-center gap-1 rounded-xs font-semibold text-brand-strong no-underline underline-offset-4 hover:underline cursor-pointer disabled:text-text-disabled disabled:no-underline disabled:cursor-default forced-colors:disabled:text-[GrayText] [-webkit-tap-highlight-color:transparent]'
 });
 
-export function Link(props: LinkProps) {
+/** A text link: teal text without a box, underlined on hover. Icons inside are 16 px. */
+export function Link(props: AriaLinkProps) {
   return (
     <AriaLink
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
-        styles({...renderProps, className, variant: props.variant})
+        styles({...renderProps, className})
       )}
     />
   );

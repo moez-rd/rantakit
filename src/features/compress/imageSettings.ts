@@ -53,3 +53,17 @@ export function toImageOptions(settings: ImageSettings): ToolOptions {
     maxDimension: settings.maxDimension || undefined,
   };
 }
+
+/** Longest sides tried, in order, when a Size limit can't be reached. */
+const SHRINK_STEPS = [1920, 1280, 960, 640];
+
+/**
+ * The follow-up to "Paling kecil bisa …": the same options with smaller
+ * images. Null when the options have no Size limit or can't shrink further.
+ */
+export function withSmallerImages(options: ToolOptions): ToolOptions | null {
+  if (options.tool !== "kompres-foto" || options.maxBytes === undefined) return null;
+  const current = options.maxDimension ?? Infinity;
+  const next = SHRINK_STEPS.find((side) => side < current);
+  return next === undefined ? null : { ...options, maxDimension: next };
+}

@@ -10,7 +10,7 @@ import {Dialog} from '@/components/ui/Dialog';
 interface AlertDialogProps extends Omit<DialogProps, 'children'> {
   title: string;
   children: ReactNode;
-  variant?: 'info' | 'destructive';
+  variant?: 'info' | 'danger';
   actionLabel: string;
   cancelLabel?: string;
   onAction?: () => void;
@@ -33,8 +33,8 @@ export function AlertDialog({
             {title}
           </Heading>
           <div
-            className={`w-6 h-6 absolute right-6 top-6 stroke-2 ${variant === 'destructive' ? 'text-danger' : 'text-brand-strong'}`}>
-            {variant === 'destructive' ? <CircleAlert aria-hidden /> : <Info aria-hidden />}
+            className={`w-6 h-6 absolute right-6 top-6 stroke-2 ${variant === 'danger' ? 'text-danger' : 'text-brand-strong'}`}>
+            {variant === 'danger' ? <CircleAlert aria-hidden /> : <Info aria-hidden />}
           </div>
           <p className="mt-3 text-text-muted">{children}</p>
           <div className="mt-6 flex justify-end gap-2">
@@ -42,7 +42,7 @@ export function AlertDialog({
               {cancelLabel || 'Cancel'}
             </Button>
             <Button
-              variant={variant === 'destructive' ? 'destructive' : 'primary'}
+              variant={variant === 'danger' ? 'danger' : 'primary'}
               autoFocus
               onPress={chain(onAction, close)}>
               {actionLabel}

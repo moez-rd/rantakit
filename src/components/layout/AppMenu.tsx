@@ -25,7 +25,7 @@ function Item({ id, children }: { id: AppCommand; children: string }) {
 export function AppMenu({ onCommand }: AppMenuProps) {
   return (
     <MenuTrigger placement="bottom start">
-      <Button variant="quiet" aria-label="Menu">
+      <Button variant="icon" aria-label="Menu">
         <MoreHorizontal aria-hidden className="size-5" />
       </Button>
       <Menu onAction={(key) => onCommand(key as AppCommand)}>
