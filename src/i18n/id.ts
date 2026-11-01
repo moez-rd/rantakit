@@ -189,6 +189,18 @@ export const id = {
   "error.unexpected": "Ada yang tidak beres. Coba lagi.",
 
   // Tool page
+  "task.file.failed": "Belum berhasil",
+  "working.kompres-foto": "Mengompres {current} dari {files}…",
+  "working.kompres-pdf": "Mengompres {current} dari {files}…",
+  "leave.working.title": "Hentikan dan keluar?",
+  "leave.working.body.photo": "Foto yang sudah selesai tetap tersimpan.",
+  "leave.working.body.pdf": "PDF yang sudah selesai tetap tersimpan.",
+  "leave.working.stop": "Hentikan",
+  "leave.working.keep": "Lanjutkan",
+  "result.cancelled": "Dibatalkan · {done} dari {files} selesai",
+  "result.cancelled.body.photo": "Foto yang belum selesai tidak disimpan.",
+  "result.cancelled.body.pdf": "PDF yang belum selesai tidak disimpan.",
+  "task.file.saved": "Selesai · {size}",
   "options.dimension.help": "Mengatur panjang dan lebar foto. Makin kecil ukurannya, makin kecil filenya, tapi detail foto ikut berkurang. Foto tidak pernah dibesarkan.",
   "options.quality.help": "Angka untuk mengatur ketajaman foto. Angka kecil membuat file lebih kecil tapi foto lebih buram, angka besar sebaliknya. Biarkan kosong agar Rantakit memilih sendiri.",
   "options.quality.pdf.help": "Angka untuk mengatur ketajaman gambar di dalam PDF. Angka kecil membuat file lebih kecil tapi gambar lebih buram. Teks tidak terpengaruh. Biarkan kosong agar Rantakit memilih sendiri.",

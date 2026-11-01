@@ -17,13 +17,14 @@ interface JobViewProps {
   icon: ComponentType<IconProps>;
   /** The formats the Tool opens, for "can't open this kind of file". */
   formats: string;
+  noun: "photo" | "pdf";
   onCompressMore: () => void;
 }
 
 /** Progress and results of the current batch. */
-export function JobView({ job, icon, formats, onCompressMore }: JobViewProps) {
+export function JobView({ job, icon, formats, noun, onCompressMore }: JobViewProps) {
   const tr = useT();
-  const { t } = tr;
+  const { t, count } = tr;
   const { items, isRunning } = job;
   const finished = items.filter((item) => item.status !== "pending" && item.status !== "working");
   const cancelled = items.some((item) => item.status === "cancelled");
@@ -36,11 +37,18 @@ export function JobView({ job, icon, formats, onCompressMore }: JobViewProps) {
             {isRunning
               ? t("task.working", { current: Math.min(finished.length + 1, items.length), total: items.length })
               : cancelled
-                ? t("task.cancelled")
+                ? t("result.cancelled", {
+                    done: items.filter((item) => item.status === "done").length,
+                    files: count(`files.${noun}`, items.length),
+                  })
                 : t("task.done")}
           </h1>
           <p className="text-small text-text-muted">
-            {isRunning ? t("task.savedNext") : summary(tr, items)}
+            {isRunning
+              ? t("task.savedNext")
+              : cancelled
+                ? t(`result.cancelled.body.${noun}`)
+                : summary(tr, items)}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">

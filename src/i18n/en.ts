@@ -186,6 +186,18 @@ export const en: Messages = {
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
+  "task.file.failed": "Didn't work",
+  "working.kompres-foto": "Compressing {current} of {files}…",
+  "working.kompres-pdf": "Compressing {current} of {files}…",
+  "leave.working.title": "Stop and leave?",
+  "leave.working.body.photo": "The photos that are done stay saved.",
+  "leave.working.body.pdf": "The PDFs that are done stay saved.",
+  "leave.working.stop": "Stop",
+  "leave.working.keep": "Keep going",
+  "result.cancelled": "Cancelled · {done} of {files} done",
+  "result.cancelled.body.photo": "Photos that weren't finished aren't saved.",
+  "result.cancelled.body.pdf": "PDFs that weren't finished aren't saved.",
+  "task.file.saved": "Done · {size}",
   "options.dimension.help": "Sets the photo's width and height. The smaller it is, the smaller the file, but the photo loses detail too. Photos are never made bigger.",
   "options.quality.help": "A number for how sharp the photo is. A low number makes the file smaller but the photo blurrier, a high number the other way round. Leave it empty to let Rantakit choose.",
   "options.quality.pdf.help": "A number for how sharp the images inside the PDF are. A low number makes the file smaller but the images blurrier. Text isn't affected. Leave it empty to let Rantakit choose.",

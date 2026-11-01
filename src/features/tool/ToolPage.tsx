@@ -1,9 +1,9 @@
 import { ArrowLeft, ChevronRight } from "@keyline-icons/react";
-import { Button as AriaButton } from "react-aria-components";
+import { Button as AriaButton, ProgressBar } from "react-aria-components";
 import { Button } from "@/components/ui/Button";
 import { JobView } from "@/features/compress/JobView";
 import type { ToolOptions } from "@/features/compress/taskApi";
-import type { CompressJob } from "@/features/compress/useCompressJob";
+import type { CompressJob, JobItem } from "@/features/compress/useCompressJob";
 import { TOOL_ICONS } from "@/features/home/tools";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
@@ -27,11 +27,12 @@ interface ToolPageProps {
  * button. Render it with `key={tool}`; each Tool keeps its own settings.
  */
 export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, onProcessAnother }: ToolPageProps) {
-  const { t } = useT();
+  const { t, count } = useT();
   const def = toolDef(tool);
   const [settings, update] = def.useSettings();
   const Icon = TOOL_ICONS[tool];
-  const hasJob = job.items.length > 0;
+  const running = job.isRunning;
+  const hasResult = !running && job.items.length > 0;
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-10 pt-6 pb-10">
@@ -50,19 +51,28 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
         </div>
       </header>
 
-      {hasJob ? (
-        <JobView job={job} icon={NOUN_ICONS[def.noun]} formats={t(`formats.${def.noun}`)} onCompressMore={onProcessAnother} />
+      {hasResult ? (
+        <JobView job={job} icon={NOUN_ICONS[def.noun]} formats={t(`formats.${def.noun}`)} noun={def.noun} onCompressMore={onProcessAnother} />
       ) : (
         <div className="flex flex-1 flex-col items-stretch gap-6 lg:flex-row lg:items-start">
           <section aria-label={t(`files.pick.${def.noun}`)} className="flex min-w-0 flex-1 flex-col">
-            <FilesColumn noun={def.noun} paths={paths} onPick={onPick} onRemove={onRemove} />
+            <FilesColumn
+              noun={def.noun}
+              paths={paths}
+              items={running ? job.items : undefined}
+              onPick={onPick}
+              onRemove={onRemove}
+            />
           </section>
 
           <aside
             aria-label={t("options.label")}
-            className="flex shrink-0 flex-col rounded-[20px] border border-border bg-surface lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:w-[380px]"
+            className="flex shrink-0 flex-col rounded-[20px] border border-border bg-surface lg:sticky lg:top-6 lg:max-h-[calc(100dvh-12rem)] lg:w-[380px]"
           >
-            <div className="flex flex-col gap-[22px] overflow-y-auto p-5">
+            <div
+              inert={running}
+              className={`flex flex-col gap-[22px] overflow-y-auto p-5 transition-opacity ${running ? "opacity-45" : ""}`}
+            >
               <def.Main settings={settings} onChange={update} />
               {def.Advanced && (
                 <MoreOptions tool={tool}>
@@ -71,10 +81,21 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
               )}
             </div>
             <div className="flex flex-col gap-2 border-t border-border p-5">
-              <Button isDisabled={paths.length === 0} onPress={() => onStart(def.toRequest(settings))}>
+              {running ? (
+                <Working
+                  label={t(`working.${tool}`, {
+                    current: Math.min(job.items.filter(isFinished).length + 1, job.items.length),
+                    files: count(`files.${def.noun}`, job.items.length),
+                  })}
+                  fraction={overall(job.items)}
+                  onCancel={job.cancel}
+                />
+              ) : (
+                <Button isDisabled={paths.length === 0} onPress={() => onStart(def.toRequest(settings))}>
                 {t(`main.${tool}`)}
-              </Button>
-              {paths.length === 0 && (
+                </Button>
+              )}
+              {!running && paths.length === 0 && (
                 <p className="text-center text-small text-text-muted">{t(`options.needFiles.${def.noun}`)}</p>
               )}
             </div>
@@ -112,5 +133,40 @@ function MoreOptions({ tool, children }: { tool: ShippedTool; children: React.Re
       </AriaButton>
       {isOpen && children}
     </div>
+  );
+}
+
+const isFinished = (item: JobItem) => item.status !== "pending" && item.status !== "working";
+
+/** How far the whole Task is, 0–1. */
+function overall(items: JobItem[]) {
+  const done = items.reduce(
+    (sum, item) => sum + (isFinished(item) ? 1 : item.status === "working" ? item.fraction : 0),
+    0,
+  );
+  return items.length > 0 ? done / items.length : 0;
+}
+
+/** Takes the main button's place while a Task runs. */
+function Working({ label, fraction, onCancel }: { label: string; fraction: number; onCancel: () => void }) {
+  const { t } = useT();
+  return (
+    <>
+      <ProgressBar aria-label={label} value={fraction * 100} className="flex flex-col gap-2">
+        {({ percentage }) => (
+          <>
+            <span aria-hidden className="text-label font-semibold">
+              {label}
+            </span>
+            <span className="h-2 overflow-hidden rounded-full bg-badge-bg">
+              <span className="block h-full rounded-full bg-brand transition-[width]" style={{ width: `${percentage}%` }} />
+            </span>
+          </>
+        )}
+      </ProgressBar>
+      <Button variant="secondary" onPress={onCancel}>
+        {t("task.cancel")}
+      </Button>
+    </>
   );
 }

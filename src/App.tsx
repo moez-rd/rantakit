@@ -44,8 +44,8 @@ function App() {
   /** The Originals added to that page. */
   const [paths, setPaths] = useState<string[]>([]);
   const job = useCompressJob();
-  /** What to do once the user agrees to leave the Tool page. */
-  const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  /** What to do once the user agrees to leave the Tool page, and whether that stops a Task. */
+  const [leaving, setLeaving] = useState<{ action: () => void; working: boolean } | null>(null);
 
   const openPage = (next: Page, tab: SettingsTab) => {
     if (next === "settings" && hasSettingsWindow) {
@@ -66,7 +66,7 @@ function App() {
   /** Run `action`, which leaves the Tool page, after asking if files would be lost. */
   const leaveTool = (action: () => void) => {
     const hasFiles = paths.length > 0 && job.items.length === 0;
-    if (tool && (hasFiles || job.isRunning)) setLeaving(() => action);
+    if (tool && (hasFiles || job.isRunning)) setLeaving({ action, working: job.isRunning });
     else action();
   };
 
@@ -205,14 +205,23 @@ function App() {
       )}
       {leaving && (
         <LeaveDialog
-          title={t("leave.title")}
-          body={t(`leave.body.${noun}`)}
-          leaveLabel={t("leave.leave")}
-          stayLabel={t("leave.stay")}
+          {...(leaving.working
+            ? {
+                title: t("leave.working.title"),
+                body: t(`leave.working.body.${noun}`),
+                leaveLabel: t("leave.working.stop"),
+                stayLabel: t("leave.working.keep"),
+              }
+            : {
+                title: t("leave.title"),
+                body: t(`leave.body.${noun}`),
+                leaveLabel: t("leave.leave"),
+                stayLabel: t("leave.stay"),
+              })}
           onStay={() => setLeaving(null)}
           onLeave={() => {
             setLeaving(null);
-            leaving();
+            leaving.action();
           }}
         />
       )}
