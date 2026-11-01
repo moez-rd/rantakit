@@ -5,6 +5,7 @@ use rantakit_core::{CancelToken, ErrorKind, Progress};
 use rantakit_image::{ImageFormat, ImageOptions, OutputFormat};
 use rantakit_pdf::PdfOptions;
 
+use crate::catalogue::ToolId;
 use crate::names::result_path;
 
 /// One run of a Tool on one or more Originals.
@@ -25,6 +26,13 @@ pub enum ToolOptions {
 }
 
 impl ToolOptions {
+    pub fn id(&self) -> ToolId {
+        match self {
+            Self::KompresFoto(_) => ToolId::KompresFoto,
+            Self::KompresPdf(_) => ToolId::KompresPdf,
+        }
+    }
+
     /// The English word in the Result name: `ijazah (compressed).pdf`.
     fn suffix(&self) -> &'static str {
         match self {

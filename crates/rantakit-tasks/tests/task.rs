@@ -5,8 +5,9 @@ use ::image::codecs::jpeg::JpegEncoder;
 use ::image::{ExtendedColorType, ImageEncoder, Rgb, RgbImage};
 use lopdf::{Document, Object, Stream, dictionary};
 use rantakit_tasks::{
-    CancelToken, Details, ErrorKind, FileOutcome, ImageFormat, ImageOptions, OutputFormat,
-    PdfOptions, Target, Task, TaskEvent, ToolOptions, run_task,
+    Availability, CATALOGUE, CancelToken, Details, ErrorKind, FileOutcome, ImageFormat,
+    ImageOptions, OutputFormat, PdfOptions, Platform, Target, Task, TaskEvent, ToolId, ToolOptions,
+    detect_kind, run_task, tools_for_files,
 };
 
 /// A noisy 600x400 photo, so compressing it really makes it smaller.
@@ -287,4 +288,44 @@ fn cancel_keeps_finished_results_and_skips_the_rest() {
         file_names(&dir),
         ["a (compressed).jpg", "a.jpg", "b.jpg", "c.jpg"]
     );
+}
+
+#[test]
+fn every_tool_that_runs_is_shipped_and_accepts_its_original() {
+    let dir = scratch("catalogue_matches_tasks");
+    for tool in every_tool() {
+        let (name, bytes) = original_for(&tool);
+        let path = dir.join(name);
+        fs::write(&path, bytes).unwrap();
+        let facts = CATALOGUE.iter().find(|t| t.id == tool.id()).unwrap();
+
+        assert_eq!(facts.availability, Availability::Shipped, "{tool:?}");
+        assert!(
+            facts.accepts.contains(&detect_kind(&path).unwrap()),
+            "{tool:?}"
+        );
+    }
+}
+
+#[test]
+fn dropped_files_fit_tools_by_content_not_extension() {
+    let dir = scratch("tools_for_files");
+    let photo_named_pdf = dir.join("ktp.pdf");
+    let png = dir.join("pas foto.png");
+    let pdf = dir.join("ijazah.pdf");
+    let text = dir.join("catatan.txt");
+    fs::write(&photo_named_pdf, photo_jpg()).unwrap();
+    fs::write(&png, b"\x89PNG\r\n\x1a\n").unwrap();
+    fs::write(&pdf, scan_pdf()).unwrap();
+    fs::write(&text, b"bukan foto").unwrap();
+    let on = Platform::current();
+
+    assert_eq!(
+        tools_for_files(&[&photo_named_pdf, &png], on),
+        [ToolId::KompresFoto]
+    );
+    assert_eq!(tools_for_files(&[&pdf], on), [ToolId::KompresPdf]);
+    assert!(tools_for_files(&[&photo_named_pdf, &pdf], on).is_empty());
+    assert!(tools_for_files(&[&pdf, &text], on).is_empty());
+    assert!(tools_for_files(&[dir.join("hilang.jpg")], on).is_empty());
 }
