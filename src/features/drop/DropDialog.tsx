@@ -42,7 +42,7 @@ export function DropDialog({ paths, match, onChoose, onClose }: DropDialogProps)
             <Heading slot="title" className="flex-1 pt-1.5 font-display text-dialog">
               {title}
             </Heading>
-            <Button variant="icon" aria-label={t("task.close")} onPress={onClose}>
+            <Button variant="icon" aria-label={t("common.close")} onPress={onClose}>
               <X aria-hidden className="size-5" />
             </Button>
           </div>

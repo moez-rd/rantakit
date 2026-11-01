@@ -19,6 +19,11 @@ export type ToolOptions =
       maxDimension?: number;
     };
 
+/** The Size limit in bytes these options aim for, if any. */
+export function limitOf(options: ToolOptions): number | undefined {
+  return options.tool === "kompres-foto" ? options.maxBytes : undefined;
+}
+
 /** Mirrors `TaskRequest` in `src-tauri/src/commands/task.rs`. */
 export interface TaskRequest {
   options: ToolOptions;

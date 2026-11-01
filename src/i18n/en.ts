@@ -3,6 +3,7 @@ import type { Messages } from "./index";
 /** Every string the user reads, in English. Same tone and keys as `id.ts`. */
 export const en: Messages = {
   // Navigation and menu
+  "common.close": "Close",
   "nav.label": "Main navigation",
   "nav.home": "Home",
   "nav.history": "History",
@@ -106,22 +107,13 @@ export const en: Messages = {
   "options.dimension.px": "{px} px",
 
   // Working and Result
-  "task.working": "Compressing {current} of {total}…",
-  "task.cancelled": "Cancelled",
-  "task.done": "Done",
-  "task.savedNext": "Results are saved next to the original files.",
   "task.cancel": "Cancel",
-  "task.close": "Close",
-  "task.again": "Compress more",
   "task.file.waiting": "Waiting",
   "task.file.working": "Compressing… {percent}%",
-  "task.file.done": "Done · {size} ({change})",
   "task.file.cancelled": "Cancelled",
   "task.showInFolder": "Show in folder",
   "task.retry": "Try again",
   "task.shrink": "Yes, shrink it",
-  "task.failedCount": "{count} failed",
-  "task.cancelledCount": "{count} cancelled",
 
   // Dropping files
   "drop.here": "Drop here",
@@ -186,6 +178,21 @@ export const en: Messages = {
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
+  "result.done": "{files} done",
+  "result.partial": "{done} of {files} done",
+  "result.partial.body": "{failed} didn't work. See why below.",
+  "result.underLimit.all": "All under {limit}.",
+  "result.savedNext": "Saved in the same folder as the originals.",
+  "result.savedIn": "Saved in {folder}.",
+  "result.underLimit": "Under {limit}",
+  "result.label": "Result",
+  "result.before": "Before",
+  "result.after": "After",
+  "result.open": "Open",
+  "result.openName": "Open {name}",
+  "result.share": "Share",
+  "result.another": "Process another file",
+  "result.list": "Results",
   "task.file.failed": "Didn't work",
   "working.kompres-foto": "Compressing {current} of {files}…",
   "working.kompres-pdf": "Compressing {current} of {files}…",

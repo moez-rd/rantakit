@@ -11,3 +11,6 @@ export const isDesktopApp = isTauri() && !["android", "ios"].includes(platform);
  * overlay title bar. Windows and Linux use the in-app menu instead.
  */
 export const isMacApp = isDesktopApp && platform === "darwin";
+
+/** The Windows app, the only one with a system share sheet Rantakit can open. */
+export const isWindowsApp = isDesktopApp && platform === "windows";

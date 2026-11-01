@@ -27,6 +27,7 @@ pub fn run() {
             commands::files::file_info,
             commands::files::thumbnail,
             commands::files::open_path,
+            commands::share::share_files,
             commands::menu::set_menu_language,
             commands::tools::list_tools,
             commands::tools::match_files,

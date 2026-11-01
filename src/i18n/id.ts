@@ -5,6 +5,7 @@
  */
 export const id = {
   // Navigation and menu
+  "common.close": "Tutup",
   "nav.label": "Navigasi utama",
   "nav.home": "Beranda",
   "nav.history": "Riwayat",
@@ -108,22 +109,13 @@ export const id = {
   "options.dimension.px": "{px} px",
 
   // Working and Result
-  "task.working": "Mengompres {current} dari {total}…",
-  "task.cancelled": "Dibatalkan",
-  "task.done": "Selesai",
-  "task.savedNext": "Hasil disimpan di folder aslinya.",
   "task.cancel": "Batalkan",
-  "task.close": "Tutup",
-  "task.again": "Kompres lagi",
   "task.file.waiting": "Menunggu",
   "task.file.working": "Mengompres… {percent}%",
-  "task.file.done": "Selesai · {size} ({change})",
   "task.file.cancelled": "Dibatalkan",
   "task.showInFolder": "Tampilkan di folder",
   "task.retry": "Coba lagi",
   "task.shrink": "Ya, kecilkan",
-  "task.failedCount": "{count} gagal",
-  "task.cancelledCount": "{count} dibatalkan",
 
   // Dropping files
   "drop.here": "Lepas di sini",
@@ -189,6 +181,21 @@ export const id = {
   "error.unexpected": "Ada yang tidak beres. Coba lagi.",
 
   // Tool page
+  "result.done": "{files} selesai",
+  "result.partial": "{done} dari {files} selesai",
+  "result.partial.body": "{failed} belum berhasil. Lihat keterangannya di bawah.",
+  "result.underLimit.all": "Semua di bawah {limit}.",
+  "result.savedNext": "Disimpan di folder yang sama dengan file aslinya.",
+  "result.savedIn": "Disimpan di {folder}.",
+  "result.underLimit": "Di bawah {limit}",
+  "result.label": "Hasil",
+  "result.before": "Sebelum",
+  "result.after": "Sesudah",
+  "result.open": "Buka",
+  "result.openName": "Buka {name}",
+  "result.share": "Bagikan",
+  "result.another": "Proses file lain",
+  "result.list": "Hasil",
   "task.file.failed": "Belum berhasil",
   "working.kompres-foto": "Mengompres {current} dari {files}…",
   "working.kompres-pdf": "Mengompres {current} dari {files}…",

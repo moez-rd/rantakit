@@ -1,14 +1,14 @@
 import { ArrowLeft, ChevronRight } from "@keyline-icons/react";
 import { Button as AriaButton, ProgressBar } from "react-aria-components";
 import { Button } from "@/components/ui/Button";
-import { JobView } from "@/features/compress/JobView";
 import type { ToolOptions } from "@/features/compress/taskApi";
 import type { CompressJob, JobItem } from "@/features/compress/useCompressJob";
 import { TOOL_ICONS } from "@/features/home/tools";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
-import { FilesColumn, NOUN_ICONS } from "./FilesColumn";
+import { FilesColumn } from "./FilesColumn";
+import { ResultView } from "./ResultView";
 import { toolDef, type ShippedTool } from "./tools";
 
 interface ToolPageProps {
@@ -52,7 +52,7 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
       </header>
 
       {hasResult ? (
-        <JobView job={job} icon={NOUN_ICONS[def.noun]} formats={t(`formats.${def.noun}`)} noun={def.noun} onCompressMore={onProcessAnother} />
+        <ResultView job={job} noun={def.noun} resultsFolder={null} onProcessAnother={onProcessAnother} />
       ) : (
         <div className="flex flex-1 flex-col items-stretch gap-6 lg:flex-row lg:items-start">
           <section aria-label={t(`files.pick.${def.noun}`)} className="flex min-w-0 flex-1 flex-col">
