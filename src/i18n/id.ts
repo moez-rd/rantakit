@@ -76,6 +76,7 @@ export const id = {
 
   // Home
   "home.all": "Semua alat",
+  "home.comingSoon": "Segera hadir",
 
   // Files and Options
   "setup.selected": "{files} dipilih",

@@ -74,6 +74,7 @@ export const en: Messages = {
 
   // Home
   "home.all": "All tools",
+  "home.comingSoon": "Coming soon",
 
   // Files and Options
   "setup.selected": "{files} chosen",
