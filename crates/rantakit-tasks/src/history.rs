@@ -1,17 +1,34 @@
-//! Compression history, stored as one JSON file in the app data folder.
+//! History, stored as one JSON file in the app data folder. The shell says
+//! where that folder is.
 //!
 //! All access goes through [`History`], so the storage can later move to
-//! SQLite without touching the commands or the frontend.
+//! SQLite without touching the shells or the frontend.
 
 use std::fs;
-use std::path::PathBuf;
+use std::io;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use rantakit_image::ImageFormat;
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Error, Result};
+use crate::task::{Details, FileOutcome, ResultFile, Task, ToolOptions};
+
+#[derive(Debug, thiserror::Error)]
+pub enum HistoryError {
+    #[error(transparent)]
+    Io(#[from] io::Error),
+
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
+
+    #[error("history was saved by a newer version of Rantakit (format {0})")]
+    Newer(u32),
+}
+
+pub type Result<T> = std::result::Result<T, HistoryError>;
 
 /// Bump when the file layout changes, and migrate older versions on load.
 const VERSION: u32 = 1;
@@ -51,7 +68,10 @@ pub struct History {
 
 impl History {
     pub fn new(path: PathBuf) -> Self {
-        Self { path, lock: Mutex::new(()) }
+        Self {
+            path,
+            lock: Mutex::new(()),
+        }
     }
 
     /// Entries, newest first.
@@ -63,6 +83,30 @@ impl History {
     pub fn add(&self, entry: Entry) -> Result<()> {
         self.update(|entries| {
             entries.insert(0, entry);
+            entries.truncate(MAX_ENTRIES);
+        })
+    }
+
+    /// Adds every Result of a finished Task, one entry per file.
+    pub fn record(&self, task: &Task, outcomes: &[FileOutcome]) -> Result<()> {
+        let created_at = now_ms();
+        let added: Vec<Entry> = task
+            .originals
+            .iter()
+            .zip(outcomes)
+            .filter_map(|(original, outcome)| {
+                let result = outcome.as_ref().ok()?;
+                Some(entry(&task.tool, original, result, created_at))
+            })
+            .collect();
+        if added.is_empty() {
+            return Ok(());
+        }
+
+        self.update(|entries| {
+            for entry in added {
+                entries.insert(0, entry);
+            }
             entries.truncate(MAX_ENTRIES);
         })
     }
@@ -85,13 +129,13 @@ impl History {
     fn load(&self) -> Result<Vec<Entry>> {
         let text = match fs::read_to_string(&self.path) {
             Ok(text) => text,
-            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
             Err(err) => return Err(err.into()),
         };
 
         match serde_json::from_str::<HistoryFile>(&text) {
             // Written by a newer app version: leave it untouched rather than lose data.
-            Ok(file) if file.version > VERSION => Err(Error::NewerHistory(file.version)),
+            Ok(file) if file.version > VERSION => Err(HistoryError::Newer(file.version)),
             Ok(file) => Ok(file.entries),
             Err(err) => {
                 // Keep the broken file for inspection and start over.
@@ -107,7 +151,10 @@ impl History {
         if let Some(dir) = self.path.parent() {
             fs::create_dir_all(dir)?;
         }
-        let file = HistoryFile { version: VERSION, entries };
+        let file = HistoryFile {
+            version: VERSION,
+            entries,
+        };
         let tmp = self.path.with_extension("json.tmp");
         fs::write(&tmp, serde_json::to_vec_pretty(&file)?)?;
         fs::rename(&tmp, &self.path)?;
@@ -115,17 +162,63 @@ impl History {
     }
 }
 
+fn entry(tool: &ToolOptions, original: &Path, result: &ResultFile, created_at: u64) -> Entry {
+    let (format, width, height, quality) = match &result.details {
+        Details::Photo {
+            format,
+            width,
+            height,
+            quality,
+        } => {
+            let format = match format {
+                ImageFormat::Jpeg => "jpeg",
+                ImageFormat::Png => "png",
+            };
+            (format, Some(*width), Some(*height), *quality)
+        }
+        Details::Pdf {
+            images_recompressed,
+            ..
+        } => {
+            // Only meaningful when an image was actually re-encoded.
+            let quality = match tool {
+                ToolOptions::KompresPdf(opts) if *images_recompressed > 0 => {
+                    Some(opts.quality.clamp(1, 100))
+                }
+                _ => None,
+            };
+            ("pdf", None, None, quality)
+        }
+    };
+
+    Entry {
+        id: new_id(created_at),
+        created_at,
+        input_path: original.to_path_buf(),
+        output_path: result.path.clone(),
+        original_bytes: result.original_size,
+        compressed_bytes: result.size,
+        format: format.into(),
+        width,
+        height,
+        quality,
+    }
+}
+
 /// Milliseconds since the Unix epoch.
-pub fn now_ms() -> u64 {
+fn now_ms() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |d| d.as_millis() as u64)
 }
 
 /// Unique within this machine: the timestamp plus a counter for same-millisecond entries.
-pub fn new_id(created_at: u64) -> String {
+fn new_id(created_at: u64) -> String {
     static COUNTER: AtomicU64 = AtomicU64::new(0);
-    format!("{created_at:x}-{:x}", COUNTER.fetch_add(1, Ordering::Relaxed))
+    format!(
+        "{created_at:x}-{:x}",
+        COUNTER.fetch_add(1, Ordering::Relaxed)
+    )
 }
 
 #[cfg(test)]
@@ -172,16 +265,68 @@ mod tests {
     }
 
     #[test]
+    fn records_each_result_of_a_task_newest_first() {
+        let (history, dir) = temp_history("record");
+        let task = Task {
+            tool: ToolOptions::KompresPdf(crate::PdfOptions {
+                quality: 150,
+                max_dimension: None,
+            }),
+            originals: vec!["a.pdf".into(), "b.pdf".into(), "c.pdf".into()],
+            results_folder: None,
+        };
+        let done = |path: &str, images_recompressed| {
+            Ok(ResultFile {
+                path: path.into(),
+                original_size: 100,
+                size: 40,
+                details: Details::Pdf {
+                    images: 1,
+                    images_recompressed,
+                },
+            })
+        };
+
+        let outcomes = [
+            done("a (compressed).pdf", 1),
+            Err(crate::ErrorKind::Damaged),
+            done("c (compressed).pdf", 0),
+        ];
+        history.record(&task, &outcomes).unwrap();
+
+        let entries = history.list().unwrap();
+        let outputs: Vec<_> = entries.iter().map(|e| e.output_path.clone()).collect();
+        assert_eq!(
+            outputs,
+            [
+                PathBuf::from("c (compressed).pdf"),
+                PathBuf::from("a (compressed).pdf")
+            ]
+        );
+        assert_eq!(entries[0].quality, None, "no image was re-encoded");
+        assert_eq!(entries[1].quality, Some(100));
+        assert_eq!(entries[1].input_path, PathBuf::from("a.pdf"));
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
     fn keeps_at_most_max_entries() {
         let (history, dir) = temp_history("cap");
-        let full = (0..MAX_ENTRIES).rev().map(|i| entry(&i.to_string())).collect();
+        let full = (0..MAX_ENTRIES)
+            .rev()
+            .map(|i| entry(&i.to_string()))
+            .collect();
         history.save(full).unwrap();
 
         history.add(entry("new")).unwrap();
         let entries = history.list().unwrap();
         assert_eq!(entries.len(), MAX_ENTRIES);
         assert_eq!(entries[0].id, "new");
-        assert_eq!(entries[MAX_ENTRIES - 1].id, "1", "oldest entry should be dropped");
+        assert_eq!(
+            entries[MAX_ENTRIES - 1].id,
+            "1",
+            "oldest entry should be dropped"
+        );
         fs::remove_dir_all(dir).unwrap();
     }
 
@@ -191,8 +336,11 @@ mod tests {
         fs::create_dir_all(&dir).unwrap();
         fs::write(&history.path, r#"{"version":99,"entries":[]}"#).unwrap();
 
-        assert!(matches!(history.list(), Err(Error::NewerHistory(99))));
-        assert!(history.add(entry("a")).is_err(), "must not overwrite a newer file");
+        assert!(matches!(history.list(), Err(HistoryError::Newer(99))));
+        assert!(
+            history.add(entry("a")).is_err(),
+            "must not overwrite a newer file"
+        );
         fs::remove_dir_all(dir).unwrap();
     }
 

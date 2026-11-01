@@ -1,6 +1,6 @@
 import { isInt, useStoredState } from "@/lib/storedState";
 import { MAX_DIMENSIONS } from "./imageSettings";
-import type { PdfRequest } from "./pdfApi";
+import type { ToolOptions } from "./taskApi";
 
 export interface PdfSettings {
   /** JPEG quality for images inside the PDF, 1–100. */
@@ -26,9 +26,9 @@ export function usePdfSettings() {
   return useStoredState("rantakit.pdfSettings", parse);
 }
 
-export function toPdfRequest(path: string, settings: PdfSettings): PdfRequest {
+export function toPdfOptions(settings: PdfSettings): ToolOptions {
   return {
-    path,
+    tool: "kompres-pdf",
     quality: settings.quality,
     maxDimension: settings.maxDimension || undefined,
   };

@@ -104,7 +104,8 @@ cargo clippy --workspace --all-targets
 crates/rantakit-core/    kontrak mesin: jenis error, progres, pembatalan
 crates/rantakit-image/   mesin gambar (JPG dan PNG), tanpa dependensi Tauri
 crates/rantakit-pdf/     mesin PDF, tanpa dependensi Tauri
-src-tauri/               aplikasi desktop: command, riwayat, menu native
+crates/rantakit-tasks/   tugas, nama file hasil, katalog alat, riwayat, tanpa dependensi Tauri
+src-tauri/               aplikasi desktop: command, menu native
 src/                     frontend React
 ```
 

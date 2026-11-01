@@ -1,27 +1,31 @@
+use rantakit_tasks::HistoryError;
+use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 
-/// Errors returned by commands. The frontend receives the message as a string.
+/// Errors returned by commands. The frontend receives a code, never English
+/// text; the text is only logged. A Task's per-file error kinds travel on its
+/// channel instead (see `commands::task`).
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error(transparent)]
-    Io(#[from] std::io::Error),
+    History(#[from] HistoryError),
+}
 
-    #[error(transparent)]
-    Engine(#[from] rantakit_core::ErrorKind),
-
-    #[error(transparent)]
-    Tauri(#[from] tauri::Error),
-
-    #[error(transparent)]
-    Json(#[from] serde_json::Error),
-
-    #[error("history was saved by a newer version of Rantakit (format {0})")]
-    NewerHistory(u32),
+impl Error {
+    fn code(&self) -> &'static str {
+        match self {
+            Self::History(HistoryError::Newer(_)) => "history-from-newer-version",
+            Self::History(_) => "unexpected",
+        }
+    }
 }
 
 impl Serialize for Error {
     fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.to_string())
+        eprintln!("command failed: {self}");
+        let mut error = serializer.serialize_struct("Error", 1)?;
+        error.serialize_field("code", self.code())?;
+        error.end()
     }
 }
 

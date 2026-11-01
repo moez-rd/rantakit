@@ -1,5 +1,5 @@
 import { isInt, useStoredState } from "@/lib/storedState";
-import type { ImageRequest } from "./imageApi";
+import type { ToolOptions } from "./taskApi";
 
 export type SizeMode = "quality" | "target";
 export type OutputFormat = "same" | "jpeg" | "png";
@@ -44,9 +44,9 @@ export function useImageSettings() {
   return useStoredState("rantakit.imageSettings", parse);
 }
 
-export function toImageRequest(path: string, settings: ImageSettings): ImageRequest {
+export function toImageOptions(settings: ImageSettings): ToolOptions {
   return {
-    path,
+    tool: "kompres-foto",
     format: settings.format === "same" ? undefined : settings.format,
     quality: settings.quality,
     maxBytes: settings.mode === "target" ? settings.targetKb * 1024 : undefined,
