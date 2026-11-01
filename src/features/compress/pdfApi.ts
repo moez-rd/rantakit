@@ -4,7 +4,7 @@ import { currentTranslator } from "@/i18n";
 
 /** Ask the user for PDFs. Returns an empty list when cancelled or outside Tauri. */
 export async function pickPdfs(): Promise<string[]> {
-  if (!isTauri()) return [];
+  if (!isTauri()) return import.meta.env.DEV ? (await import("@/lib/devMocks")).devPick("pdf") : [];
 
   const selected = await open({
     title: currentTranslator().t("picker.pdfs"),

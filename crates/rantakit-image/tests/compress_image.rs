@@ -431,3 +431,33 @@ fn cancel_during_size_search_stops_it() {
     assert!(result.is_none());
     assert_eq!(steps_after_cancel, 0, "no step may run after cancelling");
 }
+
+#[test]
+fn photo_info_reads_the_header() {
+    let dir = scratch("photo-info");
+    let path = dir.join("photo.jpg");
+    fs::write(&path, PHOTO).unwrap();
+
+    let info = rantakit_image::photo_info(&path).unwrap();
+    assert_eq!(info.format, ImageFormat::Jpeg);
+    assert!(info.width > 0 && info.height > 0);
+}
+
+#[test]
+fn thumbnails_are_small_jpgs() {
+    let dir = scratch("thumbnail");
+    let path = dir.join("transparent.png");
+    fs::write(&path, TRANSPARENT).unwrap();
+
+    let bytes = rantakit_image::thumbnail(&path, 96).unwrap();
+    let thumb = ::image::load_from_memory(&bytes).unwrap();
+    assert!(thumb.width().max(thumb.height()) <= 96);
+    assert_eq!(detect_format_of(&bytes), ImageFormat::Jpeg);
+}
+
+fn detect_format_of(bytes: &[u8]) -> ImageFormat {
+    match ::image::guess_format(bytes).unwrap() {
+        ::image::ImageFormat::Jpeg => ImageFormat::Jpeg,
+        _ => ImageFormat::Png,
+    }
+}

@@ -5,18 +5,23 @@ import { ProblemRow } from "@/components/blocks/ProblemRow";
 import { Button } from "@/components/ui/Button";
 import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
-import { FILE_KINDS } from "./fileKinds";
+import type { ComponentType } from "react";
+import type { IconProps } from "@keyline-icons/react";
 import { withSmallerImages } from "./imageSettings";
 import { useT, type Translator } from "@/i18n";
 import type { CompressJob, JobItem } from "./useCompressJob";
 
 interface JobViewProps {
   job: CompressJob;
+  /** The file kind's stroke icon. */
+  icon: ComponentType<IconProps>;
+  /** The formats the Tool opens, for "can't open this kind of file". */
+  formats: string;
   onCompressMore: () => void;
 }
 
 /** Progress and results of the current batch. */
-export function JobView({ job, onCompressMore }: JobViewProps) {
+export function JobView({ job, icon, formats, onCompressMore }: JobViewProps) {
   const tr = useT();
   const { t } = tr;
   const { items, isRunning } = job;
@@ -44,12 +49,7 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
               {t("task.cancel")}
             </Button>
           ) : (
-            <>
-              <Button variant="secondary" onPress={job.clear}>
-                {t("task.close")}
-              </Button>
-              <Button onPress={onCompressMore}>{t("task.again")}</Button>
-            </>
+            <Button onPress={onCompressMore}>{t("task.again")}</Button>
           )}
         </div>
       </div>
@@ -60,7 +60,8 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
             key={item.path}
             tr={tr}
             item={item}
-            kind={FILE_KINDS[job.kind]}
+            icon={icon}
+            formats={formats}
             canRetry={!isRunning}
             onRetry={(options) => job.retry(index, options)}
           />
@@ -73,14 +74,15 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
 interface JobRowProps {
   tr: Translator;
   item: JobItem;
-  kind: (typeof FILE_KINDS)["image"];
+  icon: ComponentType<IconProps>;
+  formats: string;
   canRetry: boolean;
   onRetry: (options?: JobItem["options"]) => void;
 }
 
-function JobRow({ tr, item, kind, canRetry, onRetry }: JobRowProps) {
+function JobRow({ tr, item, icon, formats, canRetry, onRetry }: JobRowProps) {
   const { t, locale } = tr;
-  const common = { name: item.name, title: item.path, icon: kind.icon };
+  const common = { name: item.name, title: item.path, icon };
 
   switch (item.status) {
     case "pending":
@@ -122,7 +124,7 @@ function JobRow({ tr, item, kind, canRetry, onRetry }: JobRowProps) {
         <ProblemRow
           {...common}
           tone={smaller ? "limit" : "failed"}
-          message={errorMessage(tr, item.error, { accepted: kind.formats, canShrink: smaller !== null && canRetry })}
+          message={errorMessage(tr, item.error, { accepted: formats, canShrink: smaller !== null && canRetry })}
           action={
             !canRetry
               ? undefined

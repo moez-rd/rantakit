@@ -1,5 +1,6 @@
 mod encode;
 pub mod options;
+mod preview;
 mod resize;
 mod target_size;
 
@@ -10,6 +11,7 @@ use ::image::{DynamicImage, ImageDecoder, ImageError, ImageFormat as RawFormat, 
 use rantakit_core::{Tracker, read_original, write_result};
 
 pub use options::{Compressed, ImageFormat, ImageOptions, OutputFormat, Target};
+pub use preview::{PhotoInfo, photo_info, thumbnail};
 pub use rantakit_core::{CancelToken, ErrorKind, Progress, Result};
 
 /// Progress once the Original is read, decoded, resized, and encoded.
@@ -82,7 +84,7 @@ pub fn detect_format(path: &Path) -> Result<ImageFormat> {
     format_of(reader.format())
 }
 
-fn decode(input: &[u8]) -> Result<(DynamicImage, ImageFormat)> {
+pub(crate) fn decode(input: &[u8]) -> Result<(DynamicImage, ImageFormat)> {
     let reader = ImageReader::new(Cursor::new(input))
         .with_guessed_format()
         .map_err(|e| ErrorKind::reading(&e))?;
@@ -98,7 +100,7 @@ fn decode(input: &[u8]) -> Result<(DynamicImage, ImageFormat)> {
     Ok((img, format))
 }
 
-fn format_of(raw: Option<RawFormat>) -> Result<ImageFormat> {
+pub(crate) fn format_of(raw: Option<RawFormat>) -> Result<ImageFormat> {
     match raw {
         Some(RawFormat::Jpeg) => Ok(ImageFormat::Jpeg),
         Some(RawFormat::Png) => Ok(ImageFormat::Png),

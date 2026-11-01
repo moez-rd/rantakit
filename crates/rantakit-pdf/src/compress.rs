@@ -98,6 +98,20 @@ pub fn compress_pdf(
     })
 }
 
+/// How many pages the PDF at `path` has, for the Files step.
+pub fn page_count(path: &Path) -> Result<usize> {
+    let original = read_original(path)?;
+    if !is_pdf(&original) {
+        return Err(ErrorKind::UnsupportedFormat);
+    }
+    let load = LoadOptions {
+        max_decompressed_size: Some(MAX_DECOMPRESSED_BYTES),
+        ..Default::default()
+    };
+    let doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
+    Ok(doc.get_pages().len())
+}
+
 /// PDF readers accept the `%PDF-` header anywhere in the first 1024 bytes.
 fn is_pdf(bytes: &[u8]) -> bool {
     bytes[..bytes.len().min(1024)]

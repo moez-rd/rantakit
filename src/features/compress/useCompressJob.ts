@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from "react";
 import { fileName } from "./imageApi";
-import type { FileKind } from "./fileKinds";
 import {
   cancelTask,
   startTask,
@@ -25,10 +24,11 @@ export type JobItem =
 
 /** Runs one Task over a batch of files and tracks each file's status. */
 export function useCompressJob() {
-  const [kind, setKind] = useState<FileKind>("image");
   const [items, setItems] = useState<JobItem[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const running = useRef(false);
+  /** Set by `reset` during a Task: empty the list once the Task has stopped. */
+  const discard = useRef(false);
   const taskId = useRef<number | null>(null);
   const itemsRef = useRef(items);
   itemsRef.current = items;
@@ -37,6 +37,10 @@ export function useCompressJob() {
     running.current = false;
     taskId.current = null;
     setIsRunning(false);
+    if (discard.current) {
+      discard.current = false;
+      setItems([]);
+    }
   }, []);
 
   /** Run `options` over the items at `indexes`; the rest of the list stays as it is. */
@@ -76,7 +80,10 @@ export function useCompressJob() {
       try {
         const id = await startTask({ options, paths }, onMessage);
         // A short Task may already be over by the time its id arrives.
-        if (running.current) taskId.current = id;
+        if (running.current) {
+          taskId.current = id;
+          if (discard.current) cancelTask(id);
+        }
       } catch (error) {
         const failed = { code: (error as TaskError | undefined)?.code ?? "unexpected" };
         for (const index of indexes) {
@@ -89,10 +96,9 @@ export function useCompressJob() {
   );
 
   const start = useCallback(
-    (kind: FileKind, paths: string[], options: ToolOptions) => {
+    (paths: string[], options: ToolOptions) => {
       // Ignore a new batch (e.g. from the menu) while one is still running.
       if (running.current || paths.length === 0) return;
-      setKind(kind);
       const fresh: JobItem[] = paths.map((path) => ({ path, name: fileName(path), options, status: "pending" }));
       itemsRef.current = fresh;
       setItems(fresh);
@@ -124,11 +130,17 @@ export function useCompressJob() {
     if (taskId.current !== null) cancelTask(taskId.current);
   }, []);
 
-  const clear = useCallback(() => {
-    if (!running.current) setItems([]);
+  /** Empties the list; a running Task is stopped first, and its finished Results stay. */
+  const reset = useCallback(() => {
+    if (running.current) {
+      discard.current = true;
+      if (taskId.current !== null) cancelTask(taskId.current);
+    } else {
+      setItems([]);
+    }
   }, []);
 
-  return { kind, items, isRunning, start, retry, cancel, clear };
+  return { items, isRunning, start, retry, cancel, reset };
 }
 
 export type CompressJob = ReturnType<typeof useCompressJob>;

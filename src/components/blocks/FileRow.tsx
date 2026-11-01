@@ -11,6 +11,8 @@ interface FileRowProps {
   title?: string;
   /** Stroke icon for the file's kind, shown in the thumbnail tile. */
   icon: ComponentType<IconProps>;
+  /** A small picture of the file, shown in the tile instead of the icon once loaded. */
+  thumbnail?: string | null;
   status: FileRowStatus;
   /** The line under the name: a size, "Menunggu", "Selesai · 196 KB", or a message. */
   note: ReactNode;
@@ -30,16 +32,16 @@ const NOTE_ICON: Partial<Record<FileRowStatus, [ComponentType<IconProps>, string
 };
 
 /** A file in the Files step; each state has its own icon or text, never color alone. */
-export function FileRow({ name, title, icon: Icon, status, note, fraction = 0, onRemove, removeLabel, action }: FileRowProps) {
+export function FileRow({ name, title, icon: Icon, thumbnail, status, note, fraction = 0, onRemove, removeLabel, action }: FileRowProps) {
   const [NoteIcon, noteStyle] = NOTE_ICON[status] ?? [null, "text-text-muted"];
 
   return (
     <li className="flex items-center gap-3.5 py-3 ps-3 pe-2">
       <span
         aria-hidden
-        className="flex size-12 shrink-0 items-center justify-center rounded-[10px] bg-badge-bg text-text-muted"
+        className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-badge-bg text-text-muted"
       >
-        <Icon className="size-6" />
+        {thumbnail ? <img src={thumbnail} alt="" className="size-full object-cover" /> : <Icon className="size-6" />}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-label" title={title}>

@@ -1,40 +1,45 @@
 import { Slider } from "@/components/ui/Slider";
+import { OptionField } from "@/features/tool/OptionField";
+import { defineTool, type OptionsProps } from "@/features/tool/toolDef";
 import { useT } from "@/i18n";
-import { AdvancedOptions } from "./AdvancedOptions";
 import { MaxDimensionSelect } from "./ImageOptions";
-import type { PdfSettings } from "./pdfSettings";
-import { OptionRow } from "./SetupView";
+import { pickPdfs } from "./pdfApi";
+import { toPdfOptions, usePdfSettings, type PdfSettings } from "./pdfSettings";
 
-interface PdfOptionsProps {
-  settings: PdfSettings;
-  onChange: (patch: Partial<PdfSettings>) => void;
+function Main() {
+  const { t } = useT();
+  return <p className="text-text-muted">{t("options.pdf.intro")}</p>;
 }
 
-export function PdfOptions({ settings, onChange }: PdfOptionsProps) {
+function Advanced({ settings, onChange }: OptionsProps<PdfSettings>) {
   const { t } = useT();
   return (
     <>
-      <p className="px-4 py-4 text-text-muted">{t("options.pdf.intro")}</p>
-
-      <AdvancedOptions>
-        <OptionRow label={t("options.quality.pdf")} description={t("options.quality.pdf.hint")}>
-          <Slider
-            aria-label={t("options.quality.pdf")}
-            className="sm:w-48"
-            minValue={1}
-            maxValue={100}
-            value={settings.quality}
-            onChange={(quality) => onChange({ quality })}
-          />
-        </OptionRow>
-        <OptionRow label={t("options.dimension")} description={t("options.dimension.pdf.hint")}>
-          <MaxDimensionSelect
-            label={t("options.dimension")}
-            value={settings.maxDimension}
-            onChange={(maxDimension) => onChange({ maxDimension })}
-          />
-        </OptionRow>
-      </AdvancedOptions>
+      <OptionField label={t("options.quality.pdf")} help={t("options.quality.pdf.help")} description={t("options.quality.pdf.hint")}>
+        <Slider
+          aria-label={t("options.quality.pdf")}
+          minValue={1}
+          maxValue={100}
+          value={settings.quality}
+          onChange={(quality) => onChange({ quality })}
+        />
+      </OptionField>
+      <OptionField label={t("options.dimension")} description={t("options.dimension.pdf.hint")}>
+        <MaxDimensionSelect
+          label={t("options.dimension")}
+          value={settings.maxDimension}
+          onChange={(maxDimension) => onChange({ maxDimension })}
+        />
+      </OptionField>
     </>
   );
 }
+
+export const kompresPdf = defineTool({
+  noun: "pdf",
+  pick: pickPdfs,
+  useSettings: usePdfSettings,
+  Main,
+  Advanced,
+  toRequest: toPdfOptions,
+});
