@@ -15,17 +15,17 @@ import {ChevronRight} from 'lucide-react';
 import {composeTailwindRenderProps} from '@/lib/react-aria-utils';
 
 const disclosure = tv({
-  base: 'group min-w-50 font-sans rounded-lg text-neutral-900 dark:text-neutral-200'
+  base: 'group min-w-50 font-sans rounded-lg text-text'
 });
 
 const chevron = tv({
-  base: 'w-4 h-4 text-neutral-500 dark:text-neutral-400 transition-transform duration-200 ease-in-out',
+  base: 'w-4 h-4 text-text-muted transition-transform duration-200 ease-in-out',
   variants: {
     isExpanded: {
       true: 'transform rotate-90'
     },
     isDisabled: {
-      true: 'text-neutral-300 dark:text-neutral-600 forced-colors:text-[GrayText]'
+      true: 'text-text-disabled forced-colors:text-[GrayText]'
     }
   }
 });

@@ -16,7 +16,7 @@ function Row({ label, description, children }: { label: string; description?: st
     <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="flex flex-col">
         <span className="text-sm font-medium">{label}</span>
-        {description && <span className="text-xs text-muted">{description}</span>}
+        {description && <span className="text-xs text-text-muted">{description}</span>}
       </div>
       {children}
     </div>
@@ -90,10 +90,10 @@ function AboutTab() {
       <img src="/rantakit.svg" alt="" className="size-16" />
       <div className="flex flex-col">
         <span className="text-lg font-semibold">Rantakit</span>
-        <span className="text-sm text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
+        <span className="text-sm text-text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
       </div>
       <p className="max-w-xs text-sm">Kompres berkas, tetap di perangkatmu.</p>
-      <p className="max-w-xs text-xs text-muted">
+      <p className="max-w-xs text-xs text-text-muted">
         Perangkat lunak bebas di bawah lisensi AGPL-3.0-or-later.{" "}
         <Link onPress={() => openExternal(LICENSE_URL)}>Lihat lisensi</Link>
       </p>

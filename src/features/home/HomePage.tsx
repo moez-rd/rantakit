@@ -8,7 +8,7 @@ const card = tv({
   base: [
     "flex w-full items-center gap-4 rounded-2xl border border-border bg-surface p-5 text-left",
     "cursor-default select-none transition [-webkit-tap-highlight-color:transparent]",
-    "hovered:border-primary/40 hovered:bg-accent-soft/20 pressed:scale-[0.99]",
+    "hovered:border-brand pressed:scale-[0.99]",
   ],
 });
 
@@ -22,12 +22,12 @@ interface CompressCardProps {
 function CompressCard({ icon: Icon, title, description, onPress }: CompressCardProps) {
   return (
     <Button onPress={onPress} className={(renderProps) => card(renderProps)}>
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
         <Icon aria-hidden className="size-6" />
       </span>
       <span className="flex flex-col">
         <span className="font-medium">{title}</span>
-        <span className="text-sm text-muted">{description}</span>
+        <span className="text-sm text-text-muted">{description}</span>
       </span>
     </Button>
   );
@@ -55,7 +55,7 @@ export function HomePage({ onCompressImage, onCompressPdf }: HomePageProps) {
           onPress={onCompressPdf}
         />
       </div>
-      <p className="hidden text-xs text-muted pointer-fine:block">atau seret berkas ke sini</p>
+      <p className="hidden text-xs text-text-muted pointer-fine:block">atau seret berkas ke sini</p>
     </div>
   );
 }

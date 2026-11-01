@@ -9,11 +9,10 @@ import { MAIN_NAV, SETTINGS_NAV, type NavItem, type Page } from "./navigation";
 const navLink = tv({
   extend: focusRing,
   base: [
-    "flex h-9 items-center gap-3 rounded-lg px-3 text-sm text-muted cursor-default select-none transition",
+    "flex h-9 items-center gap-3 rounded-lg px-3 text-sm text-text-muted cursor-default select-none transition",
     "pointer-coarse:h-11",
-    "hovered:bg-black/5 hovered:text-foreground dark:hovered:bg-white/5",
-    "data-[current]:bg-surface data-[current]:font-medium data-[current]:text-foreground",
-    "data-[current]:shadow-xs data-[current]:ring-1 data-[current]:ring-border",
+    "hovered:bg-badge-bg hovered:text-text",
+    "data-[current]:bg-brand-soft data-[current]:font-semibold data-[current]:text-brand-strong",
   ],
 });
 
@@ -37,7 +36,7 @@ export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
   );
 
   return (
-    <nav aria-label="Navigasi utama" className="hidden w-52 shrink-0 flex-col gap-1 p-3 md:flex">
+    <nav aria-label="Navigasi utama" className="hidden w-52 shrink-0 flex-col gap-1 border-e border-border bg-sidebar p-3 md:flex">
       <div className="mb-4 flex items-center gap-2 ps-2 pt-1">
         <img src="/rantakit.svg" alt="" className="size-7" />
         <span className="flex-1 font-semibold">Rantakit</span>

@@ -62,7 +62,7 @@ function StepperButton(props: ButtonProps) {
   return (
     <Button
       {...props}
-      className="flex border-0 py-0 px-0.5 flex-1 box-border cursor-default text-neutral-500 bg-transparent pressed:bg-neutral-100 group-disabled:text-neutral-200 dark:text-neutral-400 dark:pressed:bg-neutral-800 dark:group-disabled:text-neutral-600 forced-colors:group-disabled:text-[GrayText] [-webkit-tap-highlight-color:transparent]"
+      className="flex border-0 py-0 px-0.5 flex-1 box-border cursor-default text-text-muted bg-transparent pressed:bg-badge-bg group-disabled:text-text-disabled forced-colors:group-disabled:text-[GrayText] [-webkit-tap-highlight-color:transparent]"
     />
   );
 }

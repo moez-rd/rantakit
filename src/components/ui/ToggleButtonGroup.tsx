@@ -7,7 +7,7 @@ import {
 import {tv} from 'tailwind-variants';
 
 const styles = tv({
-  base: 'flex gap-1',
+  base: 'flex gap-1 rounded-xl bg-track p-1',
   variants: {
     orientation: {
       horizontal: 'flex-row',

@@ -13,7 +13,7 @@ interface AppShellProps {
 }
 
 /**
- * Desktop: sidebar on the window background, content in a rounded inset panel.
+ * Desktop: sidebar on its own background, content beside it.
  * Mobile: full-width content with a bottom tab bar.
  */
 export function AppShell({ page, onNavigate, onCommand, children }: AppShellProps) {
@@ -24,7 +24,7 @@ export function AppShell({ page, onNavigate, onCommand, children }: AppShellProp
       {isMacApp && <div data-tauri-drag-region className="h-7 shrink-0" />}
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <Sidebar page={page} onNavigate={onNavigate} onCommand={onCommand} />
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto md:m-2 md:ml-0 md:rounded-2xl md:border md:border-border md:bg-surface">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto">
           {children}
         </main>
         <TabBar page={page} onNavigate={onNavigate} />

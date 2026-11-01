@@ -89,19 +89,19 @@ function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => voi
 
   return (
     <li className="flex items-center gap-3 py-3 ps-4 pe-2">
-      <Icon aria-hidden className={`size-5 shrink-0 ${item.outputExists ? "text-muted" : "text-border"}`} />
+      <Icon aria-hidden className={`size-5 shrink-0 ${item.outputExists ? "text-text-muted" : "text-border"}`} />
       <div className="min-w-0 flex-1">
         <p
-          className={`truncate text-sm font-medium ${item.outputExists ? "" : "text-muted line-through"}`}
+          className={`truncate text-sm font-medium ${item.outputExists ? "" : "text-text-muted line-through"}`}
           title={item.outputPath}
         >
           {fileName(item.outputPath)}
         </p>
-        <p className="truncate text-xs text-muted">
+        <p className="truncate text-xs text-text-muted">
           {item.outputExists ? (
             <>
               {formatBytes(item.originalBytes)} → {formatBytes(item.compressedBytes)}{" "}
-              <span className={smaller ? "text-success" : "text-warning"}>
+              <span className={smaller ? "text-success" : "text-warn"}>
                 {formatChange(item.originalBytes, item.compressedBytes)}
               </span>
             </>
@@ -139,9 +139,9 @@ function Message({
 }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-      <Icon aria-hidden className="size-8 text-muted" />
+      <Icon aria-hidden className="size-8 text-text-muted" />
       <h1 className="font-medium">{title}</h1>
-      <p className="max-w-xs text-sm text-muted">{children}</p>
+      <p className="max-w-xs text-sm text-text-muted">{children}</p>
     </div>
   );
 }

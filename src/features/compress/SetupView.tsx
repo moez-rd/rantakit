@@ -33,7 +33,7 @@ export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel
       <ul className="flex max-h-48 flex-col divide-y divide-border overflow-auto rounded-2xl border border-border bg-surface">
         {paths.map((path) => (
           <li key={path} className="flex items-center gap-3 py-1 ps-4 pe-2">
-            <Icon aria-hidden className="size-4 shrink-0 text-muted" />
+            <Icon aria-hidden className="size-4 shrink-0 text-text-muted" />
             <span className="min-w-0 flex-1 truncate text-sm" title={path}>
               {fileName(path)}
             </span>
@@ -73,7 +73,7 @@ export function OptionRow({
     <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="flex flex-col">
         <span className="text-sm font-medium">{label}</span>
-        {description && <span className="text-xs text-muted">{description}</span>}
+        {description && <span className="text-xs text-text-muted">{description}</span>}
       </div>
       {children}
     </div>

@@ -40,18 +40,18 @@ export function RadioGroup(props: RadioGroupProps) {
 
 const styles = tv({
   extend: focusRing,
-  base: 'w-4.5 h-4.5 flex-shrink-0 box-border rounded-full border bg-white dark:bg-neutral-900 transition-all',
+  base: 'w-4.5 h-4.5 flex-shrink-0 box-border rounded-full border bg-surface transition-all',
   variants: {
     isSelected: {
       false:
-        'border-neutral-400 dark:border-neutral-400 group-pressed:border-neutral-500 dark:group-pressed:border-neutral-300',
-      true: 'border-[calc(var(--spacing)*1.5)] border-neutral-700 dark:border-neutral-300 forced-colors:border-[Highlight]! group-pressed:border-neutral-800 dark:group-pressed:border-neutral-200'
+        'border-border-strong group-pressed:border-border-strong',
+      true: 'border-[calc(var(--spacing)*1.5)] border-brand-strong forced-colors:border-[Highlight]!'
     },
     isInvalid: {
-      true: 'border-red-700 dark:border-red-600 group-pressed:border-red-800 dark:group-pressed:border-red-700 forced-colors:border-[Mark]!'
+      true: 'border-danger group-pressed:border-danger forced-colors:border-[Mark]!'
     },
     isDisabled: {
-      true: 'border-neutral-200 dark:border-neutral-700 forced-colors:border-[GrayText]!'
+      true: 'border-border forced-colors:border-[GrayText]!'
     }
   }
 });
@@ -66,7 +66,7 @@ export function Radio(props: RadioProps) {
       <RadioButton
         className={composeTailwindRenderProps(
           props.className,
-          'flex relative gap-2 items-center group text-neutral-800 disabled:text-neutral-300 dark:text-neutral-200 dark:disabled:text-neutral-600 forced-colors:disabled:text-[GrayText] text-sm transition [-webkit-tap-highlight-color:transparent]'
+          'flex relative gap-2 items-center group text-text disabled:text-text-disabled forced-colors:disabled:text-[GrayText] text-sm transition [-webkit-tap-highlight-color:transparent]'
         )}>
         {composeRenderProps(props.children, (children, renderProps) => (
           <>

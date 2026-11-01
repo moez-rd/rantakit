@@ -27,16 +27,16 @@ export function DropOverlay({ plan, isBusy }: DropOverlayProps) {
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed inset-0 z-50 flex bg-background/80 p-3 backdrop-blur-sm"
+      className="pointer-events-none fixed inset-0 z-50 flex bg-bg/80 p-3 backdrop-blur-sm"
     >
       <div
         className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed text-center ${
-          canDrop ? "border-primary text-primary" : "border-border text-muted"
+          canDrop ? "border-brand-strong text-brand-strong" : "border-border text-text-muted"
         }`}
       >
         <Icon aria-hidden className="size-10" />
         <p className="font-medium">{message}</p>
-        {detail && <p className="text-sm text-muted">{detail}</p>}
+        {detail && <p className="text-sm text-text-muted">{detail}</p>}
       </div>
     </div>
   );

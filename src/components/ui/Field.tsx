@@ -14,7 +14,7 @@ export function Label(props: LabelProps) {
     <RACLabel
       {...props}
       className={twMerge(
-        'font-sans text-sm text-neutral-600 dark:text-neutral-300 font-medium cursor-default w-fit',
+        'font-sans text-sm text-text-muted font-medium cursor-default w-fit',
         props.className
       )}
     />
@@ -27,7 +27,7 @@ export function Description(props: TextProps) {
       {...props}
       slot="description"
       className={twMerge(
-        'text-xs text-neutral-600 dark:text-neutral-400 group-disabled:text-neutral-200 dark:group-disabled:text-neutral-700 contain-inline-size',
+        'text-xs text-text-muted group-disabled:text-text-disabled contain-inline-size',
         props.className
       )}
     />
@@ -40,7 +40,7 @@ export function FieldError(props: FieldErrorProps) {
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        'text-xs text-red-600 contain-inline-size forced-colors:text-[Mark]'
+        'text-xs text-danger contain-inline-size forced-colors:text-[Mark]'
       )}
     />
   );
@@ -51,21 +51,21 @@ export const fieldBorderStyles = tv({
   variants: {
     isFocusWithin: {
       false:
-        'border-neutral-300 hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500 forced-colors:border-[ButtonBorder]',
-      true: 'border-neutral-600 dark:border-neutral-300 forced-colors:border-[Highlight]'
+        'border-border hover:border-border-strong forced-colors:border-[ButtonBorder]',
+      true: 'border-border-strong forced-colors:border-[Highlight]'
     },
     isInvalid: {
-      true: 'border-red-600 dark:border-red-600 forced-colors:border-[Mark]'
+      true: 'border-danger forced-colors:border-[Mark]'
     },
     isDisabled: {
-      true: 'border-neutral-200 dark:border-neutral-700 forced-colors:border-[GrayText]'
+      true: 'border-border forced-colors:border-[GrayText]'
     }
   }
 });
 
 export const fieldGroupStyles = tv({
   extend: focusRing,
-  base: 'group flex items-center h-9 box-border bg-white dark:bg-neutral-900 forced-colors:bg-[Field] border rounded-lg overflow-hidden transition',
+  base: 'group flex items-center h-9 box-border bg-surface forced-colors:bg-[Field] border rounded-lg overflow-hidden transition',
   variants: fieldBorderStyles.variants
 });
 
@@ -86,7 +86,7 @@ export function Input(props: InputProps) {
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        'px-3 py-0 min-h-9 flex-1 min-w-0 border-0 outline outline-0 bg-white dark:bg-neutral-900 font-sans text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-600 dark:placeholder:text-neutral-400 disabled:text-neutral-200 dark:disabled:text-neutral-600 disabled:placeholder:text-neutral-200 dark:disabled:placeholder:text-neutral-600 [-webkit-tap-highlight-color:transparent]'
+        'px-3 py-0 min-h-9 flex-1 min-w-0 border-0 outline outline-0 bg-surface font-sans text-sm text-text placeholder:text-text-muted disabled:text-text-disabled disabled:placeholder:text-text-disabled [-webkit-tap-highlight-color:transparent]'
       )}
     />
   );

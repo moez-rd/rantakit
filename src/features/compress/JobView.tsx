@@ -29,7 +29,7 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
                 ? "Dibatalkan"
                 : "Selesai"}
           </h1>
-          <p className="text-sm text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
+          <p className="text-sm text-text-muted">{isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}</p>
         </div>
         <div className="flex shrink-0 gap-2">
           {isRunning ? (
@@ -64,7 +64,7 @@ function JobRow({ item }: { item: JobItem }) {
         <p className="truncate text-sm font-medium" title={item.path}>
           {item.name}
         </p>
-        <p className="truncate text-xs text-muted">
+        <p className="truncate text-xs text-text-muted">
           {item.status === "pending" && "Menunggu"}
           {item.status === "working" && `Memproses… ${Math.round(item.fraction * 100)}%`}
           {item.status === "cancelled" && "Dibatalkan"}
@@ -73,7 +73,7 @@ function JobRow({ item }: { item: JobItem }) {
               {formatBytes(item.result.originalBytes)} → {formatBytes(item.result.compressedBytes)}{" "}
               <span
                 className={
-                  item.result.compressedBytes < item.result.originalBytes ? "text-success" : "text-warning"
+                  item.result.compressedBytes < item.result.originalBytes ? "text-success" : "text-warn"
                 }
               >
                 {formatChange(item.result.originalBytes, item.result.compressedBytes)}
@@ -100,15 +100,15 @@ function StatusIcon({ status }: { status: JobItem["status"] }) {
   const className = "size-5 shrink-0";
   switch (status) {
     case "pending":
-      return <Circle aria-hidden className={`${className} text-muted`} />;
+      return <Circle aria-hidden className={`${className} text-text-muted`} />;
     case "working":
-      return <Loader2 aria-hidden className={`${className} animate-spin text-primary`} />;
+      return <Loader2 aria-hidden className={`${className} animate-spin text-brand-strong`} />;
     case "done":
       return <CheckCircle2 aria-hidden className={`${className} text-success`} />;
     case "failed":
       return <XCircle aria-hidden className={`${className} text-danger`} />;
     case "cancelled":
-      return <CircleSlash aria-hidden className={`${className} text-muted`} />;
+      return <CircleSlash aria-hidden className={`${className} text-text-muted`} />;
   }
 }
 

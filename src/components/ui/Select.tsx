@@ -18,12 +18,12 @@ import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 const styles = tv({
   extend: focusRing,
-  base: 'flex items-center text-start gap-4 w-full font-sans border border-black/10 dark:border-white/10 cursor-default rounded-lg pl-3 pr-2 h-9 min-w-[180px] transition bg-neutral-50 dark:bg-neutral-700 [-webkit-tap-highlight-color:transparent]',
+  base: 'flex items-center text-start gap-4 w-full font-sans border border-border cursor-default rounded-lg pl-3 pr-2 h-9 min-w-[180px] transition bg-badge-bg [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
       false:
-        'text-neutral-800 dark:text-neutral-300 hover:bg-neutral-100 pressed:bg-neutral-200 dark:hover:bg-neutral-600 dark:pressed:bg-neutral-500 group-invalid:outline group-invalid:outline-red-600 forced-colors:group-invalid:outline-[Mark]',
-      true: 'border-transparent dark:border-transparent text-neutral-200 dark:text-neutral-600 forced-colors:text-[GrayText] bg-neutral-100 dark:bg-neutral-800'
+        'text-text hover:bg-badge-bg pressed:bg-badge-bg group-invalid:outline group-invalid:outline-danger forced-colors:group-invalid:outline-[Mark]',
+      true: 'border-transparent text-text-disabled forced-colors:text-[GrayText] bg-badge-bg'
     }
   }
 });
@@ -61,7 +61,7 @@ export function Select<T, M extends 'single' | 'multiple' = 'single'>({
         </SelectValue>
         <ChevronDown
           aria-hidden
-          className="w-4 h-4 text-neutral-600 dark:text-neutral-400 forced-colors:text-[ButtonText] group-disabled:text-neutral-200 dark:group-disabled:text-neutral-600 forced-colors:group-disabled:text-[GrayText]"
+          className="w-4 h-4 text-text-muted forced-colors:text-[ButtonText] group-disabled:text-text-disabled forced-colors:group-disabled:text-[GrayText]"
         />
       </Button>
       {description && <Description>{description}</Description>}
