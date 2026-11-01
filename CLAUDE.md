@@ -1,1 +1,1 @@
-RANTAKIT.md
+@AGENTS.md
