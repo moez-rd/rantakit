@@ -24,23 +24,36 @@ Everything runs on your device. That means it works with no internet connection.
 > [!WARNING]
 > Rantakit is in early development and is not stable yet. Features and behavior may change at any time.
 
-## Features
+## Roadmap
 
-| Type                         | Status                | Type                         | Status                |
-| ---------------------------- | --------------------- | ---------------------------- | --------------------- |
-| **Compress image**           | 🧪 Preview (JPG, PNG)  | **Rotate PDF pages**         | ❌ Not implemented yet |
-| **Compress PDF**             | 🧪 Preview             | **Reorder PDF pages**        | ❌ Not implemented yet |
-| **Compress GIF**             | ❌ Not implemented yet | **Capture documents**        | ❌ Not implemented yet |
-| **Compress video**           | ❌ Not implemented yet | **Extract text from images** | ❌ Not implemented yet |
-| **Compress audio**           | ❌ Not implemented yet | **Batch processing**         | 🧪 Preview             |
-| **Compress office document** | ❌ Not implemented yet | **History of recent jobs**   | 🧪 Preview             |
-| **Image format conversions** | 🧪 Preview (JPG ↔ PNG) | **Windows support**          | 🧪 Preview             |
-| **Images to PDF**            | ❌ Not implemented yet | **macOS support**            | ❌ Not implemented yet |
-| **PDF to images**            | ❌ Not implemented yet | **Linux support**            | 🧪 Preview             |
-| **Merge PDFs**               | ❌ Not implemented yet | **Android support**          | ❌ Not implemented yet |
-| **Split PDFs**               | ❌ Not implemented yet | **iOS support**              | ❌ Not implemented yet |
-| **Extract PDF pages**        | ❌ Not implemented yet |                              |                       |
+The features Rantakit has and plans, by release. Releases have no dates; see [ROADMAP.md](ROADMAP.md) for details.
 
+| Version       | Feature                    | Short description                                                  |
+| ------------- | -------------------------- | ------------------------------------------------------------------ |
+| v0.1          | Batch processing           | Work on many files at once (already in preview)                    |
+| v0.2          | Compress image             | Make photos smaller, by size limit or "just make it smaller"       |
+| v0.2          | Compress PDF               | Make PDFs small enough for upload portals                          |
+| v0.2          | Image format conversions   | Convert photos between JPG and PNG                                 |
+| v0.2          | History of recent jobs     | Riwayat (History) of past Tasks, kept for 30 days                  |
+| v0.2          | Windows and Linux support  | Desktop release with the new look, in Indonesian and English       |
+| v0.3          | Android support            | The same Tools on low-end phones, with Share → Rantakit            |
+| v0.4          | Merge PDFs                 | Combine several PDFs into one                                      |
+| v0.4          | Split PDFs                 | Cut one PDF into several                                           |
+| v0.4          | Extract PDF pages          | Save chosen pages as a new PDF                                     |
+| v0.4          | Rotate PDF pages           | Turn pages the right way up                                        |
+| v0.4          | Reorder PDF pages          | Change the order of pages                                          |
+| v0.5          | Images to PDF              | Turn photos into one PDF, with crop and straighten                 |
+| v0.5          | Capture documents          | Scan paper with the camera into a clean PDF (Android)              |
+| v0.7          | Image format conversions   | Convert HEIC and WebP photos to JPG or PNG                         |
+| v0.7          | PDF to images              | Turn PDF pages into JPG images                                     |
+| v0.7          | Compress office document   | Make Word, Excel, and PowerPoint files smaller                     |
+| v0.8          | Compress audio             | Make audio files such as voice notes smaller                       |
+| v0.9          | Compress video             | Make videos small enough to send or upload                         |
+| After 1.0     | Extract text from images   | Get text out of images and PDFs, in Indonesian and English         |
+| Not scheduled | Compress GIF               | Not in the roadmap yet                                             |
+| Not scheduled | macOS and iOS support      | Not in the roadmap yet                                             |
+
+The roadmap is not fixed. Suggestions from anyone are welcome: if there is a feature that would make Rantakit more useful for you, please [open an issue](https://github.com/moez-rd/rantakit/issues) and tell us about it. Your ideas help decide what Rantakit builds next.
 
 ## Install
 

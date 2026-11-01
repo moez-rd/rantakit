@@ -24,22 +24,36 @@ Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneks
 > [!WARNING]
 > Rantakit masih dalam tahap awal pengembangan dan belum stabil. Fitur dan perilaku aplikasi bisa berubah sewaktu-waktu.
 
-## Fitur
+## Rencana pengembangan
 
-| Jenis                      | Status                  | Jenis                              | Status           |
-| -------------------------- | ----------------------- | ---------------------------------- | ---------------- |
-| **Kompres gambar**         | 🧪 Pratinjau (JPG, PNG)  | **Putar halaman PDF**              | ❌ Belum tersedia |
-| **Kompres PDF**            | 🧪 Pratinjau             | **Urutkan ulang halaman PDF**      | ❌ Belum tersedia |
-| **Kompres GIF**            | ❌ Belum tersedia        | **Pindai dokumen**                 | ❌ Belum tersedia |
-| **Kompres video**          | ❌ Belum tersedia        | **Ambil teks dari gambar**         | ❌ Belum tersedia |
-| **Kompres audio**          | ❌ Belum tersedia        | **Proses banyak berkas sekaligus** | 🧪 Pratinjau      |
-| **Kompres dokumen Office** | ❌ Belum tersedia        | **Riwayat proses terbaru**         | 🧪 Pratinjau      |
-| **Konversi format gambar** | 🧪 Pratinjau (JPG ↔ PNG) | **Dukungan Windows**               | 🧪 Pratinjau      |
-| **Gambar ke PDF**          | ❌ Belum tersedia        | **Dukungan macOS**                 | ❌ Belum tersedia |
-| **PDF ke gambar**          | ❌ Belum tersedia        | **Dukungan Linux**                 | 🧪 Pratinjau      |
-| **Gabung PDF**             | ❌ Belum tersedia        | **Dukungan Android**               | ❌ Belum tersedia |
-| **Pisah PDF**              | ❌ Belum tersedia        | **Dukungan iOS**                   | ❌ Belum tersedia |
-| **Ambil halaman PDF**      | ❌ Belum tersedia        |                                    |                  |
+Fitur yang sudah ada dan yang direncanakan, menurut rilis. Rilis tidak punya tanggal; lihat [ROADMAP.md](../../ROADMAP.md) (bahasa Inggris) untuk detailnya.
+
+| Versi            | Fitur                          | Penjelasan singkat                                                     |
+| ---------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| v0.1             | Proses banyak berkas sekaligus | Olah banyak berkas dalam sekali jalan (sudah tersedia sebagai pratinjau) |
+| v0.2             | Kompres gambar                 | Perkecil foto sesuai batas ukuran, atau "kecilkan saja"                |
+| v0.2             | Kompres PDF                    | Perkecil PDF supaya bisa diunggah ke portal                            |
+| v0.2             | Konversi format gambar         | Ubah foto antara JPG dan PNG                                           |
+| v0.2             | Riwayat proses terbaru         | Riwayat proses sebelumnya, disimpan selama 30 hari                     |
+| v0.2             | Dukungan Windows dan Linux     | Rilis desktop dengan tampilan baru, dalam bahasa Indonesia dan Inggris |
+| v0.3             | Dukungan Android               | Alat yang sama di HP spesifikasi rendah, bisa dibuka lewat Bagikan     |
+| v0.4             | Gabung PDF                     | Satukan beberapa PDF jadi satu                                         |
+| v0.4             | Pisah PDF                      | Pecah satu PDF jadi beberapa                                           |
+| v0.4             | Ambil halaman PDF              | Simpan halaman pilihan sebagai PDF baru                                |
+| v0.4             | Putar halaman PDF              | Putar halaman supaya tidak terbalik                                    |
+| v0.4             | Urutkan ulang halaman PDF      | Ubah urutan halaman                                                    |
+| v0.5             | Gambar ke PDF                  | Jadikan foto satu PDF, dengan potong dan luruskan                      |
+| v0.5             | Pindai dokumen                 | Pindai kertas dengan kamera jadi PDF yang rapi (Android)               |
+| v0.7             | Konversi format gambar         | Ubah foto HEIC dan WebP ke JPG atau PNG                                |
+| v0.7             | PDF ke gambar                  | Ubah halaman PDF jadi gambar JPG                                       |
+| v0.7             | Kompres dokumen Office         | Perkecil berkas Word, Excel, dan PowerPoint                            |
+| v0.8             | Kompres audio                  | Perkecil berkas audio, misalnya pesan suara                            |
+| v0.9             | Kompres video                  | Perkecil video supaya bisa dikirim atau diunggah                       |
+| Setelah 1.0      | Ambil teks dari gambar         | Ambil teks dari gambar dan PDF, dalam bahasa Indonesia dan Inggris     |
+| Belum dijadwalkan | Kompres GIF                   | Belum masuk rencana pengembangan                                       |
+| Belum dijadwalkan | Dukungan macOS dan iOS        | Belum masuk rencana pengembangan                                       |
+
+Rencana ini belum tetap. Saran dari siapa pun sangat diterima: kalau ada fitur yang bisa membuat Rantakit lebih berguna buatmu, silakan [buka issue](https://github.com/moez-rd/rantakit/issues) dan ceritakan idemu. Masukanmu ikut menentukan apa yang dibangun Rantakit berikutnya.
 
 ## Instalasi
 
