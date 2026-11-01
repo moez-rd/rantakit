@@ -163,6 +163,8 @@ export const id = {
   "error.unsupported-format": "Alat ini belum bisa membuka file jenis ini.",
   "error.size-limit-unreachable": "Paling kecil bisa {best}.",
   "error.size-limit-unreachable.unknown": "Batas ukuran tidak tercapai.",
+  "error.size-limit-unreachable.shrink": "Kecilkan juga ukuran gambarnya?",
+  "error.accepted": "Yang bisa dibuka: {formats}.",
   "error.not-enough-space": "Ruang penyimpanan penuh. Kosongkan sedikit ruang, lalu coba lagi.",
   "error.cannot-write": "Hasil tidak bisa disimpan di folder ini. Pilih folder lain di Pengaturan.",
   "error.original-missing": "File aslinya sudah dipindah atau dihapus.",

@@ -10,13 +10,15 @@ interface KindInfo {
   /** Count of files of this kind: "3 foto", "3 PDF". */
   files: "files.photo" | "files.pdf";
   icon: ComponentType<IconProps>;
+  /** The formats this kind opens, as the user knows them. */
+  formats: string;
   matches: (path: string) => boolean;
   pick: () => Promise<string[]>;
 }
 
 export const FILE_KINDS: Record<FileKind, KindInfo> = {
-  image: { files: "files.photo", icon: Image, matches: isImagePath, pick: pickImages },
-  pdf: { files: "files.pdf", icon: File, matches: isPdfPath, pick: pickPdfs },
+  image: { files: "files.photo", icon: Image, formats: "JPG, PNG", matches: isImagePath, pick: pickImages },
+  pdf: { files: "files.pdf", icon: File, formats: "PDF", matches: isPdfPath, pick: pickPdfs },
 };
 
 export interface DropPlan {

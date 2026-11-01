@@ -161,6 +161,8 @@ export const en: Messages = {
   "error.unsupported-format": "This tool can't open this kind of file yet.",
   "error.size-limit-unreachable": "Can only reach {best}.",
   "error.size-limit-unreachable.unknown": "The size limit couldn't be reached.",
+  "error.size-limit-unreachable.shrink": "Also shrink the image dimensions?",
+  "error.accepted": "It can open: {formats}.",
   "error.not-enough-space": "Storage is full. Free up some space, then try again.",
   "error.cannot-write": "The Result can't be saved in this folder. Choose another folder in Settings.",
   "error.original-missing": "The original file was moved or deleted.",

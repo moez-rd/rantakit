@@ -60,7 +60,7 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
             key={item.path}
             tr={tr}
             item={item}
-            icon={FILE_KINDS[job.kind].icon}
+            kind={FILE_KINDS[job.kind]}
             canRetry={!isRunning}
             onRetry={(options) => job.retry(index, options)}
           />
@@ -73,14 +73,14 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
 interface JobRowProps {
   tr: Translator;
   item: JobItem;
-  icon: (typeof FILE_KINDS)["image"]["icon"];
+  kind: (typeof FILE_KINDS)["image"];
   canRetry: boolean;
   onRetry: (options?: JobItem["options"]) => void;
 }
 
-function JobRow({ tr, item, icon, canRetry, onRetry }: JobRowProps) {
+function JobRow({ tr, item, kind, canRetry, onRetry }: JobRowProps) {
   const { t, locale } = tr;
-  const common = { name: item.name, title: item.path, icon };
+  const common = { name: item.name, title: item.path, icon: kind.icon };
 
   switch (item.status) {
     case "pending":
@@ -122,7 +122,7 @@ function JobRow({ tr, item, icon, canRetry, onRetry }: JobRowProps) {
         <ProblemRow
           {...common}
           tone={smaller ? "limit" : "failed"}
-          message={errorMessage(tr, item.error)}
+          message={errorMessage(tr, item.error, { accepted: kind.formats, canShrink: smaller !== null && canRetry })}
           action={
             !canRetry
               ? undefined
