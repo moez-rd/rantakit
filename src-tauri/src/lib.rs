@@ -32,6 +32,7 @@ pub fn run() {
             commands::history::list_history,
             commands::history::remove_history,
             commands::history::clear_history,
+            commands::history::recent_tools,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

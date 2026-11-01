@@ -14,6 +14,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use rantakit_image::ImageFormat;
 use serde::{Deserialize, Serialize};
 
+use crate::catalogue::ToolId;
 use crate::task::{Details, FileOutcome, ResultFile, Task, ToolOptions};
 
 #[derive(Debug, thiserror::Error)]
@@ -34,11 +35,17 @@ pub type Result<T> = std::result::Result<T, HistoryError>;
 const VERSION: u32 = 1;
 /// Oldest entries are dropped beyond this.
 const MAX_ENTRIES: usize = 500;
+/// How many Tools "Terakhir dipakai" (Recent tools) shows on Home.
+pub const RECENT_TOOLS: usize = 4;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
     pub id: String,
+    /// The Tool that made this Result, by `ToolId::as_str`. Entries saved
+    /// before Tools were recorded get one from their format on load.
+    #[serde(default)]
+    pub tool: String,
     /// Unix time in milliseconds.
     pub created_at: u64,
     pub input_path: PathBuf,
@@ -78,6 +85,20 @@ impl History {
     pub fn list(&self) -> Result<Vec<Entry>> {
         let _guard = self.lock.lock().unwrap_or_else(|e| e.into_inner());
         self.load()
+    }
+
+    /// The last Tools used, newest first, each once, at most [`RECENT_TOOLS`].
+    pub fn recent_tools(&self) -> Result<Vec<String>> {
+        let mut tools: Vec<String> = Vec::with_capacity(RECENT_TOOLS);
+        for entry in self.list()? {
+            if tools.len() == RECENT_TOOLS {
+                break;
+            }
+            if !tools.contains(&entry.tool) {
+                tools.push(entry.tool);
+            }
+        }
+        Ok(tools)
     }
 
     pub fn add(&self, entry: Entry) -> Result<()> {
@@ -136,7 +157,7 @@ impl History {
         match serde_json::from_str::<HistoryFile>(&text) {
             // Written by a newer app version: leave it untouched rather than lose data.
             Ok(file) if file.version > VERSION => Err(HistoryError::Newer(file.version)),
-            Ok(file) => Ok(file.entries),
+            Ok(file) => Ok(file.entries.into_iter().map(with_tool).collect()),
             Err(err) => {
                 // Keep the broken file for inspection and start over.
                 eprintln!("history file is unreadable, moving it aside: {err}");
@@ -160,6 +181,20 @@ impl History {
         fs::rename(&tmp, &self.path)?;
         Ok(())
     }
+}
+
+/// Fills in the Tool of an entry saved before Tools were recorded: only
+/// Kompres Foto and Kompres PDF existed then.
+fn with_tool(mut entry: Entry) -> Entry {
+    if entry.tool.is_empty() {
+        let tool = if entry.format == "pdf" {
+            ToolId::KompresPdf
+        } else {
+            ToolId::KompresFoto
+        };
+        entry.tool = tool.as_str().into();
+    }
+    entry
 }
 
 fn entry(tool: &ToolOptions, original: &Path, result: &ResultFile, created_at: u64) -> Entry {
@@ -193,6 +228,7 @@ fn entry(tool: &ToolOptions, original: &Path, result: &ResultFile, created_at: u
 
     Entry {
         id: new_id(created_at),
+        tool: tool.id().as_str().into(),
         created_at,
         input_path: original.to_path_buf(),
         output_path: result.path.clone(),
@@ -226,8 +262,13 @@ mod tests {
     use super::*;
 
     fn entry(id: &str) -> Entry {
+        used(id, "kompres-foto")
+    }
+
+    fn used(id: &str, tool: &str) -> Entry {
         Entry {
             id: id.into(),
+            tool: tool.into(),
             created_at: 0,
             input_path: "in.jpg".into(),
             output_path: "in-rantakit.jpg".into(),
@@ -306,6 +347,55 @@ mod tests {
         assert_eq!(entries[0].quality, None, "no image was re-encoded");
         assert_eq!(entries[1].quality, Some(100));
         assert_eq!(entries[1].input_path, PathBuf::from("a.pdf"));
+        assert_eq!(entries[1].tool, "kompres-pdf");
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn recent_tools_are_distinct_and_newest_first() {
+        let (history, dir) = temp_history("recent");
+        assert!(history.recent_tools().unwrap().is_empty());
+
+        for (id, tool) in [
+            ("1", "kompres-foto"),
+            ("2", "kompres-pdf"),
+            ("3", "kompres-foto"),
+            ("4", "a"),
+            ("5", "b"),
+            ("6", "c"),
+        ] {
+            history.add(used(id, tool)).unwrap();
+        }
+        assert_eq!(
+            history.recent_tools().unwrap(),
+            ["c", "b", "a", "kompres-foto"]
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn entries_from_before_tools_were_recorded_get_one_from_their_format() {
+        let (history, dir) = temp_history("no-tool");
+        fs::create_dir_all(&dir).unwrap();
+        let old = |id: &str, format: &str| {
+            format!(
+                r#"{{"id":"{id}","createdAt":0,"inputPath":"a","outputPath":"b","originalBytes":2,"compressedBytes":1,"format":"{format}","width":null,"height":null,"quality":null}}"#
+            )
+        };
+        let file = format!(
+            r#"{{"version":1,"entries":[{},{}]}}"#,
+            old("a", "pdf"),
+            old("b", "jpeg")
+        );
+        fs::write(&history.path, file).unwrap();
+
+        let tools: Vec<_> = history
+            .list()
+            .unwrap()
+            .into_iter()
+            .map(|e| e.tool)
+            .collect();
+        assert_eq!(tools, ["kompres-pdf", "kompres-foto"]);
         fs::remove_dir_all(dir).unwrap();
     }
 

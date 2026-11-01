@@ -37,6 +37,9 @@ export function installDevMocks() {
         return TOOLS;
       case "list_history":
         return [];
+      // Add ?recent to the URL to see Home after a few Tasks.
+      case "recent_tools":
+        return new URLSearchParams(location.search).has("recent") ? ["kompres-pdf", "kompres-foto"] : [];
       default:
         return null;
     }

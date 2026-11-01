@@ -73,6 +73,7 @@ export const en: Messages = {
   "picker.pdfs": "Choose PDFs",
 
   // Home
+  "home.recent": "Recent tools",
   "home.all": "All tools",
   "home.comingSoon": "Coming soon",
 

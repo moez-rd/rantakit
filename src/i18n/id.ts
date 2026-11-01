@@ -75,6 +75,7 @@ export const id = {
   "picker.pdfs": "Pilih PDF",
 
   // Home
+  "home.recent": "Terakhir dipakai",
   "home.all": "Semua alat",
   "home.comingSoon": "Segera hadir",
 

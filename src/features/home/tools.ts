@@ -75,6 +75,17 @@ export const TOOL_ICONS: Record<ToolId, ComponentType<IconProps>> = {
   "hapus-info-lokasi": MapPinOff,
 };
 
+/** The last Tools used, newest first; empty until the first Task finishes. */
+export function useRecentTools(): string[] {
+  const [recent, setRecent] = useState<string[]>([]);
+  useEffect(() => {
+    invoke<string[]>("recent_tools")
+      .then(setRecent)
+      .catch(() => {});
+  }, []);
+  return recent;
+}
+
 /** The Tools to list on this platform; empty until the backend answers. */
 export function useTools(): ToolInfo[] {
   const [tools, setTools] = useState<ToolInfo[]>([]);
