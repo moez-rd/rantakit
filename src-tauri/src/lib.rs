@@ -27,6 +27,7 @@ pub fn run() {
             commands::files::file_sizes,
             commands::menu::set_menu_language,
             commands::tools::list_tools,
+            commands::tools::match_files,
             commands::task::start_task,
             commands::task::cancel_task,
             commands::history::list_history,

@@ -4,9 +4,6 @@ import { currentTranslator } from "@/i18n";
 
 export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
-export const isImagePath = (path: string) =>
-  IMAGE_EXTENSIONS.includes(path.split(".").pop()?.toLowerCase() ?? "");
-
 /** Last segment of a Windows or POSIX path. */
 export const fileName = (path: string) => path.split(/[\\/]/).pop() ?? path;
 

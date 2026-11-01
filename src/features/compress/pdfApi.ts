@@ -2,8 +2,6 @@ import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { currentTranslator } from "@/i18n";
 
-export const isPdfPath = (path: string) => path.toLowerCase().endsWith(".pdf");
-
 /** Ask the user for PDFs. Returns an empty list when cancelled or outside Tauri. */
 export async function pickPdfs(): Promise<string[]> {
   if (!isTauri()) return [];

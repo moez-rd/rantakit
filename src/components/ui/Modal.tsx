@@ -15,8 +15,12 @@ const overlayStyles = tv({
 });
 
 const modalStyles = tv({
-  base: 'font-sans w-full max-w-[min(90vw,450px)] max-h-[calc(var(--visual-viewport-height)*.9)] rounded-[20px] bg-surface text-left align-middle text-text bg-clip-padding border border-border',
+  base: 'font-sans w-full max-h-[calc(var(--visual-viewport-height)*.9)] rounded-[20px] bg-surface text-left align-middle text-text bg-clip-padding border border-border',
   variants: {
+    size: {
+      normal: 'max-w-[min(90vw,450px)]',
+      wide: 'max-w-[min(90vw,560px)]'
+    },
     isEntering: {
       true: 'animate-in zoom-in-105 ease-out duration-200'
     },
@@ -26,11 +30,11 @@ const modalStyles = tv({
   }
 });
 
-export function Modal(props: ModalOverlayProps) {
+export function Modal({size = 'normal', ...props}: ModalOverlayProps & {size?: 'normal' | 'wide'}) {
   return (
     <ModalOverlay {...props} className={overlayStyles}>
       <div className="sticky top-0 left-0 w-full h-(--visual-viewport-height) flex items-center justify-center box-border">
-        <RACModal {...props} className={modalStyles} />
+        <RACModal {...props} className={(renderProps) => modalStyles({...renderProps, size})} />
       </div>
     </ModalOverlay>
   );

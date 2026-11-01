@@ -9,8 +9,8 @@ mod names;
 mod task;
 
 pub use catalogue::{
-    Availability, CATALOGUE, Job, Platform, Tool, ToolId, tools_for, tools_for_files,
-    tools_for_kinds,
+    Availability, CATALOGUE, FileMatch, Job, Platform, Tool, ToolId, match_files, match_kinds,
+    tools_for, tools_for_files, tools_for_kinds,
 };
 pub use history::{Entry, History, HistoryError};
 pub use kinds::{FileKind, detect_kind};

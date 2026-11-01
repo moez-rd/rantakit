@@ -127,11 +127,20 @@ export const en: Messages = {
   "task.cancelledCount": "{count} cancelled",
 
   // Dropping files
+  "drop.here": "Drop here",
+  "drop.addTo": "Drop to add to {tool}",
   "drop.busy": "Wait until the files are done",
-  "drop.add": "Drop to add {files}",
-  "drop.skipped": "{count} other files will be skipped",
   "drop.unsupported": "Rantakit can't open this kind of file yet",
   "drop.accepted": "What works: JPG, PNG, PDF",
+  "drop.mixed": "Photos and PDFs can't be processed together",
+  "drop.mixed.hint": "Drag only photos or only PDFs",
+  "drop.ask.single": "What should we do with this {noun}?",
+  "drop.ask.many": "What should we do with these {files}?",
+  "drop.files": "Dragged files",
+  "drop.tools": "Matching tools",
+  "noun.photo": "photo",
+  "noun.pdf": "PDF",
+  "noun.any": "file",
 
   // History
   "history.title": "History",

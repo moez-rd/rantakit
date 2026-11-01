@@ -129,11 +129,20 @@ export const id = {
   "task.cancelledCount": "{count} dibatalkan",
 
   // Dropping files
+  "drop.here": "Lepas di sini",
+  "drop.addTo": "Lepaskan untuk menambahkan ke {tool}",
   "drop.busy": "Tunggu sampai file selesai diproses",
-  "drop.add": "Lepaskan untuk menambahkan {files}",
-  "drop.skipped": "{count} file lain akan dilewati",
   "drop.unsupported": "Rantakit belum bisa membuka file jenis ini",
   "drop.accepted": "Apa yang bisa: JPG, PNG, PDF",
+  "drop.mixed": "Foto dan PDF tidak bisa diproses bersamaan",
+  "drop.mixed.hint": "Seret foto saja atau PDF saja",
+  "drop.ask.single": "Mau diapakan {noun} ini?",
+  "drop.ask.many": "Mau diapakan {files} ini?",
+  "drop.files": "File yang diseret",
+  "drop.tools": "Alat yang cocok",
+  "noun.photo": "foto",
+  "noun.pdf": "PDF",
+  "noun.any": "file",
 
   // History
   "history.title": "Riwayat",
