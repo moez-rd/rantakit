@@ -53,12 +53,12 @@ A Tool keeps the same promise on every platform (same Tool, same output format, 
 | PDF compress, merge, split, arrange | `lopdf` | `lopdf` | `lopdf` |
 | HEIC input ([ADR 0007](docs/adr/0007-accept-hevc-patent-risk-for-heic-decoding.md)) | `heic` | `heic` | `heic` (the system decoder is the reserve if `heic` is too big) |
 | WebP input (no WebP output) | `image-webp` | `image-webp` | `image-webp` |
-| PDF to JPG | `hayro`, with `mupdf` as fallback | same | same |
+| PDF to JPG | `hayro` | `hayro` | `hayro` (Android's `PdfRenderer` is the fallback if `hayro` fails real documents) |
 | Compress office documents | `zip` plus `rantakit-image` | same | same |
 | Audio in (.opus, .ogg, .m4a, .mp3, .wav) | `symphonia`, libopus for Opus | same | same |
 | Audio out (MP3 only) | LAME | LAME | LAME |
-| Video (H.264 in MP4 only, [ADR 0008](docs/adr/0008-h264-through-native-encoders-only.md)) | Media Foundation | System ffmpeg or GStreamer at runtime (to be confirmed by the size experiment) | MediaCodec and MediaMuxer through the NDK |
-| Word and Excel to PDF | `office2pdf` with Carlito and Liberation fonts, labeled best effort | same | same |
+| Video (H.264 in MP4 only, [ADR 0008](docs/adr/0008-h264-through-native-encoders-only.md)) | Media Foundation | System ffmpeg or GStreamer at runtime (to be proven by the v0.9 prototype) | MediaCodec and MediaMuxer through the NDK |
+| Word and Excel to PDF | `office2pdf` with Carlito and Liberation fonts, labeled best effort; must be slimmed to fit the size budget | same | same |
 | Scan Dokumen edge detection | | | `imageproc`, with draggable corners when detection misses |
 
 Native Android backends are called from Rust through the NDK (`ndk` crate), so engine logic stays inside the engine crate. Kotlin is used only for app plumbing.
@@ -73,11 +73,10 @@ Native Android backends are called from Rust through the NDK (`ndk` crate), so e
 
 ## Size experiment
 
-Before stories for the heavy formats are written, a throwaway `spike/size` branch adds each heavy format as a cargo feature on a minimal build of the current app. A GitHub Actions workflow builds the baseline and each format alone for Windows (installer), Linux (AppImage), and Android (arm64-v8a and armeabi-v7a APKs), and reports download size, plus installed size as a secondary number.
+The throwaway `spike/size` branch adds each heavy format as a `spike-*` cargo feature on v0.1.0, and its "Size experiment" workflow builds the baseline and each format alone for Windows (installer), Linux (`.deb` and AppImage), and Android (arm64-v8a and armeabi-v7a APKs), then writes a download-size table. The AppImage bundles its own WebKit, so `.deb` is the Linux number that shows what a format adds. The branch is kept so later epics can measure again; it is never merged.
 
-- **Budget:** one download-size cap per platform for the whole 1.0 app, set from the baseline.
-- **Over budget:** formats leave 1.0 in this order until the app fits: Word and Excel to PDF, video, audio, PDF to JPG, office compression, HEIC.
-- **Afterwards:** the measurements and the budget are recorded in an ADR, ROADMAP.md is updated, and the branch is deleted.
+- **Results and budget:** [ADR 0009](docs/adr/0009-size-budget.md). The 1.0 caps are 20 MB (Android arm64), 16 MB (Android armv7), 8 MB (Windows installer), and 10 MB (Linux `.deb`).
+- **Over budget:** Word and Excel to PDF is the only format that does not fit yet; its epic slims it first. If formats still exceed the caps, they leave 1.0 in this order: Word and Excel to PDF, video, audio, PDF to JPG, office compression, HEIC.
 
 ## Tests and CI
 

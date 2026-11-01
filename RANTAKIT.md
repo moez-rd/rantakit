@@ -48,7 +48,7 @@ Tools are named with the words people search for (Kompres PDF, not invented name
 
 | Job | MVP | Later |
 |---|---|---|
-| 1. Make it acceptable | Kompres Foto and Kompres PDF (compress photo, compress PDF; both with Size limit mode), convert photos (JPG, PNG, HEIC, WebP → JPG or PNG), resize photo, compress office documents (Word, Excel, PowerPoint), compress and convert audio, compress video, Word ke PDF (Word to PDF), Excel ke PDF (Excel to PDF) | |
+| 1. Make it acceptable | Kompres Foto and Kompres PDF (compress photo, compress PDF; both with Size limit mode), Ubah Format Foto (convert photo: JPG, PNG, HEIC, WebP → JPG or PNG), Ubah Ukuran Foto (resize photo), compress office documents (Word, Excel, PowerPoint), compress and convert audio, compress video, Word ke PDF (Word to PDF), Excel ke PDF (Excel to PDF) | |
 | 2. Paper → PDF | **All platforms:** JPG ke PDF (JPG to PDF), with crop and straighten. **Android:** Scan Dokumen (scan document: camera, automatic edge detection, crop, straighten, clean up, multiple pages into one PDF) | |
 | 3. Arrange documents | Gabung PDF (merge PDF), Pisah PDF (split PDF), Atur Halaman PDF (arrange PDF pages: reorder, rotate, delete, extract), PDF ke JPG (PDF to JPG) | |
 | 4. Get text | | Ambil Teks dari Gambar/PDF (get text from an image or PDF), with Indonesian and English included in the app |
@@ -113,7 +113,7 @@ Every Tool follows the same layout:
 
 1. **Files:** pick, drop, or share. Shows thumbnails, sizes, and page counts.
 2. **Options:** defaults already filled in, Advanced options collapsed, one main button ("Kompres" (Compress), "Gabungkan" (Merge)).
-3. **Result:** before and after (size, preview), then **Open / Share / Show in folder**, then "Proses file lain" (Process another file).
+3. **Result:** before and after (size, preview), then **Open / Share / Show in folder**, then "Proses file lain" (Process another file). Share appears only where the platform has a share sheet (Android and Windows, not Linux).
 
 On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are stacked, and the Result is its own screen.
 
@@ -173,13 +173,13 @@ On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are st
 | Android | Google Play, F-Droid, APK on GitHub Releases |
 | Linux | Flathub (primary); .deb, .rpm, and AppImage on GitHub Releases |
 
-The in-app update check is on by default, shows a quiet "update available" notice with a one-click download, can be switched off in Settings, and is disabled where a store handles updates ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)).
+The in-app update check is on by default, shows a quiet "update available" notice with a one-click download, can be switched off in Settings, and is disabled where a store handles updates ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)). It is postponed while the maintainer is the only user, and ships before Rantakit is offered to anyone else.
 
 ### App size
 
 Keep the app as small as possible, because many users download it over prepaid mobile data. When a feature would make the app noticeably bigger, the lighter way to build it wins, even if it is slightly less clever. Indonesian and English language data are included; other languages are optional downloads the user asks for.
 
-**The size gate.** Before a heavy format (HEIC and WebP, office documents, audio, video, Word and Excel to PDF) is planned in detail, a throwaway prototype measures how much it adds to the installed app on each platform. A size budget is set from the measured size of v0.1.0. A format over budget moves to after 1.0 until a lighter way is found; it is never offered as an optional download ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)).
+**The size gate.** The 1.0 app must fit these download sizes: 20 MB for the Android arm64 APK, 16 MB for the armv7 APK, 8 MB for the Windows installer, and 10 MB for the Linux `.deb` ([ADR 0009](docs/adr/0009-size-budget.md)). Every heavy format was measured against them; all fit except Word and Excel to PDF, which must be slimmed before it ships. A format over budget moves to after 1.0 until a lighter way is found, unless the caps are raised on purpose; it is never offered as an optional download ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)).
 
 ## 8. Design system
 
@@ -234,7 +234,7 @@ The app cannot measure anything itself ([ADR 0001](docs/adr/0001-files-never-lea
 
 - Where in the app donations are mentioned (ADR 0002 says one quiet place; the place is not decided yet).
 - Distribution: when each channel opens, whether to also publish on the Microsoft Store, and whether 1.0 requires the stores.
-- The size budget, set after measuring v0.1.0.
+- Whether Word and Excel to PDF can be slimmed to fit the size budget.
 - Which additional OCR languages to offer as downloads first.
 
 The dark-mode palette is decided in v0.2, and each Tool's Advanced options are decided at the start of its epic ([ROADMAP.md](ROADMAP.md)).
