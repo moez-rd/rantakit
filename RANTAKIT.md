@@ -142,7 +142,7 @@ On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are st
 
 ### First launch and language
 
-- No onboarding tour, no sign-up, no questions. The app opens on the home screen with one quiet line: "Semua proses di perangkatmu. Tanpa internet." (Everything happens on your device. No internet.) The first Tool is one tap away.
+- No onboarding tour, no sign-up, no questions. The app opens on the home screen, and the first Tool is one tap away.
 - The language follows the operating system. Settings offers "Ikuti sistem" (Follow system, the default), Bahasa Indonesia, and English.
 
 ## 7. Multiplatform design
