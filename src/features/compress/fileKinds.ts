@@ -7,16 +7,16 @@ import { isPdfPath, pickPdfs } from "./pdfApi";
 export type FileKind = "image" | "pdf";
 
 interface KindInfo {
-  /** Noun for counts in the UI: "3 gambar", "3 PDF". */
-  noun: string;
+  /** Count of files of this kind: "3 foto", "3 PDF". */
+  files: "files.photo" | "files.pdf";
   icon: ComponentType<IconProps>;
   matches: (path: string) => boolean;
   pick: () => Promise<string[]>;
 }
 
 export const FILE_KINDS: Record<FileKind, KindInfo> = {
-  image: { noun: "gambar", icon: Image, matches: isImagePath, pick: pickImages },
-  pdf: { noun: "PDF", icon: File, matches: isPdfPath, pick: pickPdfs },
+  image: { files: "files.photo", icon: Image, matches: isImagePath, pick: pickImages },
+  pdf: { files: "files.pdf", icon: File, matches: isPdfPath, pick: pickPdfs },
 };
 
 export interface DropPlan {

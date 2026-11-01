@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import type { Language } from "@/i18n";
 
+export type { Language };
 export type Theme = "light" | "dark" | "system";
-export type Language = "id" | "en";
 export type TextSize = "normal" | "large" | "larger";
 
 export interface Preferences {
@@ -70,18 +71,20 @@ export function syncPreferences() {
   systemDark.addEventListener("change", apply);
 }
 
+/** Call `onChange` when preferences change in any window. Returns the unsubscribe. */
+export function subscribePreferences(onChange: () => void) {
+  window.addEventListener(CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
 export function usePreferences(): [Preferences, (patch: Partial<Preferences>) => void] {
   const [prefs, setPrefs] = useState(loadPreferences);
 
-  useEffect(() => {
-    const reload = () => setPrefs(loadPreferences());
-    window.addEventListener(CHANGE_EVENT, reload);
-    window.addEventListener("storage", reload);
-    return () => {
-      window.removeEventListener(CHANGE_EVENT, reload);
-      window.removeEventListener("storage", reload);
-    };
-  }, []);
+  useEffect(() => subscribePreferences(() => setPrefs(loadPreferences())), []);
 
   const update = (patch: Partial<Preferences>) => savePreferences({ ...prefs, ...patch });
   return [prefs, update];

@@ -6,13 +6,14 @@ import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { fileName } from "@/features/compress/imageApi";
+import { useT } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
 import { clearHistory, listHistory, removeHistory, type HistoryItem } from "./historyApi";
 
-const dateTime = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short" });
-
 export function RecentsPage() {
+  const tr = useT();
+  const { t } = tr;
   const [items, setItems] = useState<HistoryItem[] | null>(null);
   const [error, setError] = useState<string>();
 
@@ -22,8 +23,8 @@ export function RecentsPage() {
         setItems(items);
         setError(undefined);
       })
-      .catch((err) => setError(errorMessage(err)));
-  }, []);
+      .catch((err) => setError(errorMessage(tr, err)));
+  }, [tr]);
 
   useEffect(load, [load]);
 
@@ -40,7 +41,7 @@ export function RecentsPage() {
 
   if (error) {
     return (
-      <Message icon={TriangleAlert} title="Riwayat tidak bisa dibuka">
+      <Message icon={TriangleAlert} title={t("history.loadFailed")}>
         {error}
       </Message>
     );
@@ -48,8 +49,8 @@ export function RecentsPage() {
   if (items === null) return null;
   if (items.length === 0) {
     return (
-      <Message icon={History} title="Belum ada riwayat">
-        Berkas yang kamu kompres akan muncul di sini.
+      <Message icon={History} title={t("history.empty")}>
+        {t("history.empty.hint")}
       </Message>
     );
   }
@@ -57,18 +58,20 @@ export function RecentsPage() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-medium">Terbaru</h1>
+        <h1 className="font-display text-title">{t("history.title")}</h1>
         <DialogTrigger>
-          <Button variant="secondary">Hapus semua</Button>
+          <Button variant="secondary" size="row">
+            {t("history.clear")}
+          </Button>
           <Modal>
             <AlertDialog
-              title="Hapus semua riwayat?"
+              title={t("history.clear.title")}
               variant="danger"
-              actionLabel="Hapus semua"
-              cancelLabel="Batal"
+              actionLabel={t("history.clear")}
+              cancelLabel={t("history.clear.cancel")}
               onAction={clear}
             >
-              Daftar ini akan dikosongkan. Berkas hasil kompresi tidak ikut terhapus.
+              {t("history.clear.body")}
             </AlertDialog>
           </Modal>
         </DialogTrigger>
@@ -84,6 +87,8 @@ export function RecentsPage() {
 }
 
 function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => void }) {
+  const { t, locale } = useT();
+  const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const smaller = item.compressedBytes < item.originalBytes;
   const Icon = item.format === "pdf" ? File : Image;
 
@@ -100,13 +105,13 @@ function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => voi
         <p className="truncate text-small text-text-muted">
           {item.outputExists ? (
             <>
-              {formatBytes(item.originalBytes)} → {formatBytes(item.compressedBytes)}{" "}
+              {formatBytes(item.originalBytes, locale)} → {formatBytes(item.compressedBytes, locale)}{" "}
               <span className={smaller ? "text-success" : "text-warn"}>
                 {formatChange(item.originalBytes, item.compressedBytes)}
               </span>
             </>
           ) : (
-            "Berkas tidak ditemukan"
+            t("history.missing")
           )}
           {" · "}
           {dateTime.format(item.createdAt)}
@@ -115,13 +120,13 @@ function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => voi
       {item.outputExists && (
         <Button
           variant="icon"
-          aria-label="Tampilkan di folder"
+          aria-label={t("task.showInFolder")}
           onPress={() => revealItemInDir(item.outputPath)}
         >
           <FolderOpen aria-hidden className="size-5" />
         </Button>
       )}
-      <Button variant="icon" aria-label="Hapus dari riwayat" onPress={onRemove}>
+      <Button variant="icon" aria-label={t("history.remove")} onPress={onRemove}>
         <X aria-hidden className="size-5" />
       </Button>
     </li>

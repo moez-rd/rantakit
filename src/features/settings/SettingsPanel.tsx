@@ -7,6 +7,7 @@ import { Select, SelectItem } from "@/components/ui/Select";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
+import { useT } from "@/i18n";
 import { LICENSE_URL, openExternal } from "@/lib/links";
 import { usePreferences, type Language, type TextSize, type Theme } from "./preferences";
 import type { SettingsTab } from "./settingsWindow";
@@ -15,7 +16,7 @@ function Row({ label, description, children }: { label: string; description?: st
   return (
     <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="flex flex-col">
-        <span className="text-small font-medium">{label}</span>
+        <span className="text-label">{label}</span>
         {description && <span className="text-small text-text-muted">{description}</span>}
       </div>
       {children}
@@ -24,51 +25,53 @@ function Row({ label, description, children }: { label: string; description?: st
 }
 
 function GeneralTab() {
+  const { t } = useT();
   const [prefs, update] = usePreferences();
 
   return (
     <div className="flex flex-col divide-y divide-border">
-      <Row label="Tema">
+      <Row label={t("settings.theme")}>
         <ToggleButtonGroup
-          aria-label="Tema"
+          aria-label={t("settings.theme")}
           selectionMode="single"
           disallowEmptySelection
           selectedKeys={[prefs.theme]}
           onSelectionChange={(keys) => update({ theme: [...keys][0] as Theme })}
         >
           <ToggleButton id="system">
-            <Monitor aria-hidden className="size-5" /> Ikuti sistem
+            <Monitor aria-hidden className="size-5" /> {t("settings.theme.system")}
           </ToggleButton>
           <ToggleButton id="light">
-            <Sun aria-hidden className="size-5" /> Terang
+            <Sun aria-hidden className="size-5" /> {t("settings.theme.light")}
           </ToggleButton>
           <ToggleButton id="dark">
-            <Moon aria-hidden className="size-5" /> Gelap
+            <Moon aria-hidden className="size-5" /> {t("settings.theme.dark")}
           </ToggleButton>
         </ToggleButtonGroup>
       </Row>
 
-      <Row label="Ukuran teks">
+      <Row label={t("settings.textSize")}>
         <ToggleButtonGroup
-          aria-label="Ukuran teks"
+          aria-label={t("settings.textSize")}
           selectionMode="single"
           disallowEmptySelection
           selectedKeys={[prefs.textSize]}
           onSelectionChange={(keys) => update({ textSize: [...keys][0] as TextSize })}
         >
-          <ToggleButton id="normal">Normal</ToggleButton>
-          <ToggleButton id="large">Besar</ToggleButton>
-          <ToggleButton id="larger">Lebih besar</ToggleButton>
+          <ToggleButton id="normal">{t("settings.textSize.normal")}</ToggleButton>
+          <ToggleButton id="large">{t("settings.textSize.large")}</ToggleButton>
+          <ToggleButton id="larger">{t("settings.textSize.larger")}</ToggleButton>
         </ToggleButtonGroup>
       </Row>
 
-      <Row label="Bahasa" description="Terjemahan bahasa Inggris segera hadir.">
+      <Row label={t("settings.language")}>
         <Select
-          aria-label="Bahasa"
-          className="sm:w-44"
+          aria-label={t("settings.language")}
+          className="sm:w-48"
           value={prefs.language}
           onChange={(key) => update({ language: key as Language })}
         >
+          {/* Each language is named in itself, whatever the UI language. */}
           <SelectItem id="id">Bahasa Indonesia</SelectItem>
           <SelectItem id="en">English</SelectItem>
         </Select>
@@ -78,6 +81,7 @@ function GeneralTab() {
 }
 
 function AboutTab() {
+  const { t } = useT();
   const [version, setVersion] = useState<string>();
 
   useEffect(() => {
@@ -88,13 +92,14 @@ function AboutTab() {
     <div className="flex flex-col items-center gap-3 py-6 text-center">
       <img src="/rantakit.svg" alt="" className="size-16" />
       <div className="flex flex-col">
-        <span className="text-section">Rantakit</span>
-        <span className="text-small text-text-muted">{version ? `Versi ${version}` : "Versi pengembangan"}</span>
+        <span className="font-display text-dialog">Rantakit</span>
+        <span className="text-small text-text-muted">
+          {version ? t("about.version", { version }) : t("about.devVersion")}
+        </span>
       </div>
-      <p className="max-w-xs text-small">Kompres berkas, tetap di perangkatmu.</p>
+      <p className="max-w-xs">{t("about.tagline")}</p>
       <p className="max-w-xs text-small text-text-muted">
-        Perangkat lunak bebas di bawah lisensi AGPL-3.0-or-later.{" "}
-        <Link onPress={() => openExternal(LICENSE_URL)}>Lihat lisensi</Link>
+        {t("about.license")} <Link onPress={() => openExternal(LICENSE_URL)}>{t("about.viewLicense")}</Link>
       </p>
     </div>
   );
@@ -106,11 +111,12 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ tab, onTabChange }: SettingsPanelProps) {
+  const { t } = useT();
   return (
     <Tabs selectedKey={tab} onSelectionChange={(key) => onTabChange(key as SettingsTab)}>
-      <TabList aria-label="Pengaturan">
-        <Tab id="general">Umum</Tab>
-        <Tab id="about">Tentang</Tab>
+      <TabList aria-label={t("settings.title")}>
+        <Tab id="general">{t("settings.tab.general")}</Tab>
+        <Tab id="about">{t("settings.tab.about")}</Tab>
       </TabList>
       <TabPanel id="general">
         <GeneralTab />

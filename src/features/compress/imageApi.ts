@@ -1,5 +1,6 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { currentTranslator } from "@/i18n";
 
 export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
@@ -9,15 +10,16 @@ export const isImagePath = (path: string) =>
 /** Last segment of a Windows or POSIX path. */
 export const fileName = (path: string) => path.split(/[\\/]/).pop() ?? path;
 
-/** Ask the user for images. Returns an empty list when cancelled or outside Tauri. */
+/** Ask the user for photos. Returns an empty list when cancelled or outside Tauri. */
 export async function pickImages(): Promise<string[]> {
   if (!isTauri()) return [];
 
+  const { t } = currentTranslator();
   const selected = await open({
-    title: "Pilih gambar",
+    title: t("picker.photos"),
     multiple: true,
     directory: false,
-    filters: [{ name: "Gambar", extensions: IMAGE_EXTENSIONS }],
+    filters: [{ name: t("picker.photos.filter"), extensions: IMAGE_EXTENSIONS }],
   });
   return selected ?? [];
 }

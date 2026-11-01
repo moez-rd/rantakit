@@ -21,7 +21,7 @@ import {
 import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
 import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
-import { useMenuEvents } from "@/lib/menuEvents";
+import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
 import { isMacApp } from "@/lib/platform";
 
 /** Picked files waiting for the user to choose settings. */
@@ -102,6 +102,7 @@ function App() {
   };
 
   useMenuEvents(runCommand);
+  useMenuLanguage();
   // On macOS the menu bar handles these as Cmd shortcuts.
   useShortcuts(runCommand, !isMacApp);
 

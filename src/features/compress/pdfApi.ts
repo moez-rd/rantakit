@@ -1,5 +1,6 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { currentTranslator } from "@/i18n";
 
 export const isPdfPath = (path: string) => path.toLowerCase().endsWith(".pdf");
 
@@ -8,7 +9,7 @@ export async function pickPdfs(): Promise<string[]> {
   if (!isTauri()) return [];
 
   const selected = await open({
-    title: "Pilih PDF",
+    title: currentTranslator().t("picker.pdfs"),
     multiple: true,
     directory: false,
     filters: [{ name: "PDF", extensions: ["pdf"] }],

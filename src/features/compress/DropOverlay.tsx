@@ -1,4 +1,5 @@
 import { FileArrowDown, FileX } from "@keyline-icons/react/two-tone";
+import { useT } from "@/i18n";
 import { FILE_KINDS, type DropPlan } from "./fileKinds";
 
 interface DropOverlayProps {
@@ -9,19 +10,20 @@ interface DropOverlayProps {
 
 /** Full-window hint shown while files are dragged over the app. */
 export function DropOverlay({ plan, isBusy }: DropOverlayProps) {
+  const { t, count } = useT();
   const canDrop = !isBusy && plan.kind !== null;
   const Icon = canDrop ? FileArrowDown : FileX;
 
   let message: string;
   let detail: string | undefined;
   if (isBusy) {
-    message = "Tunggu kompresi selesai";
+    message = t("drop.busy");
   } else if (plan.kind === null) {
-    message = "Format tidak didukung";
-    detail = "Hanya JPG, PNG, dan PDF untuk saat ini";
+    message = t("drop.unsupported");
+    detail = t("drop.accepted");
   } else {
-    message = `Lepaskan untuk menambahkan ${plan.paths.length} ${FILE_KINDS[plan.kind].noun}`;
-    if (plan.skipped > 0) detail = `${plan.skipped} berkas lain akan dilewati`;
+    message = t("drop.add", { files: count(FILE_KINDS[plan.kind].files, plan.paths.length) });
+    if (plan.skipped > 0) detail = t("drop.skipped", { count: plan.skipped });
   }
 
   return (

@@ -1,4 +1,5 @@
 import { Link } from "react-aria-components";
+import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { MAIN_NAV, SETTINGS_NAV, type Page } from "./navigation";
 
@@ -19,19 +20,20 @@ interface TabBarProps {
 
 /** Bottom navigation for narrow (mobile) screens; replaces the sidebar. */
 export function TabBar({ page, onNavigate }: TabBarProps) {
+  const { t } = useT();
   return (
-    <nav aria-label="Navigasi utama" className="flex shrink-0 border-t border-border bg-bg px-2 md:hidden">
+    <nav aria-label={t("nav.label")} className="flex shrink-0 border-t border-border bg-bg px-2 md:hidden">
       {[...MAIN_NAV, SETTINGS_NAV].map(({ id, label, icon, currentIcon }) => {
         const Icon = page === id ? currentIcon : icon;
         return (
-        <Link
+          <Link
           key={id}
           aria-current={page === id ? "page" : undefined}
           onPress={() => onNavigate(id)}
           className={(renderProps) => tabLink(renderProps)}
         >
           <Icon aria-hidden className="size-6" />
-          {label}
+          {t(label)}
         </Link>
         );
       })}

@@ -12,7 +12,7 @@ interface AlertDialogProps extends Omit<DialogProps, 'children'> {
   children: ReactNode;
   variant?: 'info' | 'danger';
   actionLabel: string;
-  cancelLabel?: string;
+  cancelLabel: string;
   onAction?: () => void;
 }
 
@@ -39,7 +39,7 @@ export function AlertDialog({
           <p className="mt-3 text-text-muted">{children}</p>
           <div className="mt-6 flex justify-end gap-2">
             <Button variant="secondary" onPress={close}>
-              {cancelLabel || 'Cancel'}
+              {cancelLabel}
             </Button>
             <Button
               variant={variant === 'danger' ? 'danger' : 'primary'}

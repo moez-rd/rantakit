@@ -1,6 +1,7 @@
 import { Link } from "react-aria-components";
 import type { AppCommand } from "@/lib/appCommands";
 import { isMacApp } from "@/lib/platform";
+import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { AppMenu } from "./AppMenu";
 import { MAIN_NAV, SETTINGS_NAV, type NavItem, type Page } from "./navigation";
@@ -23,6 +24,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
+  const { t } = useT();
   const item = ({ id, label, icon, currentIcon }: NavItem) => {
     const Icon = page === id ? currentIcon : icon;
     return (
@@ -33,14 +35,14 @@ export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
         className={(renderProps) => navLink(renderProps)}
       >
         <Icon aria-hidden className="size-6" />
-        {label}
+        {t(label)}
       </Link>
     );
   };
 
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label={t("nav.label")}
       className="hidden w-60 shrink-0 flex-col gap-1 border-e border-border bg-sidebar px-4 pt-5 pb-4 md:flex"
     >
       <div className="flex items-center gap-2.5 px-2 pb-5">

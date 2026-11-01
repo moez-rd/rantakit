@@ -6,6 +6,7 @@ import { FILE_KINDS, type FileKind } from "./fileKinds";
 import { fileName } from "./imageApi";
 import { formatBytes } from "@/lib/format";
 import { useFileSizes } from "./useFileSizes";
+import { useT } from "@/i18n";
 
 interface SetupViewProps {
   kind: FileKind;
@@ -20,17 +21,19 @@ interface SetupViewProps {
 
 /** Review the picked files and choose how to compress them. */
 export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel, onStart }: SetupViewProps) {
-  const { noun, icon } = FILE_KINDS[kind];
+  const { t, count, locale } = useT();
+  const { files, icon } = FILE_KINDS[kind];
+  const counted = count(files, paths.length);
   const sizes = useFileSizes(paths);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-12 py-10">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-section">
-          {paths.length} {noun} dipilih
+          {t("setup.selected", { files: counted })}
         </h1>
         <Button variant="secondary" size="row" onPress={onAddMore}>
-          <Plus aria-hidden className="size-5" /> Tambah
+          <Plus aria-hidden className="size-5" /> {t("setup.add")}
         </Button>
       </div>
 
@@ -42,9 +45,9 @@ export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel
             title={path}
             icon={icon}
             status="ready"
-            note={path in sizes ? formatBytes(sizes[path]) : ""}
+            note={path in sizes ? formatBytes(sizes[path], locale) : ""}
             onRemove={() => onRemove(path)}
-            removeLabel={`Hapus ${fileName(path)} dari daftar`}
+            removeLabel={t("setup.remove", { name: fileName(path) })}
           />
         ))}
       </ul>
@@ -55,10 +58,10 @@ export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel
 
       <div className="flex justify-end gap-2">
         <Button variant="secondary" onPress={onCancel}>
-          Batal
+          {t("setup.cancel")}
         </Button>
         <Button isDisabled={paths.length === 0} onPress={onStart}>
-          Kompres {paths.length} {noun}
+          {t("setup.start", { files: counted })}
         </Button>
       </div>
     </div>

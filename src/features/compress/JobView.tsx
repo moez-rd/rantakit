@@ -7,6 +7,7 @@ import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
 import { FILE_KINDS } from "./fileKinds";
 import { withSmallerImages } from "./imageSettings";
+import { useT, type Translator } from "@/i18n";
 import type { CompressJob, JobItem } from "./useCompressJob";
 
 interface JobViewProps {
@@ -16,8 +17,9 @@ interface JobViewProps {
 
 /** Progress and results of the current batch. */
 export function JobView({ job, onCompressMore }: JobViewProps) {
+  const tr = useT();
+  const { t } = tr;
   const { items, isRunning } = job;
-  const { noun } = FILE_KINDS[job.kind];
   const finished = items.filter((item) => item.status !== "pending" && item.status !== "working");
   const cancelled = items.some((item) => item.status === "cancelled");
 
@@ -27,26 +29,26 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
         <div className="min-w-0">
           <h1 className="font-display text-title">
             {isRunning
-              ? `Mengompres ${Math.min(finished.length + 1, items.length)} dari ${items.length} ${noun}…`
+              ? t("task.working", { current: Math.min(finished.length + 1, items.length), total: items.length })
               : cancelled
-                ? "Dibatalkan"
-                : "Selesai"}
+                ? t("task.cancelled")
+                : t("task.done")}
           </h1>
           <p className="text-small text-text-muted">
-            {isRunning ? "Hasil disimpan di folder aslinya." : summary(items)}
+            {isRunning ? t("task.savedNext") : summary(tr, items)}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
           {isRunning ? (
             <Button variant="secondary" onPress={job.cancel}>
-              Batalkan
+              {t("task.cancel")}
             </Button>
           ) : (
             <>
               <Button variant="secondary" onPress={job.clear}>
-                Tutup
+                {t("task.close")}
               </Button>
-              <Button onPress={onCompressMore}>Kompres lagi</Button>
+              <Button onPress={onCompressMore}>{t("task.again")}</Button>
             </>
           )}
         </div>
@@ -56,6 +58,7 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
         {items.map((item, index) => (
           <JobRow
             key={item.path}
+            tr={tr}
             item={item}
             icon={FILE_KINDS[job.kind].icon}
             canRetry={!isRunning}
@@ -68,25 +71,27 @@ export function JobView({ job, onCompressMore }: JobViewProps) {
 }
 
 interface JobRowProps {
+  tr: Translator;
   item: JobItem;
   icon: (typeof FILE_KINDS)["image"]["icon"];
   canRetry: boolean;
   onRetry: (options?: JobItem["options"]) => void;
 }
 
-function JobRow({ item, icon, canRetry, onRetry }: JobRowProps) {
+function JobRow({ tr, item, icon, canRetry, onRetry }: JobRowProps) {
+  const { t, locale } = tr;
   const common = { name: item.name, title: item.path, icon };
 
   switch (item.status) {
     case "pending":
-      return <FileRow {...common} status="waiting" note="Menunggu" />;
+      return <FileRow {...common} status="waiting" note={t("task.file.waiting")} />;
     case "working":
       return (
         <FileRow
           {...common}
           status="working"
           fraction={item.fraction}
-          note={`Mengompres… ${Math.round(item.fraction * 100)}%`}
+          note={t("task.file.working", { percent: Math.round(item.fraction * 100) })}
         />
       );
     case "done":
@@ -94,14 +99,14 @@ function JobRow({ item, icon, canRetry, onRetry }: JobRowProps) {
         <FileRow
           {...common}
           status="done"
-          note={`Selesai · ${formatBytes(item.result.compressedBytes)} (${formatChange(
-            item.result.originalBytes,
-            item.result.compressedBytes,
-          )})`}
+          note={t("task.file.done", {
+            size: formatBytes(item.result.compressedBytes, locale),
+            change: formatChange(item.result.originalBytes, item.result.compressedBytes),
+          })}
           action={
             <Button
               variant="icon"
-              aria-label="Tampilkan di folder"
+              aria-label={t("task.showInFolder")}
               onPress={() => revealItemInDir(item.result.outputPath)}
             >
               <FolderOpen aria-hidden className="size-5" />
@@ -110,20 +115,20 @@ function JobRow({ item, icon, canRetry, onRetry }: JobRowProps) {
         />
       );
     case "cancelled":
-      return <ProblemRow {...common} tone="cancelled" message="Dibatalkan" />;
+      return <ProblemRow {...common} tone="cancelled" message={t("task.file.cancelled")} />;
     case "failed": {
       const smaller = item.error.code === "size-limit-unreachable" ? withSmallerImages(item.options) : null;
       return (
         <ProblemRow
           {...common}
           tone={smaller ? "limit" : "failed"}
-          message={errorMessage(item.error)}
+          message={errorMessage(tr, item.error)}
           action={
             !canRetry
               ? undefined
               : smaller
-                ? { label: "Ya, kecilkan", onPress: () => onRetry(smaller) }
-                : { label: "Coba lagi", onPress: () => onRetry() }
+                ? { label: t("task.shrink"), onPress: () => onRetry(smaller) }
+                : { label: t("task.retry"), onPress: () => onRetry() }
           }
         />
       );
@@ -131,7 +136,7 @@ function JobRow({ item, icon, canRetry, onRetry }: JobRowProps) {
   }
 }
 
-function summary(items: JobItem[]) {
+function summary({ t, locale }: Translator, items: JobItem[]) {
   const done = items.flatMap((item) => (item.status === "done" ? [item.result] : []));
   const failed = items.filter((item) => item.status === "failed").length;
   const cancelled = items.filter((item) => item.status === "cancelled").length;
@@ -140,9 +145,9 @@ function summary(items: JobItem[]) {
 
   const parts = [];
   if (done.length > 0) {
-    parts.push(`${formatBytes(before)} → ${formatBytes(after)} (${formatChange(before, after)})`);
+    parts.push(`${formatBytes(before, locale)} → ${formatBytes(after, locale)} (${formatChange(before, after)})`);
   }
-  if (failed > 0) parts.push(`${failed} gagal`);
-  if (cancelled > 0) parts.push(`${cancelled} dibatalkan`);
+  if (failed > 0) parts.push(t("task.failedCount", { count: failed }));
+  if (cancelled > 0) parts.push(t("task.cancelledCount", { count: cancelled }));
   return parts.join(" · ");
 }

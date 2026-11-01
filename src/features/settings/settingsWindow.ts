@@ -1,5 +1,6 @@
 import { emitTo } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { currentTranslator } from "@/i18n";
 import { isDesktopApp } from "@/lib/platform";
 
 const LABEL = "settings";
@@ -23,7 +24,7 @@ export async function openSettingsWindow(tab: SettingsTab = "general") {
 
   new WebviewWindow(LABEL, {
     url: `settings.html#${tab}`,
-    title: "Pengaturan",
+    title: currentTranslator().t("settings.title"),
     width: 560,
     height: 520,
     resizable: false,

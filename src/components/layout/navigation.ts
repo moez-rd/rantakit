@@ -12,20 +12,20 @@ type Icon = ComponentType<IconProps>;
 
 export interface NavItem {
   id: Page;
-  label: string;
+  label: "nav.home" | "nav.history" | "nav.settings";
   icon: Icon;
   /** Shown while the item is the current page. */
   currentIcon: Icon;
 }
 
 export const MAIN_NAV: NavItem[] = [
-  { id: "home", label: "Beranda", icon: House, currentIcon: HouseFill },
-  { id: "recents", label: "Riwayat", icon: History, currentIcon: HistoryFill },
+  { id: "home", label: "nav.home", icon: House, currentIcon: HouseFill },
+  { id: "recents", label: "nav.history", icon: History, currentIcon: HistoryFill },
 ];
 
 export const SETTINGS_NAV: NavItem = {
   id: "settings",
-  label: "Pengaturan",
+  label: "nav.settings",
   icon: Settings,
   currentIcon: SettingsFill,
 };
