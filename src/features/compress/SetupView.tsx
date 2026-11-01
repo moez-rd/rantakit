@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X } from "@keyline-icons/react";
 import { Button } from "@/components/ui/Button";
 import { FILE_KINDS, type FileKind } from "./fileKinds";
 import { fileName } from "./imageApi";
@@ -26,7 +26,7 @@ export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel
           {paths.length} {noun} dipilih
         </h1>
         <Button variant="secondary" onPress={onAddMore}>
-          <Plus aria-hidden className="size-4" /> Tambah
+          <Plus aria-hidden className="size-5" /> Tambah
         </Button>
       </div>
 
@@ -38,7 +38,7 @@ export function SetupView({ kind, paths, children, onAddMore, onRemove, onCancel
               {fileName(path)}
             </span>
             <Button variant="quiet" aria-label={`Hapus ${fileName(path)}`} onPress={() => onRemove(path)}>
-              <X aria-hidden className="size-4" />
+              <X aria-hidden className="size-5" />
             </Button>
           </li>
         ))}

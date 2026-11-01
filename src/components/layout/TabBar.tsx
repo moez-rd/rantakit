@@ -21,17 +21,20 @@ interface TabBarProps {
 export function TabBar({ page, onNavigate }: TabBarProps) {
   return (
     <nav aria-label="Navigasi utama" className="flex shrink-0 border-t border-border bg-bg px-2 md:hidden">
-      {[...MAIN_NAV, SETTINGS_NAV].map(({ id, label, icon: Icon }) => (
+      {[...MAIN_NAV, SETTINGS_NAV].map(({ id, label, icon, currentIcon }) => {
+        const Icon = page === id ? currentIcon : icon;
+        return (
         <Link
           key={id}
           aria-current={page === id ? "page" : undefined}
           onPress={() => onNavigate(id)}
           className={(renderProps) => tabLink(renderProps)}
         >
-          <Icon aria-hidden className="size-5" />
+          <Icon aria-hidden className="size-6" />
           {label}
         </Link>
-      ))}
+        );
+      })}
     </nav>
   );
 }

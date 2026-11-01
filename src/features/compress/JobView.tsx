@@ -1,5 +1,5 @@
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { CheckCircle2, Circle, CircleSlash, FolderOpen, Loader2, XCircle } from "lucide-react";
+import { CircleCheck, Circle, CircleStop, CircleX, FolderOpen, LoaderCircle } from "@keyline-icons/react";
 import { Button } from "@/components/ui/Button";
 import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
@@ -89,7 +89,7 @@ function JobRow({ item }: { item: JobItem }) {
           aria-label="Tampilkan di folder"
           onPress={() => revealItemInDir(item.result.outputPath)}
         >
-          <FolderOpen aria-hidden className="size-4" />
+          <FolderOpen aria-hidden className="size-5" />
         </Button>
       )}
     </li>
@@ -102,13 +102,13 @@ function StatusIcon({ status }: { status: JobItem["status"] }) {
     case "pending":
       return <Circle aria-hidden className={`${className} text-text-muted`} />;
     case "working":
-      return <Loader2 aria-hidden className={`${className} animate-spin text-brand-strong`} />;
+      return <LoaderCircle aria-hidden className={`${className} animate-spin text-brand-strong`} />;
     case "done":
-      return <CheckCircle2 aria-hidden className={`${className} text-success`} />;
+      return <CircleCheck aria-hidden className={`${className} text-success`} />;
     case "failed":
-      return <XCircle aria-hidden className={`${className} text-danger`} />;
+      return <CircleX aria-hidden className={`${className} text-danger`} />;
     case "cancelled":
-      return <CircleSlash aria-hidden className={`${className} text-text-muted`} />;
+      return <CircleStop aria-hidden className={`${className} text-text-muted`} />;
   }
 }
 

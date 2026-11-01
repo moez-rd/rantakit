@@ -1,4 +1,4 @@
-import { Ban, FileDown } from "lucide-react";
+import { FileArrowDown, FileX } from "@keyline-icons/react/two-tone";
 import { FILE_KINDS, type DropPlan } from "./fileKinds";
 
 interface DropOverlayProps {
@@ -10,7 +10,7 @@ interface DropOverlayProps {
 /** Full-window hint shown while files are dragged over the app. */
 export function DropOverlay({ plan, isBusy }: DropOverlayProps) {
   const canDrop = !isBusy && plan.kind !== null;
-  const Icon = canDrop ? FileDown : Ban;
+  const Icon = canDrop ? FileArrowDown : FileX;
 
   let message: string;
   let detail: string | undefined;

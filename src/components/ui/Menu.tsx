@@ -1,5 +1,5 @@
 'use client';
-import {Check, ChevronRight} from 'lucide-react';
+import {Check, ChevronRight} from '@keyline-icons/react';
 import React from 'react';
 import {
   Menu as AriaMenu,

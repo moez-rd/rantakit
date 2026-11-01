@@ -22,17 +22,20 @@ interface SidebarProps {
 }
 
 export function Sidebar({ page, onNavigate, onCommand }: SidebarProps) {
-  const item = ({ id, label, icon: Icon }: NavItem) => (
+  const item = ({ id, label, icon, currentIcon }: NavItem) => {
+    const Icon = page === id ? currentIcon : icon;
+    return (
     <Link
       key={id}
       aria-current={page === id ? "page" : undefined}
       onPress={() => onNavigate(id)}
       className={(renderProps) => navLink(renderProps)}
     >
-      <Icon aria-hidden className="size-4" />
+      <Icon aria-hidden className="size-6" />
       {label}
     </Link>
-  );
+    );
+  };
 
   return (
     <nav aria-label="Navigasi utama" className="hidden w-52 shrink-0 flex-col gap-1 border-e border-border bg-sidebar p-3 md:flex">

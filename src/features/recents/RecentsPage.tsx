@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { Clock, FileText, FolderOpen, Image, TriangleAlert, X } from "lucide-react";
+import { File, FolderOpen, History, Image, TriangleAlert, X } from "@keyline-icons/react";
 import { DialogTrigger } from "react-aria-components";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
@@ -48,7 +48,7 @@ export function RecentsPage() {
   if (items === null) return null;
   if (items.length === 0) {
     return (
-      <Message icon={Clock} title="Belum ada riwayat">
+      <Message icon={History} title="Belum ada riwayat">
         Berkas yang kamu kompres akan muncul di sini.
       </Message>
     );
@@ -85,7 +85,7 @@ export function RecentsPage() {
 
 function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => void }) {
   const smaller = item.compressedBytes < item.originalBytes;
-  const Icon = item.format === "pdf" ? FileText : Image;
+  const Icon = item.format === "pdf" ? File : Image;
 
   return (
     <li className="flex items-center gap-3 py-3 ps-4 pe-2">
@@ -118,11 +118,11 @@ function HistoryRow({ item, onRemove }: { item: HistoryItem; onRemove: () => voi
           aria-label="Tampilkan di folder"
           onPress={() => revealItemInDir(item.outputPath)}
         >
-          <FolderOpen aria-hidden className="size-4" />
+          <FolderOpen aria-hidden className="size-5" />
         </Button>
       )}
       <Button variant="quiet" aria-label="Hapus dari riwayat" onPress={onRemove}>
-        <X aria-hidden className="size-4" />
+        <X aria-hidden className="size-5" />
       </Button>
     </li>
   );
@@ -133,7 +133,7 @@ function Message({
   title,
   children,
 }: {
-  icon: typeof Clock;
+  icon: typeof History;
   title: string;
   children: ReactNode;
 }) {

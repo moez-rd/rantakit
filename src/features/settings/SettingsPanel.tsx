@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "@keyline-icons/react";
 import { Link } from "@/components/ui/Link";
 import { Select, SelectItem } from "@/components/ui/Select";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
@@ -37,13 +37,13 @@ function GeneralTab() {
           onSelectionChange={(keys) => update({ theme: [...keys][0] as Theme })}
         >
           <ToggleButton id="system">
-            <Monitor aria-hidden className="size-4" /> Ikuti sistem
+            <Monitor aria-hidden className="size-5" /> Ikuti sistem
           </ToggleButton>
           <ToggleButton id="light">
-            <Sun aria-hidden className="size-4" /> Terang
+            <Sun aria-hidden className="size-5" /> Terang
           </ToggleButton>
           <ToggleButton id="dark">
-            <Moon aria-hidden className="size-4" /> Gelap
+            <Moon aria-hidden className="size-5" /> Gelap
           </ToggleButton>
         </ToggleButtonGroup>
       </Row>

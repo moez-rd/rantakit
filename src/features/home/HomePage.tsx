@@ -1,4 +1,6 @@
-import { FileText, Image, type LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+import { FileArrowDown, ImageArrowDown } from "@keyline-icons/react/two-tone";
+import type { IconProps } from "@keyline-icons/react";
 import { Button } from "react-aria-components";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 
@@ -12,7 +14,7 @@ const card = tv({
 });
 
 interface CompressCardProps {
-  icon: LucideIcon;
+  icon: ComponentType<IconProps>;
   title: string;
   description: string;
   onPress?: () => void;
@@ -42,13 +44,13 @@ export function HomePage({ onCompressImage, onCompressPdf }: HomePageProps) {
     <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6">
       <div className="flex w-full max-w-sm flex-col gap-3">
         <CompressCard
-          icon={Image}
+          icon={ImageArrowDown}
           title="Kompres gambar"
           description="JPG dan PNG"
           onPress={onCompressImage}
         />
         <CompressCard
-          icon={FileText}
+          icon={FileArrowDown}
           title="Kompres PDF"
           description="Dokumen PDF"
           onPress={onCompressPdf}

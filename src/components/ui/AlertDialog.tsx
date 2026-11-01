@@ -1,5 +1,5 @@
 'use client';
-import {AlertCircleIcon, InfoIcon} from 'lucide-react';
+import {CircleAlert, Info} from '@keyline-icons/react';
 import {type ReactNode} from 'react';
 import {chain} from 'react-aria/chain';
 import {type DialogProps} from 'react-aria-components/Dialog';
@@ -34,7 +34,7 @@ export function AlertDialog({
           </Heading>
           <div
             className={`w-6 h-6 absolute right-6 top-6 stroke-2 ${variant === 'destructive' ? 'text-danger' : 'text-brand-strong'}`}>
-            {variant === 'destructive' ? <AlertCircleIcon aria-hidden /> : <InfoIcon aria-hidden />}
+            {variant === 'destructive' ? <CircleAlert aria-hidden /> : <Info aria-hidden />}
           </div>
           <p className="mt-3 text-text-muted">{children}</p>
           <div className="mt-6 flex justify-end gap-2">

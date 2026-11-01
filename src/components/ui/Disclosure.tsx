@@ -11,7 +11,7 @@ import {
 } from 'react-aria-components/Disclosure';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {Button} from '@/components/ui/Button';
-import {ChevronRight} from 'lucide-react';
+import {ChevronRight} from '@keyline-icons/react';
 
 const disclosure = tv({
   base: 'group min-w-50 font-sans rounded-lg text-text'

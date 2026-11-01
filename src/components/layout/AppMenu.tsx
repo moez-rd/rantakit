@@ -1,4 +1,4 @@
-import { Ellipsis } from "lucide-react";
+import { MoreHorizontal } from "@keyline-icons/react";
 import { Keyboard } from "react-aria-components";
 import { Button } from "@/components/ui/Button";
 import { Menu, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/Menu";
@@ -26,7 +26,7 @@ export function AppMenu({ onCommand }: AppMenuProps) {
   return (
     <MenuTrigger placement="bottom start">
       <Button variant="quiet" aria-label="Menu">
-        <Ellipsis aria-hidden className="size-4" />
+        <MoreHorizontal aria-hidden className="size-5" />
       </Button>
       <Menu onAction={(key) => onCommand(key as AppCommand)}>
         <Item id="compress_image">Kompres gambar…</Item>

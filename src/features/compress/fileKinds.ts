@@ -1,4 +1,5 @@
-import { FileText, Image, type LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+import { File, Image, type IconProps } from "@keyline-icons/react";
 import { isImagePath, pickImages } from "./imageApi";
 import { isPdfPath, pickPdfs } from "./pdfApi";
 
@@ -8,14 +9,14 @@ export type FileKind = "image" | "pdf";
 interface KindInfo {
   /** Noun for counts in the UI: "3 gambar", "3 PDF". */
   noun: string;
-  icon: LucideIcon;
+  icon: ComponentType<IconProps>;
   matches: (path: string) => boolean;
   pick: () => Promise<string[]>;
 }
 
 export const FILE_KINDS: Record<FileKind, KindInfo> = {
   image: { noun: "gambar", icon: Image, matches: isImagePath, pick: pickImages },
-  pdf: { noun: "PDF", icon: FileText, matches: isPdfPath, pick: pickPdfs },
+  pdf: { noun: "PDF", icon: File, matches: isPdfPath, pick: pickPdfs },
 };
 
 export interface DropPlan {

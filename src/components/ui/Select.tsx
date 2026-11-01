@@ -1,6 +1,6 @@
 'use client';
 import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
-import {ChevronDown} from 'lucide-react';
+import {ChevronDown} from '@keyline-icons/react';
 import React from 'react';
 import {
   Select as AriaSelect,
@@ -60,7 +60,7 @@ export function Select<T, M extends 'single' | 'multiple' = 'single'>({
         </SelectValue>
         <ChevronDown
           aria-hidden
-          className="w-4 h-4 text-text-muted forced-colors:text-[ButtonText] group-disabled:text-text-disabled forced-colors:group-disabled:text-[GrayText]"
+          className="w-5 h-5 text-text-muted forced-colors:text-[ButtonText] group-disabled:text-text-disabled forced-colors:group-disabled:text-[GrayText]"
         />
       </Button>
       {description && <Description>{description}</Description>}

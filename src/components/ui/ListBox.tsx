@@ -1,6 +1,6 @@
 'use client';
 import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
-import {Check} from 'lucide-react';
+import {Check} from '@keyline-icons/react';
 import {
   ListBox as AriaListBox,
   ListBoxItem as AriaListBoxItem,

@@ -1,5 +1,5 @@
 'use client';
-import {ChevronDown, ChevronUp} from 'lucide-react';
+import {ChevronDown, ChevronUp} from '@keyline-icons/react';
 import {
   NumberField as AriaNumberField,
   type NumberFieldProps as AriaNumberFieldProps,
