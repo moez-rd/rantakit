@@ -75,7 +75,7 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - Text and buttons meet WCAG AA contrast in light and dark themes.
 - Usability test with 5 people from the primary audience passes (RANTAKIT.md §9).
 
-**Open decisions:** the light and dark color values, which come from the design step (a design board made as a Claude Artifact).
+**Open decisions:** none. The light and dark color values come from the design board (a Claude Artifact) and are recorded in story N1.
 
 ## v0.3 Android
 
