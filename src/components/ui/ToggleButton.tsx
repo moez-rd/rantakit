@@ -8,7 +8,7 @@ import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 
 let styles = tv({
   extend: focusRing,
-  base: 'relative inline-flex items-center justify-center gap-2 border h-9 box-border px-3.5 [&:has(>svg:only-child)]:px-0 [&:has(>svg:only-child)]:h-8 [&:has(>svg:only-child)]:aspect-square font-sans text-label text-center transition rounded-lg cursor-default forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
+  base: 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap border h-9 box-border px-3.5 [&:has(>svg:only-child)]:px-0 [&:has(>svg:only-child)]:h-8 [&:has(>svg:only-child)]:aspect-square font-sans text-label text-center transition rounded-lg cursor-default forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
   variants: {
     isSelected: {
       false:
