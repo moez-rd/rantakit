@@ -1,21 +1,37 @@
 import { useCallback, useRef, useState } from "react";
 import { fileName } from "./imageApi";
-import type { CompressResult, FileKind } from "./fileKinds";
+import type { FileKind } from "./fileKinds";
+import {
+  cancelTask,
+  startTask,
+  type TaskError,
+  type TaskMessage,
+  type TaskResult,
+  type ToolOptions,
+} from "./taskApi";
 
 export type JobItem =
-  | { path: string; name: string; status: "pending" | "working" }
-  | { path: string; name: string; status: "done"; result: CompressResult }
-  | { path: string; name: string; status: "failed"; error: string };
+  | { path: string; name: string; status: "pending" | "cancelled" }
+  | { path: string; name: string; status: "working"; fraction: number }
+  | { path: string; name: string; status: "done"; result: TaskResult }
+  | { path: string; name: string; status: "failed"; error: TaskError };
 
-/** Compresses a batch of files one at a time and tracks each file's status. */
+/** Runs one Task over a batch of files and tracks each file's status. */
 export function useCompressJob() {
   const [kind, setKind] = useState<FileKind>("image");
   const [items, setItems] = useState<JobItem[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const running = useRef(false);
+  const taskId = useRef<number | null>(null);
+
+  const finish = useCallback(() => {
+    running.current = false;
+    taskId.current = null;
+    setIsRunning(false);
+  }, []);
 
   const start = useCallback(
-    async (kind: FileKind, paths: string[], compress: (path: string) => Promise<CompressResult>) => {
+    async (kind: FileKind, paths: string[], options: ToolOptions) => {
       // Ignore a new batch (e.g. from the menu) while one is still running.
       if (running.current || paths.length === 0) return;
       running.current = true;
@@ -23,31 +39,54 @@ export function useCompressJob() {
 
       setKind(kind);
       setItems(paths.map((path) => ({ path, name: fileName(path), status: "pending" })));
-      const update = (index: number, item: JobItem) =>
-        setItems((prev) => prev.map((old, i) => (i === index ? item : old)));
+      const update = (index: number, change: (item: JobItem) => JobItem) =>
+        setItems((prev) => prev.map((old, i) => (i === index ? change(old) : old)));
 
-      for (const [index, path] of paths.entries()) {
-        const name = fileName(path);
-        update(index, { path, name, status: "working" });
-        try {
-          const result = await compress(path);
-          update(index, { path, name, status: "done", result });
-        } catch (error) {
-          update(index, { path, name, status: "failed", error: String(error) });
+      const onMessage = (message: TaskMessage) => {
+        switch (message.event) {
+          case "progress":
+            return update(message.file, ({ path, name }) => ({
+              path,
+              name,
+              status: "working",
+              fraction: message.fraction,
+            }));
+          case "fileDone": {
+            const { outcome } = message;
+            return update(message.file, ({ path, name }) => {
+              if (outcome.status === "done") return { path, name, status: "done", result: outcome.result };
+              if (outcome.error.code === "cancelled") return { path, name, status: "cancelled" };
+              return { path, name, status: "failed", error: outcome.error };
+            });
+          }
+          case "finished":
+            return finish();
         }
-      }
+      };
 
-      running.current = false;
-      setIsRunning(false);
+      try {
+        const id = await startTask({ options, paths }, onMessage);
+        // A short Task may already be over by the time its id arrives.
+        if (running.current) taskId.current = id;
+      } catch (error) {
+        const failed = { code: (error as TaskError | undefined)?.code ?? "unexpected" };
+        setItems((prev) => prev.map(({ path, name }) => ({ path, name, status: "failed", error: failed })));
+        finish();
+      }
     },
-    [],
+    [finish],
   );
+
+  /** Stops the running Task; finished Results stay. */
+  const cancel = useCallback(() => {
+    if (taskId.current !== null) cancelTask(taskId.current);
+  }, []);
 
   const clear = useCallback(() => {
     if (!running.current) setItems([]);
   }, []);
 
-  return { kind, items, isRunning, start, clear };
+  return { kind, items, isRunning, start, cancel, clear };
 }
 
 export type CompressJob = ReturnType<typeof useCompressJob>;

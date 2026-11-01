@@ -6,6 +6,7 @@ import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { fileName } from "@/features/compress/imageApi";
+import { errorMessage } from "@/lib/errorMessages";
 import { formatBytes, formatChange } from "@/lib/format";
 import { clearHistory, listHistory, removeHistory, type HistoryItem } from "./historyApi";
 
@@ -21,7 +22,7 @@ export function RecentsPage() {
         setItems(items);
         setError(undefined);
       })
-      .catch((err) => setError(String(err)));
+      .catch((err) => setError(errorMessage(err)));
   }, []);
 
   useEffect(load, [load]);

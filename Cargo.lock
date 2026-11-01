@@ -2954,9 +2954,7 @@ checksum = "a611d15b50743feb4c76b7d03edcb0e64f399c26961e4efe6975bc398be6aa3d"
 name = "rantakit"
 version = "0.1.0"
 dependencies = [
- "rantakit-core",
- "rantakit-image",
- "rantakit-pdf",
+ "rantakit-tasks",
  "serde",
  "serde_json",
  "tauri",
@@ -2999,6 +2997,9 @@ dependencies = [
  "rantakit-core",
  "rantakit-image",
  "rantakit-pdf",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

@@ -3,6 +3,7 @@
 //! Result.
 
 mod catalogue;
+mod history;
 mod kinds;
 mod names;
 mod task;
@@ -11,6 +12,7 @@ pub use catalogue::{
     Availability, CATALOGUE, Job, Platform, Tool, ToolId, tools_for, tools_for_files,
     tools_for_kinds,
 };
+pub use history::{Entry, History, HistoryError};
 pub use kinds::{FileKind, detect_kind};
 pub use names::result_path;
 pub use task::{Details, FileOutcome, ResultFile, Task, TaskEvent, ToolOptions, run_task};

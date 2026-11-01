@@ -11,6 +11,9 @@ edition = "2024"
 rantakit-core = { path = "../rantakit-core" }
 rantakit-image = { path = "../rantakit-image" }
 rantakit-pdf = { path = "../rantakit-pdf" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2.0.21"
 
 [dev-dependencies]
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }

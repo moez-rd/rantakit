@@ -3,13 +3,11 @@ import { AppShell } from "@/components/layout/AppShell";
 import type { Page } from "@/components/layout/navigation";
 import { DropOverlay } from "@/features/compress/DropOverlay";
 import { FILE_KINDS, planDrop, type FileKind } from "@/features/compress/fileKinds";
-import { compressImage } from "@/features/compress/imageApi";
 import { ImageOptions } from "@/features/compress/ImageOptions";
-import { toImageRequest, useImageSettings } from "@/features/compress/imageSettings";
+import { toImageOptions, useImageSettings } from "@/features/compress/imageSettings";
 import { JobView } from "@/features/compress/JobView";
-import { compressPdf } from "@/features/compress/pdfApi";
 import { PdfOptions } from "@/features/compress/PdfOptions";
-import { toPdfRequest, usePdfSettings } from "@/features/compress/pdfSettings";
+import { toPdfOptions, usePdfSettings } from "@/features/compress/pdfSettings";
 import { SetupView } from "@/features/compress/SetupView";
 import { useCompressJob } from "@/features/compress/useCompressJob";
 import { HomePage } from "@/features/home/HomePage";
@@ -72,11 +70,7 @@ function App() {
   const startJob = () => {
     if (!selection) return;
     const { kind, paths } = selection;
-    job.start(kind, paths, (path) =>
-      kind === "image"
-        ? compressImage(toImageRequest(path, imageSettings))
-        : compressPdf(toPdfRequest(path, pdfSettings)),
-    );
+    job.start(kind, paths, kind === "image" ? toImageOptions(imageSettings) : toPdfOptions(pdfSettings));
     setSelection(null);
   };
 

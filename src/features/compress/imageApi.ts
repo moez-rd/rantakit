@@ -1,29 +1,5 @@
-import { invoke, isTauri } from "@tauri-apps/api/core";
+import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-
-/** Mirrors `ImageRequest` in `src-tauri/src/commands/image.rs`. */
-export interface ImageRequest {
-  path: string;
-  /** Output format; omit to keep the input format. */
-  format?: "jpeg" | "png";
-  /** 1–100, defaults to 80 on the Rust side. */
-  quality?: number;
-  /** Aim for this size instead of a fixed quality. */
-  maxBytes?: number;
-  maxDimension?: number;
-}
-
-/** Mirrors `ImageResult` in `src-tauri/src/commands/image.rs`. */
-export interface ImageResult {
-  inputPath: string;
-  outputPath: string;
-  format: "jpeg" | "png";
-  originalBytes: number;
-  compressedBytes: number;
-  width: number;
-  height: number;
-  quality: number | null;
-}
 
 export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
@@ -44,9 +20,4 @@ export async function pickImages(): Promise<string[]> {
     filters: [{ name: "Gambar", extensions: IMAGE_EXTENSIONS }],
   });
   return selected ?? [];
-}
-
-/** Compress one image; the copy is saved next to the original. Rejects with an error message. */
-export function compressImage(request: ImageRequest) {
-  return invoke<ImageResult>("compress_image", { request });
 }

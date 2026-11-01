@@ -1,9 +1,9 @@
 mod commands;
 mod error;
-mod history;
 #[cfg(target_os = "macos")]
 mod menu;
 
+use rantakit_tasks::History;
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -13,7 +13,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let path = app.path().app_data_dir()?.join("history.json");
-            app.manage(history::History::new(path));
+            app.manage(History::new(path));
+            app.manage(commands::task::RunningTasks::default());
             Ok(())
         });
 
@@ -23,11 +24,11 @@ pub fn run() {
 
     builder
         .invoke_handler(tauri::generate_handler![
-            commands::image::compress_image,
+            commands::task::start_task,
+            commands::task::cancel_task,
             commands::history::list_history,
             commands::history::remove_history,
             commands::history::clear_history,
-            commands::pdf::compress_pdf,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

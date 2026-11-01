@@ -2,7 +2,7 @@
 
 This is the code map for Rantakit: which part owns what, the contract every engine follows, and which library or platform backend does each job. The product rules it serves live in [RANTAKIT.md](RANTAKIT.md), the order of work in [ROADMAP.md](ROADMAP.md), and the reasons behind the hard-to-reverse choices in the ADRs linked below.
 
-Some of this is the target, not today's code. Today only `rantakit-core`, `rantakit-image`, `rantakit-pdf`, and `rantakit-tasks` exist; `rantakit-tasks` runs Tasks and names Results, but the shell does not use it yet, and History lives in `src-tauri`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
+Some of this is the target, not today's code. Today only `rantakit-core`, `rantakit-image`, `rantakit-pdf`, and `rantakit-tasks` exist, and the shell runs every Task through `rantakit-tasks`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
 
 ## Parts
 

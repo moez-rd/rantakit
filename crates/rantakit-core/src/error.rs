@@ -34,6 +34,20 @@ pub enum ErrorKind {
 pub type Result<T> = std::result::Result<T, ErrorKind>;
 
 impl ErrorKind {
+    /// The stable code the frontend turns into a message.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::PasswordProtected => "password-protected",
+            Self::Damaged => "damaged",
+            Self::UnsupportedFormat => "unsupported-format",
+            Self::SizeLimitUnreachable { .. } => "size-limit-unreachable",
+            Self::NotEnoughSpace => "not-enough-space",
+            Self::CannotWrite => "cannot-write",
+            Self::OriginalMissing => "original-missing",
+            Self::Cancelled => "cancelled",
+        }
+    }
+
     /// The kind for an I/O error while reading an Original.
     pub fn reading(err: &io::Error) -> Self {
         match err.kind() {

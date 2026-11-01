@@ -1,8 +1,8 @@
+use rantakit_tasks::{Entry, History};
 use serde::Serialize;
 use tauri::State;
 
 use crate::error::Result;
-use crate::history::{Entry, History};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -29,11 +29,11 @@ pub fn list_history(history: State<'_, History>) -> Result<Vec<HistoryItem>> {
 /// Forget one entry. The compressed file itself is left alone.
 #[tauri::command]
 pub fn remove_history(history: State<'_, History>, id: String) -> Result<()> {
-    history.remove(&id)
+    Ok(history.remove(&id)?)
 }
 
 /// Forget every entry. Compressed files are left alone.
 #[tauri::command]
 pub fn clear_history(history: State<'_, History>) -> Result<()> {
-    history.clear()
+    Ok(history.clear()?)
 }

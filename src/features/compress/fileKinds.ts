@@ -18,14 +18,6 @@ export const FILE_KINDS: Record<FileKind, KindInfo> = {
   pdf: { noun: "PDF", icon: FileText, matches: isPdfPath, pick: pickPdfs },
 };
 
-/** Common fields of every command's result. */
-export interface CompressResult {
-  inputPath: string;
-  outputPath: string;
-  originalBytes: number;
-  compressedBytes: number;
-}
-
 export interface DropPlan {
   kind: FileKind | null;
   paths: string[];
