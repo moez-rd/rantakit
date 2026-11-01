@@ -1,5 +1,5 @@
 import { useMemo, useSyncExternalStore } from "react";
-import { loadPreferences, subscribePreferences } from "@/features/settings/preferences";
+import { loadPreferences, resolveLanguage, subscribePreferences } from "@/features/settings/preferences";
 import { en } from "./en";
 import { id } from "./id";
 
@@ -47,9 +47,9 @@ export function translator(language: Language): Translator {
   };
 }
 
-/** The language the UI shows right now. */
+/** The language the UI shows right now: the chosen one, or the system's. */
 export function currentLanguage(): Language {
-  return loadPreferences().language;
+  return resolveLanguage(loadPreferences().language);
 }
 
 /** For code outside React (dialog titles, window titles). Components use `useT`. */

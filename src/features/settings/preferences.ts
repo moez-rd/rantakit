@@ -4,13 +4,15 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { Language } from "@/i18n";
 
 export type { Language };
+/** What the user chose; "system" follows the operating system language. */
+export type LanguageChoice = Language | "system";
 export type Theme = "light" | "dark" | "system";
 export type TextSize = "normal" | "large" | "larger";
 
 export interface Preferences {
   theme: Theme;
   textSize: TextSize;
-  language: Language;
+  language: LanguageChoice;
 }
 
 /** "Besar" scales every text style by 18/16 and "Lebih besar" by 20/16. */
@@ -18,7 +20,7 @@ export const TEXT_SCALES: Record<TextSize, number> = { normal: 1, large: 18 / 16
 
 const STORAGE_KEY = "rantakit.preferences";
 const CHANGE_EVENT = "rantakit:preferences";
-const DEFAULTS: Preferences = { theme: "system", textSize: "normal", language: "id" };
+const DEFAULTS: Preferences = { theme: "system", textSize: "normal", language: "system" };
 
 export function loadPreferences(): Preferences {
   let stored: Partial<Preferences> = {};
@@ -30,7 +32,7 @@ export function loadPreferences(): Preferences {
   return {
     theme: ["light", "dark", "system"].includes(stored.theme as string) ? stored.theme! : DEFAULTS.theme,
     textSize: ["normal", "large", "larger"].includes(stored.textSize as string) ? stored.textSize! : DEFAULTS.textSize,
-    language: stored.language === "en" ? "en" : DEFAULTS.language,
+    language: ["id", "en", "system"].includes(stored.language as string) ? stored.language! : DEFAULTS.language,
   };
 }
 
@@ -44,6 +46,15 @@ export function savePreferences(prefs: Preferences) {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
+/** Indonesian when the operating system is set to Indonesian, English otherwise. */
+export function systemLanguage(): Language {
+  return navigator.language.toLowerCase().startsWith("id") ? "id" : "en";
+}
+
+export function resolveLanguage(choice: LanguageChoice): Language {
+  return choice === "system" ? systemLanguage() : choice;
+}
+
 const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 /** Apply preferences to the current window. */
@@ -51,7 +62,7 @@ export function applyPreferences(prefs: Preferences) {
   const root = document.documentElement;
   const dark = prefs.theme === "dark" || (prefs.theme === "system" && systemDark.matches);
   root.dataset.theme = dark ? "dark" : "light";
-  root.lang = prefs.language;
+  root.lang = resolveLanguage(prefs.language);
   root.style.setProperty("--text-scale", String(TEXT_SCALES[prefs.textSize]));
 
   if (isTauri()) {
@@ -69,15 +80,15 @@ export function syncPreferences() {
   window.addEventListener(CHANGE_EVENT, apply);
   window.addEventListener("storage", (e) => e.key === STORAGE_KEY && apply());
   systemDark.addEventListener("change", apply);
+  window.addEventListener("languagechange", apply);
 }
 
-/** Call `onChange` when preferences change in any window. Returns the unsubscribe. */
+/** Call `onChange` when preferences or the system language change. Returns the unsubscribe. */
 export function subscribePreferences(onChange: () => void) {
-  window.addEventListener(CHANGE_EVENT, onChange);
-  window.addEventListener("storage", onChange);
+  const events = [CHANGE_EVENT, "storage", "languagechange"];
+  for (const event of events) window.addEventListener(event, onChange);
   return () => {
-    window.removeEventListener(CHANGE_EVENT, onChange);
-    window.removeEventListener("storage", onChange);
+    for (const event of events) window.removeEventListener(event, onChange);
   };
 }
 

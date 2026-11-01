@@ -3,13 +3,16 @@ import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
 import { Monitor, Moon, Sun } from "@keyline-icons/react";
 import { Link } from "@/components/ui/Link";
-import { Select, SelectItem } from "@/components/ui/Select";
+import { Radio, RadioGroup } from "@/components/ui/RadioGroup";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { useT } from "@/i18n";
 import { LICENSE_URL, openExternal } from "@/lib/links";
-import { usePreferences, type Language, type TextSize, type Theme } from "./preferences";
+import { systemLanguage, usePreferences, type Language, type LanguageChoice, type TextSize, type Theme } from "./preferences";
+
+/** Each language is named in itself, whatever the UI language. */
+const LANGUAGE_NAMES: Record<Language, string> = { id: "Bahasa Indonesia", en: "English" };
 import type { SettingsTab } from "./settingsWindow";
 
 function Row({ label, description, children }: { label: string; description?: string; children: ReactNode }) {
@@ -65,16 +68,19 @@ function GeneralTab() {
       </Row>
 
       <Row label={t("settings.language")}>
-        <Select
+        <RadioGroup
           aria-label={t("settings.language")}
-          className="sm:w-48"
           value={prefs.language}
-          onChange={(key) => update({ language: key as Language })}
+          onChange={(value) => update({ language: value as LanguageChoice })}
         >
-          {/* Each language is named in itself, whatever the UI language. */}
-          <SelectItem id="id">Bahasa Indonesia</SelectItem>
-          <SelectItem id="en">English</SelectItem>
-        </Select>
+          <Radio value="system">{t("settings.language.system", { language: LANGUAGE_NAMES[systemLanguage()] })}</Radio>
+          <Radio value="id" lang="id">
+            {LANGUAGE_NAMES.id}
+          </Radio>
+          <Radio value="en" lang="en">
+            {LANGUAGE_NAMES.en}
+          </Radio>
+        </RadioGroup>
       </Row>
     </div>
   );

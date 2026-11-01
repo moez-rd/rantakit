@@ -148,6 +148,7 @@ export const en: Messages = {
   "settings.textSize.large": "Large",
   "settings.textSize.larger": "Larger",
   "settings.language": "Language",
+  "settings.language.system": "Follow system (now {language})",
   "about.version": "Version {version}",
   "about.devVersion": "Development version",
   "about.tagline": "Your files stay on your device.",

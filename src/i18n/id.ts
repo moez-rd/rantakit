@@ -150,6 +150,7 @@ export const id = {
   "settings.textSize.large": "Besar",
   "settings.textSize.larger": "Lebih besar",
   "settings.language": "Bahasa",
+  "settings.language.system": "Ikuti sistem (sekarang {language})",
   "about.version": "Versi {version}",
   "about.devVersion": "Versi pengembangan",
   "about.tagline": "File tetap di perangkatmu.",
