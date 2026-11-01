@@ -101,7 +101,8 @@ cargo clippy --workspace --all-targets
 ## Project structure
 
 ```
-crates/rantakit_core/   compression engine (images and PDF), no Tauri dependency
+crates/rantakit-image/   image engine (JPG and PNG), no Tauri dependency
+crates/rantakit-pdf/     PDF engine, no Tauri dependency
 src-tauri/               desktop app: commands, history, native menu
 src/                     React frontend
 ```

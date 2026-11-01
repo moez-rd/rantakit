@@ -1,7 +1,8 @@
-//! Generate synthetic test images in `tests/fixtures/`.
+//! Generate synthetic test images in `tests/fixtures/`, and copy `photo.jpg`
+//! to `rantakit-pdf`, whose tests embed it in a PDF.
 //!
 //! Run from the workspace root:
-//!     cargo run -p rantakit_core --example gen_fixtures
+//!     cargo run -p rantakit-image --example gen_fixtures
 
 use std::fs;
 use std::path::Path;
@@ -27,6 +28,10 @@ fn main() {
         let size = fs::metadata(dir.join(name)).unwrap().len();
         println!("{name}: {} KB", size / 1024);
     }
+
+    let pdf_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../rantakit-pdf/tests/fixtures");
+    fs::create_dir_all(&pdf_dir).unwrap();
+    fs::copy(dir.join("photo.jpg"), pdf_dir.join("photo.jpg")).unwrap();
 }
 
 /// Smooth gradients plus fine noise, so it compresses like a real photo.

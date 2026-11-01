@@ -1,14 +1,15 @@
 mod encode;
+pub mod error;
 pub mod options;
-pub(crate) mod resize;
+mod resize;
 mod target_size;
 
 use std::io::Cursor;
 
 use ::image::{DynamicImage, ImageDecoder, ImageError, ImageFormat as RawFormat, ImageReader};
 
-use crate::error::{Error, Result};
-use options::{Compressed, ImageFormat, ImageOptions, OutputFormat, Target};
+pub use error::{Error, Result};
+pub use options::{Compressed, ImageFormat, ImageOptions, OutputFormat, Target};
 
 pub fn compress_image(input: &[u8], opts: &ImageOptions) -> Result<Compressed> {
     let (img, input_format) = decode(input)?;

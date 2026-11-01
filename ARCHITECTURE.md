@@ -2,7 +2,7 @@
 
 This is the code map for Rantakit: which part owns what, the contract every engine follows, and which library or platform backend does each job. The product rules it serves live in [RANTAKIT.md](RANTAKIT.md), the order of work in [ROADMAP.md](ROADMAP.md), and the reasons behind the hard-to-reverse choices in the ADRs linked below.
 
-Some of this is the target, not today's code. Today `crates/rantakit_core` holds both the image and PDF engines, and Result naming and History live in `src-tauri`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
+Some of this is the target, not today's code. Today only `rantakit-image` and `rantakit-pdf` exist, they do not yet follow the engine contract below, and Result naming and History live in `src-tauri`. The v0.2 "Engine foundation" epic moves the code to the layout below; other engine crates are created when their release starts.
 
 ## Parts
 
@@ -83,4 +83,4 @@ The throwaway `spike/size` branch adds each heavy format as a `spike-*` cargo fe
 - Each engine crate and `rantakit-tasks` has Rust tests against fixtures.
 - A CI workflow runs the Rust tests and the frontend type check on every push and pull request, on Windows and Linux.
 - Native backends (MediaCodec, Media Foundation) are checked by hand on a real low-end Android phone and a Windows PC before each release.
-- **Fixtures** committed to the repo are generated (like `crates/rantakit_core/examples/gen_fixtures.rs`) or openly licensed. Real documents (ID cards, diplomas, CVs, bank statements) are tested only from a local folder listed in `.gitignore`, never committed.
+- **Fixtures** committed to the repo are generated (like `crates/rantakit-image/examples/gen_fixtures.rs`) or openly licensed. Real documents (ID cards, diplomas, CVs, bank statements) are tested only from a local folder listed in `.gitignore`, never committed.
