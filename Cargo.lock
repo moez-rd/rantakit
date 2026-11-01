@@ -2954,6 +2954,7 @@ checksum = "a611d15b50743feb4c76b7d03edcb0e64f399c26961e4efe6975bc398be6aa3d"
 name = "rantakit"
 version = "0.1.0"
 dependencies = [
+ "rantakit-core",
  "rantakit-image",
  "rantakit-pdf",
  "serde",
@@ -2966,11 +2967,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rantakit-core"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "rantakit-image"
 version = "0.1.0"
 dependencies = [
  "image",
- "thiserror 2.0.21",
+ "rantakit-core",
 ]
 
 [[package]]
@@ -2979,7 +2987,7 @@ version = "0.1.0"
 dependencies = [
  "image",
  "lopdf",
- "thiserror 2.0.21",
+ "rantakit-core",
 ]
 
 [[package]]

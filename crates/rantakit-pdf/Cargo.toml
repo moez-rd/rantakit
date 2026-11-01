@@ -10,4 +10,4 @@ edition = "2024"
 [dependencies]
 image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 lopdf = { version = "0.46", default-features = false }
-thiserror = "2.0.21"
+rantakit-core = { path = "../rantakit-core" }

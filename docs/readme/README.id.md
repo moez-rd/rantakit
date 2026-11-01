@@ -101,6 +101,7 @@ cargo clippy --workspace --all-targets
 ## Struktur proyek
 
 ```
+crates/rantakit-core/    kontrak mesin: jenis error, progres, pembatalan
 crates/rantakit-image/   mesin gambar (JPG dan PNG), tanpa dependensi Tauri
 crates/rantakit-pdf/     mesin PDF, tanpa dependensi Tauri
 src-tauri/               aplikasi desktop: command, riwayat, menu native

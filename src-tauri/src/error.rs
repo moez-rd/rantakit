@@ -7,10 +7,7 @@ pub enum Error {
     Io(#[from] std::io::Error),
 
     #[error(transparent)]
-    Image(#[from] rantakit_image::Error),
-
-    #[error(transparent)]
-    Pdf(#[from] rantakit_pdf::Error),
+    Engine(#[from] rantakit_core::ErrorKind),
 
     #[error(transparent)]
     Tauri(#[from] tauri::Error),
