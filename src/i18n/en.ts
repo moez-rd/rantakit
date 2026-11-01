@@ -72,6 +72,9 @@ export const en: Messages = {
   "picker.photos.filter": "Photos",
   "picker.pdfs": "Choose PDFs",
 
+  // Home
+  "home.all": "All tools",
+
   // Files and Options
   "setup.selected": "{files} chosen",
   "setup.add": "Add",

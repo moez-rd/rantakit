@@ -26,6 +26,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::files::file_sizes,
             commands::menu::set_menu_language,
+            commands::tools::list_tools,
             commands::task::start_task,
             commands::task::cancel_task,
             commands::history::list_history,

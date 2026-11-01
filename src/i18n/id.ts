@@ -74,6 +74,9 @@ export const id = {
   "picker.photos.filter": "Foto",
   "picker.pdfs": "Pilih PDF",
 
+  // Home
+  "home.all": "Semua alat",
+
   // Files and Options
   "setup.selected": "{files} dipilih",
   "setup.add": "Tambah",

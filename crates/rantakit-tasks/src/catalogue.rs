@@ -69,6 +69,19 @@ pub enum Job {
     BagikanAman,
 }
 
+impl Job {
+    /// The stable id the frontend keys Job headings by.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::KecilkanUbah => "kecilkan-ubah",
+            Self::Scan => "scan",
+            Self::AturPdf => "atur-pdf",
+            Self::AmbilTeks => "ambil-teks",
+            Self::BagikanAman => "bagikan-aman",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Platform {
     Windows,

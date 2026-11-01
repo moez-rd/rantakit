@@ -11,6 +11,7 @@ import { toPdfOptions, usePdfSettings } from "@/features/compress/pdfSettings";
 import { SetupView } from "@/features/compress/SetupView";
 import { useCompressJob } from "@/features/compress/useCompressJob";
 import { HomePage } from "@/features/home/HomePage";
+import type { ToolId } from "@/features/home/tools";
 import { RecentsPage } from "@/features/recents/RecentsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import {
@@ -65,6 +66,12 @@ function App() {
   const pickFiles = async (kind: FileKind) => {
     if (job.isRunning) return;
     addFiles(kind, await FILE_KINDS[kind].pick());
+  };
+
+  /** Shipped Tools open the file picker; coming soon Tools can't be pressed. */
+  const openTool = (id: ToolId) => {
+    if (id === "kompres-foto") pickFiles("image");
+    else if (id === "kompres-pdf") pickFiles("pdf");
   };
 
   const startJob = () => {
@@ -129,7 +136,7 @@ function App() {
         </SetupView>
       );
     }
-    return <HomePage onCompressImage={() => pickFiles("image")} onCompressPdf={() => pickFiles("pdf")} />;
+    return <HomePage onOpenTool={openTool} />;
   };
 
   return (
