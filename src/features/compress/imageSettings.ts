@@ -4,7 +4,10 @@ import type { ToolOptions } from "./taskApi";
 
 export type OutputFormat = "same" | "jpeg" | "png";
 
-/** Plain sizes for a photo's longest side, shared by Kompres Foto and Ubah Ukuran Foto. */
+/**
+ * Plain sizes for a photo's longest side, shared by Kompres Foto and Ubah
+ * Ukuran Foto. Mirrors `PhotoSize` in crates/rantakit-tasks/src/task.rs.
+ */
 export type PhotoSize = "large" | "medium" | "small";
 export const PHOTO_SIZES: Record<PhotoSize, number> = { large: 1920, medium: 1280, small: 800 };
 

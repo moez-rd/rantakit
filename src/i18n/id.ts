@@ -267,4 +267,17 @@ export const id = {
   "unchanged.format": "Sudah {format}, tidak diubah",
   "error.unchanged": "Tidak diubah",
   "result.nothingChanged": "Semua file sudah sesuai, jadi tidak ada yang diubah.",
+
+  // Ubah Ukuran Foto
+  "main.ubah-ukuran-foto": "Ubah ukuran",
+  "working.ubah-ukuran-foto": "Mengubah ukuran {current} dari {files}…",
+  "resize.size": "Ukuran baru",
+  "resize.large.description": "Tetap jelas di layar besar",
+  "resize.medium.description": "Pas untuk dikirim lewat WhatsApp",
+  "resize.small.description": "Pas untuk formulir online",
+  "resize.side": "Sisi terpanjang (px)",
+  "resize.side.help": "Panjang sisi terpanjang foto, dalam piksel. Sisi lainnya ikut menyesuaikan supaya foto tidak gepeng.",
+  "resize.side.placeholder": "misalnya 1280",
+  "resize.side.overrides": "Kalau diisi, angka ini dipakai dan pilihan di atas diabaikan.",
+  "unchanged.size": "Sudah kecil, tidak diubah",
 } as const;

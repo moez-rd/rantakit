@@ -133,13 +133,7 @@ pub const CATALOGUE: &[Tool] = &[
     tool(ToolId::KompresFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(ToolId::KompresPdf, KecilkanUbah, &[Pdf], ALL, Shipped),
     tool(ToolId::UbahFormatFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
-    tool(
-        ToolId::UbahUkuranFoto,
-        KecilkanUbah,
-        PHOTOS,
-        ALL,
-        ComingSoon,
-    ),
+    tool(ToolId::UbahUkuranFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(
         ToolId::KompresDokumen,
         KecilkanUbah,
@@ -309,7 +303,11 @@ mod tests {
         let on = Platform::Windows;
         assert_eq!(
             tools_for_kinds(&[Jpg, Png], on),
-            [ToolId::KompresFoto, ToolId::UbahFormatFoto]
+            [
+                ToolId::KompresFoto,
+                ToolId::UbahFormatFoto,
+                ToolId::UbahUkuranFoto
+            ]
         );
         assert_eq!(tools_for_kinds(&[Pdf, Pdf], on), [ToolId::KompresPdf]);
     }
@@ -332,7 +330,11 @@ mod tests {
             match_kinds(&[Jpg, Png], on),
             FileMatch::Fits {
                 kinds: vec![Jpg, Png],
-                tools: vec![ToolId::KompresFoto, ToolId::UbahFormatFoto]
+                tools: vec![
+                    ToolId::KompresFoto,
+                    ToolId::UbahFormatFoto,
+                    ToolId::UbahUkuranFoto
+                ]
             }
         );
         assert_eq!(match_kinds(&[Jpg, Pdf], on), FileMatch::Mixed);

@@ -264,4 +264,17 @@ export const en: Messages = {
   "unchanged.format": "Already {format}, not changed",
   "error.unchanged": "Not changed",
   "result.nothingChanged": "Every file was already as asked, so nothing was changed.",
+
+  // Ubah Ukuran Foto
+  "main.ubah-ukuran-foto": "Resize",
+  "working.ubah-ukuran-foto": "Resizing {current} of {files}…",
+  "resize.size": "New size",
+  "resize.large.description": "Still clear on a large screen",
+  "resize.medium.description": "Right for sending on WhatsApp",
+  "resize.small.description": "Right for online forms",
+  "resize.side": "Longest side (px)",
+  "resize.side.help": "The length of the photo's longest side, in pixels. The other side follows so the photo isn't stretched.",
+  "resize.side.placeholder": "for example 1280",
+  "resize.side.overrides": "If filled in, this number is used and the choice above is ignored.",
+  "unchanged.size": "Already small, not changed",
 };

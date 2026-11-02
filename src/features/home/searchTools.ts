@@ -6,7 +6,7 @@ const KEYWORDS: Record<ToolId, string> = {
   "kompres-foto": "compress reduce shrink photo image picture gambar perkecil",
   "kompres-pdf": "compress reduce shrink perkecil",
   "ubah-format-foto": "convert konversi format jpg jpeg png heic webp ke to",
-  "ubah-ukuran-foto": "resize scale dimensions pixels perbesar perkecil",
+  "ubah-ukuran-foto": "resize scale dimensions pixels perbesar perkecil kecilkan ukuran",
   "kompres-dokumen": "compress office document docx xlsx pptx",
   "kompres-audio": "compress sound voice note suara",
   "ubah-format-audio": "convert konversi sound suara mp3",

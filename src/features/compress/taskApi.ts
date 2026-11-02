@@ -32,6 +32,13 @@ export type ToolOptions =
       quality?: number;
       /** "#rrggbb" behind transparent parts when a PNG becomes a JPG; white when omitted. */
       background?: string;
+    }
+  | {
+      tool: "ubah-ukuran-foto";
+      /** "Ukuran baru"; defaults to "medium" on the Rust side. */
+      size?: "large" | "medium" | "small";
+      /** "Sisi terpanjang (px)"; wins over `size`. */
+      maxSide?: number;
     };
 
 /** The Size limit in bytes these options aim for, if any. */

@@ -2,6 +2,7 @@ import type { ToolId } from "@/features/home/tools";
 import { kompresFoto } from "@/features/compress/ImageOptions";
 import { kompresPdf } from "@/features/compress/PdfOptions";
 import { ubahFormatFoto } from "@/features/convert/ConvertOptions";
+import { ubahUkuranFoto } from "@/features/resize/ResizeOptions";
 import type { ToolDef } from "./toolDef";
 
 // Each Tool keeps its own settings type; the page only passes them through.
@@ -13,6 +14,7 @@ export const TOOL_DEFS = {
   "kompres-foto": kompresFoto,
   "kompres-pdf": kompresPdf,
   "ubah-format-foto": ubahFormatFoto,
+  "ubah-ukuran-foto": ubahUkuranFoto,
 } satisfies Partial<Record<ToolId, AnyToolDef>>;
 
 export type ShippedTool = keyof typeof TOOL_DEFS;

@@ -19,7 +19,9 @@ pub use history::{Entry, History, HistoryError};
 pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};
 pub use names::result_path;
-pub use task::{Details, FileOutcome, ResultFile, Task, TaskEvent, ToolOptions, run_task};
+pub use task::{
+    Details, FileOutcome, PhotoSize, ResultFile, Task, TaskEvent, ToolOptions, run_task,
+};
 
 pub use rantakit_core::{CancelToken, ErrorKind, Progress};
 pub use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target, WHITE, thumbnail};

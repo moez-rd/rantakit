@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
     CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
-    Progress, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
+    PhotoSize, Progress, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -72,6 +72,32 @@ pub enum OptionsRequest {
         #[serde(default)]
         background: Option<String>,
     },
+    UbahUkuranFoto {
+        #[serde(default)]
+        size: SizeRequest,
+        /// "Sisi terpanjang (px)" from Advanced options; wins over `size`.
+        #[serde(default)]
+        max_side: Option<u32>,
+    },
+}
+
+#[derive(Debug, Default, Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SizeRequest {
+    Large,
+    #[default]
+    Medium,
+    Small,
+}
+
+impl From<SizeRequest> for PhotoSize {
+    fn from(size: SizeRequest) -> Self {
+        match size {
+            SizeRequest::Large => Self::Large,
+            SizeRequest::Medium => Self::Medium,
+            SizeRequest::Small => Self::Small,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -163,6 +189,9 @@ impl From<OptionsRequest> for ToolOptions {
                 quality,
                 parse_color(background.as_deref()),
             ),
+            OptionsRequest::UbahUkuranFoto { size, max_side } => {
+                Self::resize(max_side.unwrap_or(PhotoSize::from(size).side()))
+            }
         }
     }
 }

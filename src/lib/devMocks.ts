@@ -13,9 +13,9 @@ const TOOLS: ToolInfo[] = [
   { id: "kompres-foto", job: "kecilkan-ubah", comingSoon: false },
   { id: "kompres-pdf", job: "kecilkan-ubah", comingSoon: false },
   { id: "ubah-format-foto", job: "kecilkan-ubah", comingSoon: false },
+  { id: "ubah-ukuran-foto", job: "kecilkan-ubah", comingSoon: false },
   ...(
     [
-      ["ubah-ukuran-foto", "kecilkan-ubah"],
       ["kompres-dokumen", "kecilkan-ubah"],
       ["kompres-audio", "kecilkan-ubah"],
       ["ubah-format-audio", "kecilkan-ubah"],
@@ -51,6 +51,8 @@ function sizeOf(path: string) {
 }
 
 const isPdf = (path: string) => path.toLowerCase().endsWith(".pdf");
+const longestSideOf = (path: string) => 600 + (sizeOf(path) % 3400);
+const SIDES: Record<string, number> = { large: 1920, medium: 1280, small: 800 };
 const kindOf = (path: string) => (isPdf(path) ? "pdf" : path.toLowerCase().endsWith(".png") ? "png" : "jpg");
 
 /** A soft gradient as a JPG, in place of a real thumbnail. */
@@ -73,7 +75,7 @@ const cancelled = new Set<number>();
 let nextTask = 1;
 
 interface TaskArgs {
-  request: { options: { tool: string; to?: string }; paths: string[] };
+  request: { options: { tool: string; to?: string; size?: string; maxSide?: number }; paths: string[] };
   onEvent: { onmessage: (message: unknown) => void };
 }
 
@@ -99,8 +101,12 @@ function runTask({ request, onEvent }: TaskArgs) {
         continue;
       }
       const size = sizeOf(path);
-      const { to } = request.options;
-      if (to && kindOf(path) === (to === "jpeg" ? "jpg" : "png")) {
+      const { tool, to, size: photoSize, maxSide } = request.options;
+      const side = maxSide ?? SIDES[photoSize ?? "medium"];
+      if (
+        (to && kindOf(path) === (to === "jpeg" ? "jpg" : "png")) ||
+        (tool === "ubah-ukuran-foto" && longestSideOf(path) <= side)
+      ) {
         send({ event: "fileDone", file, outcome: { status: "failed", error: { code: "unchanged" } } });
         continue;
       }
@@ -146,14 +152,14 @@ export function installDevMocks() {
         const paths = (args as { paths: string[] }).paths;
         if (paths.every(isPdf)) return { status: "fits", kinds: ["pdf"], tools: ["kompres-pdf"] };
         if (paths.some(isPdf)) return { status: "mixed" };
-        return { status: "fits", kinds: ["jpg"], tools: ["kompres-foto", "ubah-format-foto"] };
+        return { status: "fits", kinds: ["jpg"], tools: ["kompres-foto", "ubah-format-foto", "ubah-ukuran-foto"] };
       }
       case "file_info":
         return (args as { paths: string[] }).paths.map((path) => ({
           size: sizeOf(path),
           kind: kindOf(path),
           pages: isPdf(path) ? 1 + (sizeOf(path) % 5) : null,
-          longestSide: isPdf(path) ? null : 4000,
+          longestSide: isPdf(path) ? null : longestSideOf(path),
         }));
       case "thumbnail": {
         const { path, size } = args as { path: string; size: number };
