@@ -283,4 +283,18 @@ export const id = {
 
   // Recent Size limits
   "options.limit.recent": "Sebelumnya",
+
+  // Presets
+  "common.cancel": "Batal",
+  "common.save": "Simpan",
+  "common.done": "Selesai",
+  "preset.label": "Preset",
+  "preset.none": "Tanpa preset",
+  "preset.manage": "Kelola preset",
+  "preset.manage.empty": "Belum ada preset.",
+  "preset.save": "Simpan sebagai preset",
+  "preset.name": "Nama preset",
+  "preset.name.hint": "Pilih nama yang mudah dikenali, misalnya \"Pas foto CPNS: JPG, 200 KB\".",
+  "preset.nameOf": "Nama preset {name}",
+  "preset.remove": "Hapus {name}",
 } as const;

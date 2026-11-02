@@ -73,6 +73,7 @@ async function fakeThumbnail(path: string, size: number) {
 
 const cancelled = new Set<number>();
 const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
+const presets: { id: string; tool: string; name: string; options: object }[] = [];
 let nextTask = 1;
 
 interface TaskArgs {
@@ -151,6 +152,27 @@ export function installDevMocks() {
         return [];
       case "recent_limits":
         return has("recent") ? [...recentLimits] : [];
+      case "list_presets": {
+        const { tool } = args as { tool: string };
+        return presets.filter((preset) => preset.tool === tool);
+      }
+      case "save_preset": {
+        const { tool, name, options } = args as { tool: string; name: string; options: object };
+        const preset = { id: String(Date.now()), tool, name: name.trim(), options };
+        presets.push(preset);
+        return preset;
+      }
+      case "rename_preset": {
+        const { id, name } = args as { id: string; name: string };
+        const preset = presets.find((p) => p.id === id);
+        if (preset) preset.name = name.trim();
+        return null;
+      }
+      case "remove_preset": {
+        const { id } = args as { id: string };
+        presets.splice(0, Infinity, ...presets.filter((p) => p.id !== id));
+        return null;
+      }
       case "recent_tools":
         return has("recent") ? ["kompres-pdf", "kompres-foto"] : [];
       case "match_files": {

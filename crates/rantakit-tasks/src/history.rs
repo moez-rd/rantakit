@@ -242,14 +242,14 @@ fn entry(tool: &ToolOptions, original: &Path, result: &ResultFile, created_at: u
 }
 
 /// Milliseconds since the Unix epoch.
-fn now_ms() -> u64 {
+pub(crate) fn now_ms() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |d| d.as_millis() as u64)
 }
 
 /// Unique within this machine: the timestamp plus a counter for same-millisecond entries.
-fn new_id(created_at: u64) -> String {
+pub(crate) fn new_id(created_at: u64) -> String {
     static COUNTER: AtomicU64 = AtomicU64::new(0);
     format!(
         "{created_at:x}-{:x}",

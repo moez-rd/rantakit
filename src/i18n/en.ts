@@ -280,4 +280,18 @@ export const en: Messages = {
 
   // Recent Size limits
   "options.limit.recent": "Used before",
+
+  // Presets
+  "common.cancel": "Cancel",
+  "common.save": "Save",
+  "common.done": "Done",
+  "preset.label": "Preset",
+  "preset.none": "No preset",
+  "preset.manage": "Manage presets",
+  "preset.manage.empty": "No presets yet.",
+  "preset.save": "Save as preset",
+  "preset.name": "Preset name",
+  "preset.name.hint": "Pick a name you'll recognize, like \"CPNS ID photo: JPG, 200 KB\".",
+  "preset.nameOf": "Name of preset {name}",
+  "preset.remove": "Delete {name}",
 };

@@ -1,9 +1,13 @@
-import { ArrowLeft, ChevronRight } from "@keyline-icons/react";
+import { useState } from "react";
+import { ArrowLeft, BookmarkPlus, ChevronRight } from "@keyline-icons/react";
 import { Button as AriaButton, ProgressBar } from "react-aria-components";
 import { Button } from "@/components/ui/Button";
 import type { ToolOptions } from "@/features/compress/taskApi";
 import type { CompressJob, JobItem } from "@/features/compress/useCompressJob";
 import { TOOL_ICONS } from "@/features/home/tools";
+import { ManagePresetsDialog, SavePresetDialog } from "@/features/presets/PresetDialogs";
+import { PresetPicker } from "@/features/presets/PresetPicker";
+import { usePresets } from "@/features/presets/presetsApi";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
@@ -31,7 +35,15 @@ interface ToolPageProps {
 export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, onProcessAnother }: ToolPageProps) {
   const { t, count } = useT();
   const def = toolDef(tool);
-  const [settings, update] = def.useSettings();
+  const [settings, updateSettings] = def.useSettings();
+  const { presets, save, rename, remove } = usePresets(tool);
+  /** The Preset whose options are in use; any change of an option leaves it. */
+  const [presetId, setPresetId] = useState<string | null>(null);
+  const [presetDialog, setPresetDialog] = useState<"save" | "manage" | null>(null);
+  const update = (patch: Partial<typeof settings>) => {
+    updateSettings(patch);
+    setPresetId(null);
+  };
   const infos = useFileInfo(paths);
   const files = paths.flatMap((path) => (infos[path] ? [infos[path]] : []));
   const request = def.toRequest(settings, files);
@@ -82,6 +94,15 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
               inert={running}
               className={`flex flex-col gap-[22px] overflow-y-auto p-5 transition-opacity ${running ? "opacity-45" : ""}`}
             >
+              <PresetPicker
+                presets={presets}
+                selected={presetId}
+                onSelect={(preset) => {
+                  if (preset) updateSettings(preset.options);
+                  setPresetId(preset?.id ?? null);
+                }}
+                onManage={() => setPresetDialog("manage")}
+              />
               <def.Main settings={settings} onChange={update} files={files} />
               {def.Advanced && (def.showAdvanced?.(settings, files) ?? true) && (
                 <MoreOptions tool={tool}>
@@ -100,9 +121,14 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
                   onCancel={job.cancel}
                 />
               ) : (
-                <Button isDisabled={paths.length === 0} onPress={() => onStart(request)}>
-                  {t(`main.${tool}`)}
-                </Button>
+                <>
+                  <Button variant="link" className="self-center" onPress={() => setPresetDialog("save")}>
+                    <BookmarkPlus aria-hidden className="size-5" /> {t("preset.save")}
+                  </Button>
+                  <Button isDisabled={paths.length === 0} onPress={() => onStart(request)}>
+                    {t(`main.${tool}`)}
+                  </Button>
+                </>
               )}
               {!running && paths.length === 0 && (
                 <p className="text-center text-small text-text-muted">{t(`options.needFiles.${def.noun}`)}</p>
@@ -110,6 +136,28 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
             </div>
           </aside>
         </div>
+      )}
+
+      {presetDialog === "save" && (
+        <SavePresetDialog
+          onClose={() => setPresetDialog(null)}
+          onSave={async (name) => {
+            setPresetDialog(null);
+            const preset = await save(name, settings).catch(() => null);
+            if (preset) setPresetId(preset.id);
+          }}
+        />
+      )}
+      {presetDialog === "manage" && (
+        <ManagePresetsDialog
+          presets={presets}
+          onRename={(id, name) => rename(id, name).catch(() => {})}
+          onRemove={(id) => {
+            if (id === presetId) setPresetId(null);
+            remove(id).catch(() => {});
+          }}
+          onClose={() => setPresetDialog(null)}
+        />
       )}
     </div>
   );
