@@ -22,7 +22,10 @@ interface FilesColumnProps {
   onRemove: (path: string) => void;
 }
 
-/** The Files step: one drop zone while empty, then a row per file and "Tambah foto". */
+/**
+ * The Files step: one drop zone while empty, then a row per file and "Tambah
+ * foto". On desktop the count and "Tambah foto" stay put while the list scrolls.
+ */
 export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: FilesColumnProps) {
   const tr = useT();
   const { t, count, locale } = tr;
@@ -30,7 +33,7 @@ export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: 
 
   if (paths.length === 0) {
     return (
-      <div className="flex min-h-[480px] flex-1 flex-col items-center justify-center gap-4 rounded-[20px] border-2 border-dashed border-border-strong p-8 text-center">
+      <div className="mx-5 mb-5 flex min-h-80 flex-1 flex-col items-center justify-center gap-4 rounded-[20px] border-2 border-dashed border-border-strong p-8 text-center md:min-h-0">
         <span className="flex size-18 items-center justify-center rounded-[20px] bg-brand-soft text-brand-strong">
           <FileArrowUp aria-hidden className="size-9" />
         </span>
@@ -45,33 +48,35 @@ export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: 
 
   const total = paths.reduce((sum, path) => sum + (infos[path]?.size ?? 0), 0);
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between gap-3">
+    <div className="flex flex-1 flex-col md:min-h-0">
+      <div className="flex items-baseline justify-between gap-3 px-5 pb-3">
         <h2 className="text-section">{count(`files.${noun}`, paths.length)}</h2>
         {total > 0 && (
           <span className="text-small text-text-muted">{t("files.total", { size: formatBytes(total, locale) })}</span>
         )}
       </div>
 
-      <ul
-        aria-label={t("files.list")}
-        className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface"
-      >
-        {items
-          ? items.map((item) => <WorkingRow key={item.path} item={item} noun={noun} />)
-          : paths.map((path) => (
-              <ReadyRow
-                key={path}
-                path={path}
-                noun={noun}
-                info={infos[path]}
-                skipNote={infos[path] ? skipNote?.(infos[path]) : null}
-                onRemove={() => onRemove(path)}
-              />
-            ))}
-      </ul>
+      <div className="px-5 md:min-h-0 md:flex-1 md:overflow-y-auto">
+        <ul
+          aria-label={t("files.list")}
+          className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface"
+        >
+          {items
+            ? items.map((item) => <WorkingRow key={item.path} item={item} noun={noun} />)
+            : paths.map((path) => (
+                <ReadyRow
+                  key={path}
+                  path={path}
+                  noun={noun}
+                  info={infos[path]}
+                  skipNote={infos[path] ? skipNote?.(infos[path]) : null}
+                  onRemove={() => onRemove(path)}
+                />
+              ))}
+        </ul>
+      </div>
 
-      <div className={`flex flex-wrap items-center gap-3 ${items ? "invisible" : ""}`}>
+      <div className={`flex flex-wrap items-center gap-3 px-5 py-4 ${items ? "invisible" : ""}`}>
         <Button variant="secondary" size="row" onPress={onPick}>
           <Plus aria-hidden className="size-5" /> {t(`files.add.${noun}`)}
         </Button>

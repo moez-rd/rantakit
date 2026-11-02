@@ -1,31 +1,31 @@
 import type { ReactNode } from "react";
-import { isDesktopApp, isMacApp } from "@/lib/platform";
+import { isDesktopApp } from "@/lib/platform";
 import { Sidebar } from "./Sidebar";
 import { TabBar } from "./TabBar";
 import type { NavTarget, Page } from "./navigation";
-import { TitleBar } from "./TitleBar";
+import { TitleBar, type TitleBarNav } from "./TitleBar";
 
 interface AppShellProps {
   page: Page;
   onNavigate: (target: NavTarget) => void;
   /** The sidebar's "Buka" button: choose files, then a Tool. */
   onOpen: () => void;
+  /** Back, Forward and the sidebar toggle, shown in the desktop title bar. */
+  titleBar: TitleBarNav;
   children: ReactNode;
 }
 
 /**
- * Desktop: sidebar on its own background, content beside it.
- * Mobile: full-width content with a bottom tab bar.
+ * Desktop: a title bar, then the sidebar and the content as two cards on the
+ * window background; the sidebar can be hidden. Mobile: full-width content
+ * with a bottom tab bar.
  */
-export function AppShell({ page, onNavigate, onOpen, children }: AppShellProps) {
+export function AppShell({ page, onNavigate, onOpen, titleBar, children }: AppShellProps) {
   return (
     <div className="flex h-full flex-col md:bg-canvas">
-      {/* macOS draws the content under an overlay title bar: keep the traffic
-          lights clear and let this strip move the window. */}
-      {isMacApp && <div data-tauri-drag-region className="h-7 shrink-0" />}
-      {isDesktopApp && !isMacApp && <TitleBar />}
+      {isDesktopApp && <TitleBar {...titleBar} />}
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-1.5 md:p-1.5 md:pt-0">
-        <Sidebar page={page} onNavigate={onNavigate} onOpen={onOpen} />
+        {titleBar.sidebarOpen && <Sidebar page={page} onNavigate={onNavigate} onOpen={onOpen} />}
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto md:rounded-xl md:border md:border-border md:bg-surface">
           {children}
         </main>

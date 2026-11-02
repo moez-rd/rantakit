@@ -1,28 +1,71 @@
 import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Copy, Minus, Square, X } from "@keyline-icons/react";
+import { ChevronLeft, ChevronRight, Copy, Minus, PanelLeft, Square, X } from "@keyline-icons/react";
 import { Button } from "react-aria-components";
 import { useT } from "@/i18n";
+import { isMacApp } from "@/lib/platform";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 
-/** Window control, 28 px square. */
+/** Title bar button, 28 px square. */
 const control = tv({
   extend: focusRing,
   base: [
     "flex size-7 rounded-lg items-center justify-center text-text-muted",
     "cursor-default select-none transition-colors",
-    "hover:bg-badge-bg hover:text-text pressed:bg-badge-bg",
+    "hover:bg-badge-bg hover:text-text pressed:bg-badge-bg disabled:opacity-40",
   ],
   variants: {
     close: { true: "hover:bg-danger hover:text-on-danger pressed:bg-danger-hover" },
   },
 });
 
+export interface TitleBarNav {
+  canBack: boolean;
+  canForward: boolean;
+  onBack: () => void;
+  onForward: () => void;
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
+}
+
 /**
- * Title bar for Windows and Linux, where the window has no OS decorations.
+ * The desktop title bar: the sidebar toggle, Back and Forward on the left,
+ * the window controls on the right. macOS keeps its own traffic lights, so
+ * the buttons start clear of them and the window controls are left out.
  * The empty strip moves the window; a double-click maximizes it.
  */
-export function TitleBar() {
+export function TitleBar({ canBack, canForward, onBack, onForward, sidebarOpen, onToggleSidebar }: TitleBarNav) {
+  const { t } = useT();
+
+  return (
+    <header
+      data-tauri-drag-region
+      className={`flex h-9 shrink-0 items-center gap-2 px-1.5 ${isMacApp ? "ps-20" : ""}`}
+    >
+      <div className="flex shrink-0 items-center gap-1">
+        {/* The sidebar only exists from md up. */}
+        <Button
+          aria-label={t(sidebarOpen ? "nav.sidebar.hide" : "nav.sidebar.show")}
+          onPress={onToggleSidebar}
+          className={(rp) => `${control(rp)} max-md:hidden`}
+        >
+          <PanelLeft aria-hidden className="size-4" />
+        </Button>
+        <Button aria-label={t("nav.back")} isDisabled={!canBack} onPress={onBack} className={(rp) => control(rp)}>
+          <ChevronLeft aria-hidden className="size-4" />
+        </Button>
+        <Button aria-label={t("nav.forward")} isDisabled={!canForward} onPress={onForward} className={(rp) => control(rp)}>
+          <ChevronRight aria-hidden className="size-4" />
+        </Button>
+      </div>
+      <div data-tauri-drag-region className="h-full flex-1" />
+      {!isMacApp && <WindowControls />}
+    </header>
+  );
+}
+
+/** Minimize, maximize or restore, and close, for Windows and Linux. */
+function WindowControls() {
   const { t } = useT();
   // getCurrentWindow() returns a new object on every call: keep one, or the
   // effect below would re-run after every render.
@@ -39,32 +82,24 @@ export function TitleBar() {
   }, [appWindow]);
 
   return (
-    <header data-tauri-drag-region className="flex h-9 shrink-0 items-center gap-2 px-1.5">
-      {/* Clicks pass through the title to the drag region behind it. */}
-      <div data-tauri-drag-region className="flex min-w-0 flex-1 items-center ps-1.5">
-        <span className="pointer-events-none truncate select-none font-display text-small font-semibold tracking-wide text-text-muted">
-          rantakit
-        </span>
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <Button aria-label={t("window.minimize")} onPress={() => appWindow.minimize()} className={(rp) => control(rp)}>
-          <Minus aria-hidden className="size-4" />
-        </Button>
-        <Button
-          aria-label={t(isMaximized ? "window.restore" : "window.maximize")}
-          onPress={() => appWindow.toggleMaximize()}
-          className={(rp) => control(rp)}
-        >
-          {isMaximized ? <Copy aria-hidden className="size-3.5" /> : <Square aria-hidden className="size-3.5" />}
-        </Button>
-        <Button
-          aria-label={t("window.close")}
-          onPress={() => appWindow.close()}
-          className={(rp) => control({ ...rp, close: true })}
-        >
-          <X aria-hidden className="size-4" />
-        </Button>
-      </div>
-    </header>
+    <div className="flex shrink-0 items-center gap-1">
+      <Button aria-label={t("window.minimize")} onPress={() => appWindow.minimize()} className={(rp) => control(rp)}>
+        <Minus aria-hidden className="size-4" />
+      </Button>
+      <Button
+        aria-label={t(isMaximized ? "window.restore" : "window.maximize")}
+        onPress={() => appWindow.toggleMaximize()}
+        className={(rp) => control(rp)}
+      >
+        {isMaximized ? <Copy aria-hidden className="size-3.5" /> : <Square aria-hidden className="size-3.5" />}
+      </Button>
+      <Button
+        aria-label={t("window.close")}
+        onPress={() => appWindow.close()}
+        className={(rp) => control({ ...rp, close: true })}
+      >
+        <X aria-hidden className="size-4" />
+      </Button>
+    </div>
   );
 }

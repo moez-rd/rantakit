@@ -19,7 +19,9 @@ import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
 import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
 import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
+import { useNavHistory } from "@/lib/navHistory";
 import { isMacApp } from "@/lib/platform";
+import { useStoredState } from "@/lib/storedState";
 import { useT } from "@/i18n";
 
 /** Dropped files waiting for the user to choose a Tool. */
@@ -29,6 +31,11 @@ interface Dropped {
 }
 
 const unique = (paths: string[]) => [...new Set(paths)];
+
+/** Whether the sidebar is shown, remembered between launches; shown unless the user hid it. */
+const parseLayout = (stored: unknown) => ({
+  sidebar: !(stored && typeof stored === "object" && (stored as { sidebar?: unknown }).sidebar === false),
+});
 
 function App() {
   const tr = useT();
@@ -102,6 +109,27 @@ function App() {
   const [dropped, setDropped] = useState<Dropped | null>(null);
   const pageTool = page === "home" ? tool : null;
 
+  // A Tool page sits over Home, so the Tool alone names where the user is.
+  const history = useNavHistory<Page | ShippedTool>(pageTool ?? page);
+
+  /** Back or Forward; leaving a Tool page asks first, and staying keeps the history where it is. */
+  const goHistory = (delta: -1 | 1) => {
+    const target = history.target(delta);
+    if (!target) return;
+    leaveTool(() => {
+      history.go(delta);
+      if (target === "home" || target === "history") {
+        closeTool();
+        setPage(target);
+      } else {
+        openTool(target);
+      }
+    });
+  };
+
+  const [layout, updateLayout] = useStoredState("rantakit.layout", parseLayout);
+  const toggleSidebar = () => updateLayout({ sidebar: !layout.sidebar });
+
   /** Files dropped on the window or chosen with "Buka": ask for a Tool, or add them to the open one. */
   const receiveFiles = async (received: string[]) => {
     if (job.isRunning || received.length === 0) return;
@@ -119,14 +147,35 @@ function App() {
     setDropped(null);
   };
 
-  // Escape leaves the Tool page, asking first when files would be lost.
+  // Escape on a Tool page is Back, asking first when files would be lost.
   useEffect(() => {
     if (!pageTool || leaving || dropped || settingsTab) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !e.defaultPrevented) leaveTool(closeTool);
+      if (e.key === "Escape" && !e.defaultPrevented) goHistory(-1);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
+  // The mouse's side buttons are Back and Forward. Cancelling them also keeps
+  // the webview from trying a navigation of its own.
+  useEffect(() => {
+    if (leaving || dropped || settingsTab) return;
+    const isSideButton = (e: MouseEvent) => e.button === 3 || e.button === 4;
+    const onMouseDown = (e: MouseEvent) => {
+      if (isSideButton(e)) e.preventDefault();
+    };
+    const onMouseUp = (e: MouseEvent) => {
+      if (!isSideButton(e)) return;
+      e.preventDefault();
+      goHistory(e.button === 3 ? -1 : 1);
+    };
+    window.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
   });
 
   /** Commands from the macOS menu bar, the in-app menu and the Ctrl shortcuts. */
@@ -148,6 +197,12 @@ function App() {
         return openExternal(SOURCE_URL);
       case "open_license":
         return openExternal(LICENSE_URL);
+      case "go_back":
+        return goHistory(-1);
+      case "go_forward":
+        return goHistory(1);
+      case "toggle_sidebar":
+        return toggleSidebar();
     }
   };
 
@@ -163,6 +218,14 @@ function App() {
       page={page}
       onNavigate={(next) => navigate(next)}
       onOpen={async () => receiveFiles(await pickAnyFiles())}
+      titleBar={{
+        canBack: history.canBack,
+        canForward: history.canForward,
+        onBack: () => goHistory(-1),
+        onForward: () => goHistory(1),
+        sidebarOpen: layout.sidebar,
+        onToggleSidebar: toggleSidebar,
+      }}
     >
       {page === "home" &&
         (tool ? (

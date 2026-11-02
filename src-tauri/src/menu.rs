@@ -13,6 +13,9 @@ pub const COMPRESS_IMAGE: &str = "compress_image";
 pub const COMPRESS_PDF: &str = "compress_pdf";
 pub const GO_HOME: &str = "go_home";
 pub const GO_HISTORY: &str = "go_history";
+pub const GO_BACK: &str = "go_back";
+pub const GO_FORWARD: &str = "go_forward";
+pub const TOGGLE_SIDEBAR: &str = "toggle_sidebar";
 pub const OPEN_SOURCE: &str = "open_source";
 pub const OPEN_LICENSE: &str = "open_license";
 pub const OPEN_SETTINGS: &str = "open_settings";
@@ -42,6 +45,9 @@ struct Labels {
     view: &'static str,
     home: &'static str,
     history: &'static str,
+    back: &'static str,
+    forward: &'static str,
+    toggle_sidebar: &'static str,
     window: &'static str,
     minimize: &'static str,
     maximize: &'static str,
@@ -54,29 +60,32 @@ struct Labels {
 const ID: Labels = Labels {
     about: "Tentang Rantakit",
     tagline: "File tetap di perangkatmu.",
-    settings: l.settings,
+    settings: "Pengaturan…",
     hide: "Sembunyikan Rantakit",
     hide_others: "Sembunyikan lainnya",
     show_all: "Tampilkan semua",
     quit: "Keluar dari Rantakit",
     file: "File",
     compress_image: "Kompres Foto…",
-    compress_pdf: l.compress_pdf,
+    compress_pdf: "Kompres PDF…",
     edit: "Edit",
     cut: "Potong",
     copy: "Salin",
     paste: "Tempel",
     select_all: "Pilih semua",
-    view: l.view,
-    home: l.home,
+    view: "Tampilan",
+    home: "Beranda",
     history: "Riwayat",
-    window: l.window,
+    back: "Kembali",
+    forward: "Maju",
+    toggle_sidebar: "Tampilkan/Sembunyikan navigasi",
+    window: "Jendela",
     minimize: "Perkecil",
     maximize: "Perbesar",
     close_window: "Tutup jendela",
-    help: l.help,
-    source: l.source,
-    license: l.license,
+    help: "Bantuan",
+    source: "Kode sumber",
+    license: "Lisensi",
 };
 
 const EN: Labels = Labels {
@@ -98,6 +107,9 @@ const EN: Labels = Labels {
     view: "View",
     home: "Home",
     history: "History",
+    back: "Back",
+    forward: "Forward",
+    toggle_sidebar: "Show/Hide Navigation",
     window: "Window",
     minimize: "Minimize",
     maximize: "Zoom",
@@ -193,6 +205,11 @@ fn build_in<R: Runtime>(app: &AppHandle<R>, l: &Labels) -> tauri::Result<Menu<R>
         &[
             &MenuItem::with_id(app, GO_HOME, l.home, true, Some("CmdOrCtrl+1"))?,
             &MenuItem::with_id(app, GO_HISTORY, l.history, true, Some("CmdOrCtrl+2"))?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, GO_BACK, l.back, true, Some("CmdOrCtrl+["))?,
+            &MenuItem::with_id(app, GO_FORWARD, l.forward, true, Some("CmdOrCtrl+]"))?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, TOGGLE_SIDEBAR, l.toggle_sidebar, true, Some("CmdOrCtrl+B"))?,
         ],
     )?;
 
@@ -226,7 +243,8 @@ pub fn handle_event<R: Runtime>(app: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         OPEN_SOURCE => open_url(app, SOURCE_URL),
         OPEN_LICENSE => open_url(app, LICENSE_URL),
-        id @ (COMPRESS_IMAGE | COMPRESS_PDF | GO_HOME | GO_HISTORY | OPEN_SETTINGS) => {
+        id @ (COMPRESS_IMAGE | COMPRESS_PDF | GO_HOME | GO_HISTORY | GO_BACK | GO_FORWARD
+        | TOGGLE_SIDEBAR | OPEN_SETTINGS) => {
             if let Err(err) = app.emit_to("main", MENU_EVENT, id) {
                 eprintln!("failed to forward menu item {id}: {err}");
             }

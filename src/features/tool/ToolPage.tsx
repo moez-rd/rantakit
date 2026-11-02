@@ -14,7 +14,7 @@ import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
 import { useFileInfo, type FileInfo } from "./fileInfo";
 import { FilesColumn } from "./FilesColumn";
-import { ResultView } from "./ResultView";
+import { ResultList, ResultSummary } from "./ResultView";
 import { toolDef, type ShippedTool } from "./tools";
 import { unchangedNote } from "./unchanged";
 
@@ -32,6 +32,10 @@ interface ToolPageProps {
 /**
  * Every Tool's page: Files on the left, Options on the right with one main
  * button. Render it with `key={tool}`; each Tool keeps its own settings.
+ *
+ * Desktop fills the content card: the page never scrolls, the file list and
+ * the Options scroll on their own, and the main button stays at the panel's
+ * foot. Mobile stacks everything and pins the main button above the tab bar.
  */
 export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, onProcessAnother }: ToolPageProps) {
   const { t, count } = useT();
@@ -57,88 +61,94 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
   const hasResult = !running && job.items.length > 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-10 pt-6 pb-10">
-      <header className="flex flex-col items-start gap-4">
-        <Button variant="link" onPress={onBack}>
-          <ArrowLeft aria-hidden className="size-5" /> {t("tool.back")}
-        </Button>
-        <div className="flex items-center gap-4">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-strong">
-            <Icon aria-hidden className="size-7" />
+    <div className="flex flex-1 flex-col md:grid md:min-h-0 md:grid-cols-[minmax(0,1fr)_20rem] md:grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_22.5rem]">
+      <section
+        aria-label={t(hasResult ? "result.list" : `files.pick.${def.noun}`)}
+        className="flex min-w-0 flex-col md:row-span-2 md:min-h-0"
+      >
+        <header className="flex h-14 shrink-0 items-center gap-2 px-2 md:px-4">
+          {/* Desktop goes back from the title bar. */}
+          <Button variant="icon" aria-label={t("tool.back")} onPress={onBack} className="md:hidden">
+            <ArrowLeft aria-hidden className="size-5" />
+          </Button>
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">
+            <Icon aria-hidden className="size-5" />
           </span>
-          <div className="flex flex-col gap-0.5">
-            <h1 className="font-display text-title">{t(`tool.${tool}`)}</h1>
-            <p className="text-text-muted">{t(`tool.${tool}.description`)}</p>
+          <h1 className="truncate ps-1 font-display text-section">{t(`tool.${tool}`)}</h1>
+        </header>
+        {hasResult ? (
+          <ResultList job={job} noun={def.noun} />
+        ) : (
+          <FilesColumn
+            noun={def.noun}
+            paths={paths}
+            items={running ? job.items : undefined}
+            skipNote={skipNote}
+            onPick={onPick}
+            onRemove={onRemove}
+          />
+        )}
+      </section>
+
+      <aside
+        aria-label={t(hasResult ? "result.label" : "options.label")}
+        className="flex flex-col border-t border-border bg-panel md:min-h-0 md:border-t-0 md:border-s"
+      >
+        {hasResult ? (
+          <div className="flex flex-col p-5 md:overflow-y-auto">
+            <ResultSummary job={job} noun={def.noun} resultsFolder={appSettings?.resultsFolder ?? null} />
           </div>
-        </div>
-      </header>
-
-      {hasResult ? (
-        <ResultView job={job} noun={def.noun} resultsFolder={appSettings?.resultsFolder ?? null} onProcessAnother={onProcessAnother} />
-      ) : (
-        <div className="flex flex-1 flex-col items-stretch gap-6 lg:flex-row lg:items-start">
-          <section aria-label={t(`files.pick.${def.noun}`)} className="flex min-w-0 flex-1 flex-col">
-            <FilesColumn
-              noun={def.noun}
-              paths={paths}
-              items={running ? job.items : undefined}
-              skipNote={skipNote}
-              onPick={onPick}
-              onRemove={onRemove}
-            />
-          </section>
-
-          <aside
-            aria-label={t("options.label")}
-            className="flex shrink-0 flex-col rounded-[20px] border border-border bg-surface lg:sticky lg:top-6 lg:max-h-[calc(100dvh-12rem)] lg:w-[380px]"
+        ) : (
+          <div
+            inert={running}
+            className={`flex flex-col gap-[22px] p-5 transition-opacity md:overflow-y-auto ${running ? "opacity-45" : ""}`}
           >
-            <div
-              inert={running}
-              className={`flex flex-col gap-[22px] overflow-y-auto p-5 transition-opacity ${running ? "opacity-45" : ""}`}
-            >
-              <PresetPicker
-                presets={presets}
-                selected={presetId}
-                onSelect={(preset) => {
-                  if (preset) updateSettings(preset.options);
-                  setPresetId(preset?.id ?? null);
-                }}
-                onManage={() => setPresetDialog("manage")}
-              />
-              <def.Main settings={settings} onChange={update} files={files} />
-              {def.Advanced && (def.showAdvanced?.(settings, files) ?? true) && (
-                <MoreOptions tool={tool}>
-                  <def.Advanced settings={settings} onChange={update} files={files} />
-                </MoreOptions>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 border-t border-border p-5">
-              {running ? (
-                <Working
-                  label={t(`working.${tool}`, {
-                    current: Math.min(job.items.filter(isFinished).length + 1, job.items.length),
-                    files: count(`files.${def.noun}`, job.items.length),
-                  })}
-                  fraction={overall(job.items)}
-                  onCancel={job.cancel}
-                />
-              ) : (
-                <>
-                  <Button variant="link" className="self-center" onPress={() => setPresetDialog("save")}>
-                    <BookmarkPlus aria-hidden className="size-5" /> {t("preset.save")}
-                  </Button>
-                  <Button isDisabled={paths.length === 0} onPress={() => onStart(request)}>
-                    {t(`main.${tool}`)}
-                  </Button>
-                </>
-              )}
-              {!running && paths.length === 0 && (
-                <p className="text-center text-small text-text-muted">{t(`options.needFiles.${def.noun}`)}</p>
-              )}
-            </div>
-          </aside>
-        </div>
-      )}
+            <PresetPicker
+              presets={presets}
+              selected={presetId}
+              onSelect={(preset) => {
+                if (preset) updateSettings(preset.options);
+                setPresetId(preset?.id ?? null);
+              }}
+              onManage={() => setPresetDialog("manage")}
+            />
+            <def.Main settings={settings} onChange={update} files={files} />
+            {def.Advanced && (def.showAdvanced?.(settings, files) ?? true) && (
+              <MoreOptions tool={tool}>
+                <def.Advanced settings={settings} onChange={update} files={files} />
+              </MoreOptions>
+            )}
+          </div>
+        )}
+      </aside>
+
+      {/* The main button: the panel's foot on desktop, pinned to the bottom of the screen on mobile. */}
+      <div className="sticky bottom-0 flex flex-col gap-2 border-t border-border bg-panel p-5 md:static md:col-start-2 md:border-s">
+        {hasResult ? (
+          <Button onPress={onProcessAnother}>{t("result.another")}</Button>
+        ) : running ? (
+          <Working
+            label={t(`working.${tool}`, {
+              current: Math.min(job.items.filter(isFinished).length + 1, job.items.length),
+              files: count(`files.${def.noun}`, job.items.length),
+            })}
+            fraction={overall(job.items)}
+            onCancel={job.cancel}
+          />
+        ) : (
+          <>
+            <Button variant="link" className="self-center" onPress={() => setPresetDialog("save")}>
+              <BookmarkPlus aria-hidden className="size-5" /> {t("preset.save")}
+            </Button>
+            <Button isDisabled={paths.length === 0} onPress={() => onStart(request)}>
+              {t(`main.${tool}`)}
+            </Button>
+            {paths.length === 0 && (
+              <p className="text-center text-small text-text-muted">{t(`options.needFiles.${def.noun}`)}</p>
+            )}
+          </>
+        )}
+      </div>
 
       {presetDialog === "save" && (
         <SavePresetDialog

@@ -26,12 +26,11 @@ import { useThumbnail } from "./fileInfo";
 import { NOUN_ICONS } from "./FilesColumn";
 import { unchangedNote } from "./unchanged";
 
-interface ResultViewProps {
+interface ResultSummaryProps {
   job: CompressJob;
   noun: "photo" | "pdf";
   /** Where Results were saved; null next to each Original. */
   resultsFolder: string | null;
-  onProcessAnother: () => void;
 }
 
 const card = tv({
@@ -56,10 +55,9 @@ const TONE_ICONS: Record<"done" | "partial" | "cancelled", ComponentType<IconPro
   cancelled: CircleStop,
 };
 
-/** What a Task made: a summary, then each Result with its sizes and actions. Takes the full width. */
-export function ResultView({ job, noun, resultsFolder, onProcessAnother }: ResultViewProps) {
-  const tr = useT();
-  const { t, count, locale } = tr;
+/** How a Task went, in the Tool page's side panel; "Proses lagi" sits below it. */
+export function ResultSummary({ job, noun, resultsFolder }: ResultSummaryProps) {
+  const { t, count, locale } = useT();
   const { items } = job;
   const done = items.flatMap((item) => (item.status === "done" ? [item] : []));
   const cancelled = items.some((item) => item.status === "cancelled");
@@ -89,35 +87,47 @@ export function ResultView({ job, noun, resultsFolder, onProcessAnother }: Resul
   const ToneIcon = TONE_ICONS[tone];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className={card({ tone })}>
-        <ToneIcon aria-hidden className={cardIcon({ tone })} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h2 className="font-display text-section">{title}</h2>
-          <p className="text-text-muted">{body}</p>
-        </div>
-        <Button onPress={onProcessAnother}>{t("result.another")}</Button>
+    <div className={card({ tone })}>
+      <ToneIcon aria-hidden className={cardIcon({ tone })} />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <h2 className="font-display text-section">{title}</h2>
+        <p className="text-text-muted">{body}</p>
       </div>
+    </div>
+  );
+}
 
-      {items.length === 1 && done.length === 1 ? (
-        <OneResult item={done[0]} noun={noun} />
-      ) : (
-        <ul
-          aria-label={t("result.list")}
-          className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface"
-        >
-          {items.map((item, index) => (
-            <ResultRow
-              key={item.path}
-              tr={tr}
-              item={item}
-              noun={noun}
-              canRetry={!job.isRunning}
-              onRetry={(options) => job.retry(index, options)}
-            />
-          ))}
-        </ul>
-      )}
+/** Each Result with its sizes and actions, in the Tool page's main column; scrolls on its own on desktop. */
+export function ResultList({ job, noun }: { job: CompressJob; noun: "photo" | "pdf" }) {
+  const tr = useT();
+  const { t } = tr;
+  const { items } = job;
+  const done = items.flatMap((item) => (item.status === "done" ? [item] : []));
+
+  return (
+    <div className="flex flex-1 flex-col md:min-h-0">
+      <h2 className="px-5 pb-3 text-section">{t("result.list")}</h2>
+      <div className="px-5 pb-5 md:min-h-0 md:flex-1 md:overflow-y-auto">
+        {items.length === 1 && done.length === 1 ? (
+          <OneResult item={done[0]} noun={noun} />
+        ) : (
+          <ul
+            aria-label={t("result.list")}
+            className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface"
+          >
+            {items.map((item, index) => (
+              <ResultRow
+                key={item.path}
+                tr={tr}
+                item={item}
+                noun={noun}
+                canRetry={!job.isRunning}
+                onRetry={(options) => job.retry(index, options)}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
@@ -255,8 +265,8 @@ function OneResult({ item, noun }: { item: DoneItem; noun: "photo" | "pdf" }) {
   const name = fileName(item.result.outputPath);
 
   return (
-    <div className="flex flex-col gap-6 rounded-[20px] border border-border bg-surface p-5 md:flex-row md:items-center">
-      <div className="flex h-[280px] w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-badge-bg text-text-muted md:w-[400px]">
+    <div className="flex flex-col gap-6 rounded-[20px] border border-border bg-surface p-5 xl:flex-row xl:items-center">
+      <div className="flex h-[280px] w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-badge-bg text-text-muted xl:w-[400px]">
         {preview ? (
           <img src={preview} alt="" className="size-full object-contain" />
         ) : (

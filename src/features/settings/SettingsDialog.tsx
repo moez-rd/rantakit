@@ -11,7 +11,7 @@ import { Modal } from "@/components/ui/Modal";
 import { RadioCards } from "@/components/ui/RadioCards";
 import { Radio, RadioGroup } from "@/components/ui/RadioGroup";
 import { Switch } from "@/components/ui/Switch";
-import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { useT } from "@/i18n";
@@ -73,11 +73,15 @@ export function SettingsDialog({ tab, onTabChange, onClose }: SettingsDialogProp
               </Tab>
             ))}
           </TabList>
-          {TABS.map(({ id }) => (
-            <TabPanel key={id} id={id} className="min-w-0 overflow-y-auto rounded-2xl bg-panel p-6">
-              {PANELS[id]}
-            </TabPanel>
-          ))}
+          {/* The panel being left fades out in place, over the one coming in; without
+              this box it would jump to the dialog's top corner while it fades. */}
+          <TabPanels className="h-full min-w-0 flex-1">
+            {TABS.map(({ id }) => (
+              <TabPanel key={id} id={id} className="h-full overflow-y-auto rounded-2xl bg-panel p-6">
+                {PANELS[id]}
+              </TabPanel>
+            ))}
+          </TabPanels>
         </Tabs>
       </Dialog>
     </Modal>
