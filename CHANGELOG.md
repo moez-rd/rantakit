@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0-rc.2] - 2026-11-02
+
+Second release candidate for 0.2.0, for Windows and Linux, with a new window layout. Rantakit is in early development and is not stable yet.
+
+### Added
+
+- Rantakit's own title bar on Windows and Linux, with Back, Forward, and a button to hide the sidebar
+- Back and Forward move between Home, History, and Tool pages, with Alt+← and Alt+→ or the mouse's side buttons; Ctrl+B hides or shows the sidebar
+- "Buka" (Open) in the sidebar: choose photos or PDFs, then pick a Tool for them
+- The window opens in the middle of the screen at 1100 × 720, and can't be made smaller than 800 × 560
+
+### Changed
+
+- The sidebar and the page are two cards on the window background
+- Tool pages fill the window: the file list and the options scroll on their own, and the main button always stays in view; on phones it stays above the tab bar
+- A smaller Tool page header, and Esc on a Tool page goes Back
+- Thin scrollbars in the app's colors
+
+### Removed
+
+- The "⋯" menu in the sidebar. The license and source code links are in Settings, under "Tentang" (About)
+
+### Fixed
+
+- Settings no longer flickers when switching tabs
+- The window no longer bounces when a touchpad swipe goes past the edge
+- Sidebar items, Tool cards, and other buttons show their hover color again
+
 ## [0.2.0-rc.1] - 2026-11-02
 
 Release candidate for 0.2.0, for Windows and Linux, to run the usability test with five people before the final release. Rantakit is in early development and is not stable yet.
@@ -57,6 +85,7 @@ First public release, for Windows and Linux. Rantakit is in early development an
 - Settings for theme (light, dark, system) and UI zoom
 - Interface in Indonesian
 
-[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.1...HEAD
+[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.2...HEAD
+[0.2.0-rc.2]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.1...v0.2.0-rc.2
 [0.2.0-rc.1]: https://github.com/moez-rd/rantakit/compare/v0.1.0...v0.2.0-rc.1
 [0.1.0]: https://github.com/moez-rd/rantakit/releases/tag/v0.1.0
