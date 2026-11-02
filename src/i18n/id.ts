@@ -112,7 +112,7 @@ export const id = {
   "drop.addTo": "Lepaskan untuk menambahkan ke {tool}",
   "drop.busy": "Tunggu sampai file selesai diproses",
   "drop.unsupported": "Rantakit belum bisa membuka file jenis ini",
-  "drop.accepted": "Apa yang bisa: JPG, PNG, PDF",
+  "drop.accepted": "Yang bisa dibuka: JPG, PNG, PDF",
   "drop.mixed": "Foto dan PDF tidak bisa diproses bersamaan",
   "drop.mixed.hint": "Seret foto saja atau PDF saja",
   "drop.ask.single": "Mau diapakan {noun} ini?",

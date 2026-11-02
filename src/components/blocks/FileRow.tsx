@@ -53,7 +53,7 @@ export function FileRow({ name, title, icon: Icon, thumbnail, status, note, frac
         </span>
         {status === "working" && (
           <ProgressBar aria-label={name} value={fraction * 100} className="h-1.5 overflow-hidden rounded-full bg-badge-bg">
-            {({ percentage }) => <div className="h-full rounded-full bg-brand" style={{ width: `${percentage}%` }} />}
+            {({ percentage }) => <div className="h-full rounded-full bg-brand-strong" style={{ width: `${percentage}%` }} />}
           </ProgressBar>
         )}
       </span>

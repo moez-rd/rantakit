@@ -218,7 +218,7 @@ function Working({ label, fraction, onCancel }: { label: string; fraction: numbe
               {label}
             </span>
             <span className="h-2 overflow-hidden rounded-full bg-badge-bg">
-              <span className="block h-full rounded-full bg-brand transition-[width]" style={{ width: `${percentage}%` }} />
+              <span className="block h-full rounded-full bg-brand-strong transition-[width]" style={{ width: `${percentage}%` }} />
             </span>
           </>
         )}

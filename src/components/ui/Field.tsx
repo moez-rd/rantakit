@@ -49,8 +49,8 @@ export const fieldBorderStyles = tv({
   variants: {
     isFocusWithin: {
       false:
-        'border-border hover:border-border-strong forced-colors:border-[ButtonBorder]',
-      true: 'border-border-strong forced-colors:border-[Highlight]'
+        'border-control forced-colors:border-[ButtonBorder]',
+      true: 'border-control forced-colors:border-[Highlight]'
     },
     isInvalid: {
       true: 'border-danger forced-colors:border-[Mark]'
