@@ -1,50 +1,125 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Bundled fonts (N2); Latin and Latin Extended cover Indonesian and English. */
+@import "@fontsource/fredoka/latin-600.css";
+@import "@fontsource/fredoka/latin-ext-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-400.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-400.css";
+@import "@fontsource/plus-jakarta-sans/latin-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-700.css";
+@import "@fontsource/plus-jakarta-sans/latin-ext-700.css";
+
 @plugin "tailwindcss-react-aria-components";
 
 /* Dark mode follows <html data-theme>, set from preferences (light, dark, or system). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
- * Rantakit design tokens.
- * The React Aria starter kit uses Tailwind's blue-* as its accent. The logo's
- * brand blue (#2563EB) is exactly blue-600, so the kit already matches the brand.
- * Use these semantic tokens in Rantakit' own components.
+ * Rantakit design tokens (docs/stories/v0.2.md, N1). Every color is named by
+ * its role; Tailwind's own palette is removed so no component can use a raw
+ * color. Light values live here, dark values under [data-theme="dark"].
  */
-@theme inline {
-  --color-primary: var(--color-blue-600);
-  --color-primary-hover: var(--color-blue-700);
-  --color-primary-soft: var(--color-sky-400);
-  --color-accent-soft: var(--color-sky-200);
+@theme {
+  --color-*: initial;
 
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
+  --color-bg: #ffffff;
+  --color-sidebar: #f9fafb;
+  --color-surface: #ffffff;
+  --color-panel: #f9fafb;
+  --color-track: #eceef1;
+  --color-border: #e5e7eb;
+  --color-border-strong: #d1d5db;
+  --color-text: #111827;
+  --color-text-muted: #4b5563;
+  --color-text-disabled: #6b7280;
+  --color-brand: #14b8a6;
+  --color-brand-strong: #0f766e;
+  --color-brand-soft: #f0fdfa;
+  --color-primary: #0f766e;
+  --color-primary-hover: #115e59;
+  --color-on-primary: #ffffff;
+  --color-badge-bg: #f3f4f6;
+  --color-badge-text: #374151;
+  --color-success: #15803d;
+  --color-success-soft: #f0fdf4;
+  --color-warn: #b45309;
+  --color-warn-soft: #fffbeb;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --color-danger-hover: #991b1b;
+  --color-on-danger: #ffffff;
+  /* Behind dialogs. */
+  --color-backdrop: rgb(17 24 39 / 0.32);
 
-  --color-success: var(--color-emerald-600);
-  --color-warning: var(--color-amber-500);
-  --color-danger: var(--color-red-700);
+  /*
+   * The six text styles (N2). Sizes follow the text size chosen in Settings
+   * through --text-scale; Tailwind's own sizes are removed.
+   */
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Fredoka", system-ui, sans-serif;
+
+  --text-*: initial;
+  --text-title: calc(32px * var(--text-scale));
+  --text-title--line-height: calc(40px * var(--text-scale));
+  --text-title--font-weight: 600;
+  --text-dialog: calc(26px * var(--text-scale));
+  --text-dialog--line-height: calc(34px * var(--text-scale));
+  --text-dialog--font-weight: 600;
+  --text-section: calc(18px * var(--text-scale));
+  --text-section--line-height: calc(26px * var(--text-scale));
+  --text-section--font-weight: 700;
+  --text-body: calc(16px * var(--text-scale));
+  --text-body--line-height: calc(24px * var(--text-scale));
+  --text-label: calc(15px * var(--text-scale));
+  --text-label--line-height: calc(22px * var(--text-scale));
+  --text-label--font-weight: 600;
+  --text-small: calc(14px * var(--text-scale));
+  --text-small--line-height: calc(20px * var(--text-scale));
+  /* The sidebar wordmark belongs to the logo; it is not one of the six. */
+  --text-wordmark: calc(22px * var(--text-scale));
+  --text-wordmark--line-height: calc(28px * var(--text-scale));
+  --text-wordmark--font-weight: 600;
 }
 
 :root {
   color-scheme: light;
-  --background: var(--color-neutral-50);
-  --surface: var(--color-white);
-  --foreground: var(--color-neutral-900);
-  --muted: var(--color-neutral-500);
-  --border: rgb(0 0 0 / 0.1);
+  /* 1, or 18/16 for "Besar", or 20/16 for "Lebih besar"; set from preferences. */
+  --text-scale: 1;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: var(--color-neutral-950);
-  --surface: var(--color-neutral-900);
-  --foreground: var(--color-neutral-100);
-  --muted: var(--color-neutral-400);
-  --border: rgb(255 255 255 / 0.1);
+  --color-bg: #121212;
+  --color-sidebar: #171717;
+  --color-surface: #1c1c1c;
+  --color-panel: #151515;
+  --color-track: #262626;
+  --color-border: #2e2e2e;
+  --color-border-strong: #404040;
+  --color-text: #f5f5f5;
+  --color-text-muted: #a3a3a3;
+  --color-text-disabled: #8a8a8a;
+  --color-brand: #2dd4bf;
+  --color-brand-strong: #5eead4;
+  --color-brand-soft: #133b37;
+  --color-primary: #2dd4bf;
+  --color-primary-hover: #5eead4;
+  --color-on-primary: #042f2e;
+  --color-badge-bg: #262626;
+  --color-badge-text: #d4d4d4;
+  --color-success: #4ade80;
+  --color-success-soft: #12301c;
+  --color-warn: #fbbf24;
+  --color-warn-soft: #3a2a0e;
+  --color-danger: #f87171;
+  --color-danger-soft: #3b1717;
+  --color-danger-hover: #fca5a5;
+  --color-on-danger: #2a0a0a;
+  --color-backdrop: rgb(0 0 0 / 0.6);
 }
 
 @layer base {
@@ -55,7 +130,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-bg text-text font-sans text-body antialiased;
     /* keep content clear of notches and gesture bars on mobile */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
       env(safe-area-inset-left);

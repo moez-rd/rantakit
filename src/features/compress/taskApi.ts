@@ -6,25 +6,50 @@ export type ToolOptions =
       tool: "kompres-foto";
       /** Output format; omit to keep the Original's format. */
       format?: "jpeg" | "png";
-      /** 1–100, defaults to 80 on the Rust side. */
+      /** The Size limit in bytes; omit to compress by `level`. */
+      limit?: number;
+      /** "Kecilkan saja"; defaults to "balanced" on the Rust side. */
+      level?: "smallest" | "balanced" | "clearest";
+      /** Exact quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
-      /** Aim for this Size limit instead of a fixed quality. */
-      maxBytes?: number;
       maxDimension?: number;
     }
   | {
       tool: "kompres-pdf";
-      /** JPEG quality for images inside the PDF, 1–100; defaults to 70 on the Rust side. */
+      /** The Size limit in bytes; omit to compress by `level`. */
+      limit?: number;
+      /** "Kecilkan saja"; defaults to "balanced" on the Rust side. */
+      level?: "smallest" | "balanced" | "clearest";
+      /** Exact image quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
-      maxDimension?: number;
+      /** "Resolusi gambar maksimum", in dpi on an A4 page. */
+      maxDpi?: number;
+    }
+  | {
+      tool: "ubah-format-foto";
+      to: "jpeg" | "png";
+      /** JPG quality 1–100; defaults to 90 on the Rust side. */
+      quality?: number;
+      /** "#rrggbb" behind transparent parts when a PNG becomes a JPG; white when omitted. */
+      background?: string;
+    }
+  | {
+      tool: "ubah-ukuran-foto";
+      /** "Ukuran baru"; defaults to "medium" on the Rust side. */
+      size?: "large" | "medium" | "small";
+      /** "Sisi terpanjang (px)"; wins over `size`. */
+      maxSide?: number;
     };
+
+/** The Size limit in bytes these options aim for, if any. */
+export function limitOf(options: ToolOptions): number | undefined {
+  return "limit" in options ? options.limit : undefined;
+}
 
 /** Mirrors `TaskRequest` in `src-tauri/src/commands/task.rs`. */
 export interface TaskRequest {
   options: ToolOptions;
   paths: string[];
-  /** The Results folder chosen in Settings; omit to save next to each Original. */
-  resultsFolder?: string;
 }
 
 /** Mirrors `ResultMessage` in `src-tauri/src/commands/task.rs`. */

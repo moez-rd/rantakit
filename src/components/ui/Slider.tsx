@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
 import {
   Slider as AriaSlider,
   type SliderProps as AriaSliderProps,
@@ -7,9 +8,7 @@ import {
   SliderTrack,
   SliderFill
 } from 'react-aria-components/Slider';
-import {tv} from 'tailwind-variants';
 import {Label} from '@/components/ui/Field';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 const trackStyles = tv({
   base: 'relative rounded-full',
@@ -19,8 +18,8 @@ const trackStyles = tv({
       vertical: 'h-full w-[6px] ml-[50%] -translate-x-[50%]'
     },
     isDisabled: {
-      false: 'bg-neutral-300 dark:bg-neutral-700 forced-colors:bg-[ButtonBorder]',
-      true: 'bg-neutral-200 dark:bg-neutral-800 forced-colors:bg-[ButtonBorder]'
+      false: 'bg-track forced-colors:bg-[ButtonBorder]',
+      true: 'bg-track forced-colors:bg-[ButtonBorder]'
     }
   }
 });
@@ -29,21 +28,21 @@ const fillStyles = tv({
   base: 'rounded-full',
   variants: {
     isDisabled: {
-      false: 'bg-blue-500 forced-colors:bg-[Highlight]',
-      true: 'bg-neutral-300 dark:bg-neutral-600 forced-colors:bg-[GrayText]'
+      false: 'bg-brand forced-colors:bg-[Highlight]',
+      true: 'bg-track forced-colors:bg-[GrayText]'
     }
   }
 });
 
 const thumbStyles = tv({
   extend: focusRing,
-  base: 'w-4.5 h-4.5 group-orientation-horizontal:mt-5 group-orientation-vertical:ml-2.5 rounded-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-700 dark:border-neutral-300',
+  base: 'w-4.5 h-4.5 group-orientation-horizontal:mt-5 group-orientation-vertical:ml-2.5 rounded-full bg-badge-bg border border-border-strong',
   variants: {
     isDragging: {
-      true: 'bg-neutral-700 dark:bg-neutral-300 forced-colors:bg-[ButtonBorder]'
+      true: 'bg-track forced-colors:bg-[ButtonBorder]'
     },
     isDisabled: {
-      true: 'border-neutral-300 dark:border-neutral-700 forced-colors:border-[GrayText]'
+      true: 'border-border forced-colors:border-[GrayText]'
     }
   }
 });
@@ -75,7 +74,7 @@ export function Slider<T extends number | number[]>({
         'font-sans orientation-horizontal:grid orientation-vertical:flex grid-cols-[1fr_auto] flex-col items-center gap-2 orientation-horizontal:w-64 orientation-horizontal:max-w-[calc(100%-10px)]'
       )}>
       <Label>{label}</Label>
-      <SliderOutput className="text-sm text-neutral-500 dark:text-neutral-400 orientation-vertical:hidden" />
+      <SliderOutput className="text-small text-text-muted orientation-vertical:hidden" />
       <SliderTrack className="group col-span-2 orientation-horizontal:h-5 orientation-vertical:w-5 orientation-vertical:h-38 flex items-center">
         {({state, ...renderProps}) => (
           <>

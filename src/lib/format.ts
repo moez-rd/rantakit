@@ -1,15 +1,14 @@
 const UNITS = ["B", "KB", "MB", "GB"];
-const number = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 });
 
-/** 1536 → "1,5 KB". Uses 1024-based units, like most file managers. */
-export function formatBytes(bytes: number) {
+/** 1536 → "1,5 KB" in Indonesian, "1.5 KB" in English. Uses 1024-based units, like most file managers. */
+export function formatBytes(bytes: number, locale: string) {
   let value = bytes;
   let unit = 0;
   while (value >= 1024 && unit < UNITS.length - 1) {
     value /= 1024;
     unit++;
   }
-  return `${number.format(value)} ${UNITS[unit]}`;
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value)} ${UNITS[unit]}`;
 }
 
 /** Size change as a signed percentage, e.g. "−75%" or "+3%". */

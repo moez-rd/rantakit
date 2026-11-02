@@ -1,4 +1,5 @@
 'use client';
+import {composeTailwindRenderProps, tv} from '@/lib/react-aria-utils';
 import React, {useContext} from 'react';
 import {
   Disclosure as AriaDisclosure,
@@ -10,22 +11,20 @@ import {
 } from 'react-aria-components/Disclosure';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
 import {Button} from '@/components/ui/Button';
-import {tv} from 'tailwind-variants';
-import {ChevronRight} from 'lucide-react';
-import {composeTailwindRenderProps} from '@/lib/react-aria-utils';
+import {ChevronRight} from '@keyline-icons/react';
 
 const disclosure = tv({
-  base: 'group min-w-50 font-sans rounded-lg text-neutral-900 dark:text-neutral-200'
+  base: 'group min-w-50 font-sans rounded-lg text-text'
 });
 
 const chevron = tv({
-  base: 'w-4 h-4 text-neutral-500 dark:text-neutral-400 transition-transform duration-200 ease-in-out',
+  base: 'w-4 h-4 text-text-muted transition-transform duration-200 ease-in-out',
   variants: {
     isExpanded: {
       true: 'transform rotate-90'
     },
     isDisabled: {
-      true: 'text-neutral-300 dark:text-neutral-600 forced-colors:text-[GrayText]'
+      true: 'text-text-disabled forced-colors:text-[GrayText]'
     }
   }
 });
@@ -53,8 +52,8 @@ export interface DisclosureHeaderProps {
 export function DisclosureHeader({children}: DisclosureHeaderProps) {
   let {isExpanded} = useContext(DisclosureStateContext)!;
   return (
-    <Heading className="text-lg font-semibold m-0">
-      <Button slot="trigger" variant="quiet" className="w-full justify-start font-medium">
+    <Heading className="text-label m-0">
+      <Button slot="trigger" variant="link" className="justify-start">
         {({isDisabled}) => (
           <>
             <ChevronRight aria-hidden className={chevron({isExpanded, isDisabled})} />

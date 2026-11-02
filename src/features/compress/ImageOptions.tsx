@@ -1,104 +1,80 @@
-import { NumberField } from "@/components/ui/NumberField";
 import { Select, SelectItem } from "@/components/ui/Select";
-import { Slider } from "@/components/ui/Slider";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
-import { MAX_DIMENSIONS, type ImageSettings, type OutputFormat, type SizeMode } from "./imageSettings";
-import { OptionRow } from "./SetupView";
+import { NumberInput } from "@/features/tool/NumberInput";
+import { OptionField } from "@/features/tool/OptionField";
+import { defineTool, type OptionsProps } from "@/features/tool/toolDef";
+import { useT } from "@/i18n";
+import { pickImages } from "./imageApi";
+import {
+  PHOTO_SIZES,
+  toImageOptions,
+  useImageSettings,
+  type ImageSettings,
+  type OutputFormat,
+  type PhotoSize,
+} from "./imageSettings";
+import { ShrinkOptions } from "./ShrinkOptions";
 
-const DIMENSION_LABELS: Record<number, string> = {
-  0: "Ukuran asli",
-  3840: "3840 px (4K)",
-  1920: "1920 px (Full HD)",
-};
-
-export function MaxDimensionSelect({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <Select aria-label={label} className="sm:w-48" value={String(value)} onChange={(key) => onChange(Number(key))}>
-      {MAX_DIMENSIONS.map((size) => (
-        <SelectItem key={size} id={String(size)}>
-          {DIMENSION_LABELS[size] ?? `${size} px`}
-        </SelectItem>
-      ))}
-    </Select>
-  );
+function Main({ settings, onChange }: OptionsProps<ImageSettings>) {
+  return <ShrinkOptions noun="photo" settings={settings} onChange={onChange} />;
 }
 
-interface ImageOptionsProps {
-  settings: ImageSettings;
-  onChange: (patch: Partial<ImageSettings>) => void;
-}
-
-export function ImageOptions({ settings, onChange }: ImageOptionsProps) {
+function Advanced({ settings, onChange }: OptionsProps<ImageSettings>) {
+  const { t } = useT();
   return (
     <>
-      <OptionRow label="Kompres berdasarkan">
+      <OptionField label={t("options.format")}>
         <ToggleButtonGroup
-          aria-label="Kompres berdasarkan"
+          aria-label={t("options.format")}
           selectionMode="single"
           disallowEmptySelection
-          selectedKeys={[settings.mode]}
-          onSelectionChange={(keys) => onChange({ mode: [...keys][0] as SizeMode })}
+          selectedKeys={[settings.format]}
+          onSelectionChange={(keys) => onChange({ format: [...keys][0] as OutputFormat })}
+          className="[&>*]:flex-1"
         >
-          <ToggleButton id="quality">Kualitas</ToggleButton>
-          <ToggleButton id="target">Ukuran target</ToggleButton>
+          <ToggleButton id="same">{t("options.format.same")}</ToggleButton>
+          <ToggleButton id="jpeg">JPG</ToggleButton>
+          <ToggleButton id="png">PNG</ToggleButton>
         </ToggleButtonGroup>
-      </OptionRow>
-
-      {settings.mode === "quality" ? (
-        <OptionRow label="Kualitas" description="Makin rendah, makin kecil. Tidak berlaku untuk PNG.">
-          <Slider
-            aria-label="Kualitas"
-            className="sm:w-48"
-            minValue={1}
-            maxValue={100}
-            value={settings.quality}
-            onChange={(quality) => onChange({ quality })}
-          />
-        </OptionRow>
-      ) : (
-        <OptionRow label="Ukuran maksimal" description="Batas untuk tiap gambar.">
-          <NumberField
-            aria-label="Ukuran maksimal"
-            minValue={10}
-            step={10}
-            value={settings.targetKb}
-            formatOptions={{ style: "unit", unit: "kilobyte" }}
-            onChange={(targetKb) => {
-              if (!Number.isNaN(targetKb)) onChange({ targetKb: Math.round(targetKb) });
-            }}
-          />
-        </OptionRow>
-      )}
-
-      <OptionRow label="Format hasil" description="PNG tidak mengurangi kualitas, tapi biasanya lebih besar.">
+      </OptionField>
+      <OptionField label={t("options.dimension")} help={t("options.dimension.help")}>
         <Select
-          aria-label="Format hasil"
-          className="sm:w-48"
-          value={settings.format}
-          onChange={(key) => onChange({ format: key as OutputFormat })}
+          aria-label={t("options.dimension")}
+          value={settings.size}
+          onChange={(key) => onChange({ size: key as ImageSettings["size"] })}
         >
-          <SelectItem id="same">Sama seperti asli</SelectItem>
-          <SelectItem id="jpeg">JPG</SelectItem>
-          <SelectItem id="png">PNG</SelectItem>
+          <SelectItem id="original">{t("options.dimension.original")}</SelectItem>
+          {(Object.keys(PHOTO_SIZES) as PhotoSize[]).map((size) => (
+            <SelectItem key={size} id={size}>
+              {t(`photoSize.${size}`)}
+            </SelectItem>
+          ))}
         </Select>
-      </OptionRow>
-
-      <OptionRow label="Ukuran gambar" description="Batas sisi terpanjang.">
-        <MaxDimensionSelect
-          label="Ukuran gambar"
-          value={settings.maxDimension}
-          onChange={(maxDimension) => onChange({ maxDimension })}
+      </OptionField>
+      <OptionField
+        label={t("options.quality")}
+        help={t("options.quality.help")}
+        description={t("options.quality.overrides")}
+      >
+        <NumberInput
+          label={t("options.quality")}
+          minValue={1}
+          maxValue={100}
+          placeholder={t("options.quality.auto")}
+          value={settings.quality}
+          onChange={(quality) => onChange({ quality: quality === null ? null : Math.round(quality) })}
         />
-      </OptionRow>
+      </OptionField>
     </>
   );
 }
+
+export const kompresFoto = defineTool({
+  noun: "photo",
+  pick: pickImages,
+  useSettings: useImageSettings,
+  Main,
+  Advanced,
+  toRequest: toImageOptions,
+});

@@ -1,5 +1,6 @@
 'use client';
-import {Check} from 'lucide-react';
+import {composeTailwindRenderProps, focusRing, tv} from '@/lib/react-aria-utils';
+import {Check} from '@keyline-icons/react';
 import {
   ListBox as AriaListBox,
   ListBoxItem as AriaListBoxItem,
@@ -11,8 +12,6 @@ import {
   type ListBoxSectionProps
 } from 'react-aria-components/ListBox';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {tv} from 'tailwind-variants';
-import {composeTailwindRenderProps, focusRing} from '@/lib/react-aria-utils';
 
 interface ListBoxProps<T> extends Omit<AriaListBoxProps<T>, 'layout' | 'orientation'> {}
 
@@ -22,7 +21,7 @@ export function ListBox<T>({children, ...props}: ListBoxProps<T>) {
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        'outline-0 p-1 w-[200px] bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-lg font-sans'
+        'outline-0 p-1 w-[200px] bg-surface border border-border rounded-lg font-sans'
       )}>
       {children}
     </AriaListBox>
@@ -31,15 +30,15 @@ export function ListBox<T>({children, ...props}: ListBoxProps<T>) {
 
 export const itemStyles = tv({
   extend: focusRing,
-  base: 'group relative flex items-center gap-8 cursor-default select-none py-1.5 px-2.5 rounded-md will-change-transform text-sm forced-color-adjust-none',
+  base: 'group relative flex items-center gap-8 cursor-default select-none py-1.5 px-2.5 rounded-md will-change-transform text-label font-medium forced-color-adjust-none',
   variants: {
     isSelected: {
       false:
-        'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 pressed:bg-neutral-100 dark:hover:bg-neutral-800 dark:pressed:bg-neutral-800 -outline-offset-2',
-      true: 'bg-blue-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-white dark:outline-white forced-colors:outline-[HighlightText]'
+        'text-text hover:bg-badge-bg pressed:bg-badge-bg -outline-offset-2',
+      true: 'bg-brand-soft text-brand-strong forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-brand-strong forced-colors:outline-[HighlightText]'
     },
     isDisabled: {
-      true: 'text-neutral-300 dark:text-neutral-600 forced-colors:text-[GrayText]'
+      true: 'text-text-disabled forced-colors:text-[GrayText]'
     }
   }
 });
@@ -52,7 +51,7 @@ export function ListBoxItem(props: ListBoxItemProps) {
       {composeRenderProps(props.children, children => (
         <>
           {children}
-          <div className="absolute left-4 right-4 bottom-0 h-px bg-white/20 forced-colors:bg-[HighlightText] hidden [.group[data-selected]:has(+[data-selected])_&]:block" />
+          <div className="absolute left-4 right-4 bottom-0 h-px bg-on-primary/20 forced-colors:bg-[HighlightText] hidden [.group[data-selected]:has(+[data-selected])_&]:block" />
         </>
       ))}
     </AriaListBoxItem>
@@ -60,24 +59,24 @@ export function ListBoxItem(props: ListBoxItemProps) {
 }
 
 export const dropdownItemStyles = tv({
-  base: 'group flex items-center gap-4 cursor-default select-none py-2 pl-3 pr-3 selected:pr-1 rounded-lg outline outline-0 text-sm forced-color-adjust-none no-underline [&[href]]:cursor-pointer [-webkit-tap-highlight-color:transparent]',
+  base: 'group flex items-center gap-4 cursor-default select-none py-2 pl-3 pr-3 selected:pr-1 rounded-lg outline outline-0 text-label font-medium forced-color-adjust-none no-underline [&[href]]:cursor-pointer [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
-      false: 'text-neutral-900 dark:text-neutral-100',
-      true: 'text-neutral-300 dark:text-neutral-600 forced-colors:text-[GrayText]'
+      false: 'text-text',
+      true: 'text-text-disabled forced-colors:text-[GrayText]'
     },
     isPressed: {
-      true: 'bg-neutral-100 dark:bg-neutral-800'
+      true: 'bg-badge-bg'
     },
     isFocused: {
-      true: 'bg-blue-600 dark:bg-blue-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]'
+      true: 'bg-brand-soft text-brand-strong forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]'
     }
   },
   compoundVariants: [
     {
       isFocused: false,
       isOpen: true,
-      className: 'bg-neutral-100 dark:bg-neutral-700/60'
+      className: 'bg-badge-bg'
     }
   ]
 });
@@ -109,7 +108,7 @@ export interface DropdownSectionProps<T> extends ListBoxSectionProps<T> {
 export function DropdownSection<T>(props: DropdownSectionProps<T>) {
   return (
     <ListBoxSection className="first:-mt-[5px] after:content-[''] after:block after:h-[5px] last:after:hidden">
-      <Header className="text-sm font-semibold text-neutral-500 dark:text-neutral-300 px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-neutral-100/60 dark:bg-neutral-700/60 backdrop-blur-md supports-[-moz-appearance:none]:bg-neutral-100 border-y border-y-neutral-200 dark:border-y-neutral-700 [&+*]:mt-1">
+      <Header className="text-small font-semibold text-text-muted px-4 py-1 truncate sticky -top-[5px] -mt-px -mx-1 z-10 bg-panel backdrop-blur-md supports-[-moz-appearance:none]:bg-badge-bg border-y border-y-border [&+*]:mt-1">
         {props.title}
       </Header>
       <Collection items={props.items}>{props.children}</Collection>

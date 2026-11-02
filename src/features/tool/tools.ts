@@ -1,0 +1,24 @@
+import type { ToolId } from "@/features/home/tools";
+import { kompresFoto } from "@/features/compress/ImageOptions";
+import { kompresPdf } from "@/features/compress/PdfOptions";
+import { ubahFormatFoto } from "@/features/convert/ConvertOptions";
+import { ubahUkuranFoto } from "@/features/resize/ResizeOptions";
+import type { ToolDef } from "./toolDef";
+
+// Each Tool keeps its own settings type; the page only passes them through.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyToolDef = ToolDef<any>;
+
+/** The Tools that have a page today. */
+export const TOOL_DEFS = {
+  "kompres-foto": kompresFoto,
+  "kompres-pdf": kompresPdf,
+  "ubah-format-foto": ubahFormatFoto,
+  "ubah-ukuran-foto": ubahUkuranFoto,
+} satisfies Partial<Record<ToolId, AnyToolDef>>;
+
+export type ShippedTool = keyof typeof TOOL_DEFS;
+
+export const isShipped = (id: string): id is ShippedTool => id in TOOL_DEFS;
+
+export const toolDef = (id: ShippedTool): AnyToolDef => TOOL_DEFS[id];

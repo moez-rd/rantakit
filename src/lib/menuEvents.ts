@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
-import { isTauri } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { useT } from "@/i18n";
 import type { AppCommand } from "./appCommands";
+import { isMacApp } from "./platform";
 
 /** Call `handler` whenever a native menu item is chosen (macOS only). No-op outside Tauri. */
 export function useMenuEvents(handler: (command: AppCommand) => void) {
@@ -19,4 +21,12 @@ export function useMenuEvents(handler: (command: AppCommand) => void) {
       unlisten.then((fn) => fn());
     };
   }, []);
+}
+
+/** Keep the native menu bar (macOS only) in the UI language. */
+export function useMenuLanguage() {
+  const { language } = useT();
+  useEffect(() => {
+    if (isMacApp) invoke("set_menu_language", { language }).catch(() => {});
+  }, [language]);
 }

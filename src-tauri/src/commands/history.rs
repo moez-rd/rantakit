@@ -1,38 +1,60 @@
-use rantakit_tasks::{Entry, History};
+use std::path::PathBuf;
+
+use rantakit_tasks::{EntryFile, History};
 use serde::Serialize;
 use tauri::State;
 
 use crate::error::Result;
 
+/// Mirrors `Entry`, with whether each Result is still where it was saved.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HistoryItem {
-    #[serde(flatten)]
-    pub entry: Entry,
-    /// False when the compressed copy was moved or deleted since.
-    pub output_exists: bool,
+    pub id: String,
+    pub tool: String,
+    pub created_at: u64,
+    pub files: Vec<HistoryFile>,
 }
 
-/// History entries, newest first.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryFile {
+    pub original_path: PathBuf,
+    pub result_path: PathBuf,
+    pub original_bytes: u64,
+    pub result_bytes: u64,
+    /// False when the Result was moved or deleted since.
+    pub exists: bool,
+}
+
+impl From<EntryFile> for HistoryFile {
+    fn from(file: EntryFile) -> Self {
+        Self {
+            exists: file.result_path.exists(),
+            original_path: file.original_path,
+            result_path: file.result_path,
+            original_bytes: file.original_bytes,
+            result_bytes: file.result_bytes,
+        }
+    }
+}
+
+/// History entries, one per Task, newest first.
 #[tauri::command]
 pub fn list_history(history: State<'_, History>) -> Result<Vec<HistoryItem>> {
     Ok(history
         .list()?
         .into_iter()
         .map(|entry| HistoryItem {
-            output_exists: entry.output_path.exists(),
-            entry,
+            id: entry.id,
+            tool: entry.tool,
+            created_at: entry.created_at,
+            files: entry.files.into_iter().map(HistoryFile::from).collect(),
         })
         .collect())
 }
 
-/// Forget one entry. The compressed file itself is left alone.
-#[tauri::command]
-pub fn remove_history(history: State<'_, History>, id: String) -> Result<()> {
-    Ok(history.remove(&id)?)
-}
-
-/// Forget every entry. Compressed files are left alone.
+/// Forget every entry. Result files are left alone.
 #[tauri::command]
 pub fn clear_history(history: State<'_, History>) -> Result<()> {
     Ok(history.clear()?)

@@ -3,7 +3,7 @@ mod error;
 #[cfg(target_os = "macos")]
 mod menu;
 
-use rantakit_tasks::History;
+use rantakit_tasks::{History, Presets, RecentLimits, RecentTools, SettingsStore};
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -12,8 +12,12 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            let path = app.path().app_data_dir()?.join("history.json");
-            app.manage(History::new(path));
+            let data = app.path().app_data_dir()?;
+            app.manage(History::new(data.join("history.json")));
+            app.manage(RecentLimits::limits(data.join("recent-limits.json")));
+            app.manage(RecentTools::tools(data.join("recent-tools.json")));
+            app.manage(SettingsStore::new(data.join("settings.json")));
+            app.manage(Presets::new(data.join("presets.json")));
             app.manage(commands::task::RunningTasks::default());
             Ok(())
         });
@@ -24,11 +28,26 @@ pub fn run() {
 
     builder
         .invoke_handler(tauri::generate_handler![
+            commands::files::file_info,
+            commands::files::thumbnail,
+            commands::files::open_path,
+            commands::share::share_files,
+            commands::menu::set_menu_language,
+            commands::tools::list_tools,
+            commands::tools::match_files,
             commands::task::start_task,
             commands::task::cancel_task,
             commands::history::list_history,
-            commands::history::remove_history,
             commands::history::clear_history,
+            commands::recent::recent_limits,
+            commands::recent::recent_tools,
+            commands::settings::get_settings,
+            commands::settings::set_keep_history,
+            commands::settings::set_results_folder,
+            commands::presets::list_presets,
+            commands::presets::save_preset,
+            commands::presets::rename_preset,
+            commands::presets::remove_preset,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

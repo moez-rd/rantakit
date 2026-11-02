@@ -8,7 +8,7 @@ export type AppCommand =
   | "compress_image"
   | "compress_pdf"
   | "go_home"
-  | "go_recents"
+  | "go_history"
   | "open_settings"
   | "open_source"
   | "open_license"
@@ -26,7 +26,7 @@ export const SHORTCUTS: Partial<Record<AppCommand, Shortcut>> = {
   compress_image: { key: "o", label: "Ctrl+O" },
   compress_pdf: { key: "o", shift: true, label: "Ctrl+Shift+O" },
   go_home: { key: "1", label: "Ctrl+1" },
-  go_recents: { key: "2", label: "Ctrl+2" },
+  go_history: { key: "2", label: "Ctrl+2" },
   open_settings: { key: ",", label: "Ctrl+," },
 };
 

@@ -92,6 +92,7 @@ fn opts(quality: u8, max_dimension: Option<u32>) -> PdfOptions {
     PdfOptions {
         quality,
         max_dimension,
+        max_bytes: None,
     }
 }
 
@@ -315,4 +316,44 @@ fn cancel_while_working_leaves_nothing() {
     assert_eq!(outcome.unwrap_err(), ErrorKind::Cancelled);
     assert!(result.is_none());
     assert_eq!(steps_after_cancel, 0, "no step may run after cancelling");
+}
+
+#[test]
+fn a_size_limit_is_met_at_the_best_quality_that_fits() {
+    let input = pdf_with_jpeg(PHOTO, "DeviceRGB");
+    let (roomy, _) = compress("limit-roomy", "ijazah.pdf", &input, &opts(90, None));
+    let limit = roomy.size * 2 / 3;
+
+    let opts = PdfOptions {
+        max_bytes: Some(limit),
+        ..opts(90, None)
+    };
+    let (fitted, _) = compress("limit-fitted", "ijazah.pdf", &input, &opts);
+
+    assert!(fitted.size <= limit, "{} > {limit}", fitted.size);
+    assert_eq!(fitted.images_recompressed, 1);
+}
+
+#[test]
+fn an_unreachable_size_limit_reports_the_smallest_size() {
+    let input = pdf_with_jpeg(PHOTO, "DeviceRGB");
+    let opts = PdfOptions {
+        max_bytes: Some(100),
+        ..opts(90, None)
+    };
+
+    let (outcome, result) = run(
+        "limit-unreachable",
+        "ijazah.pdf",
+        &input,
+        &opts,
+        &mut |_| {},
+        &CancelToken::new(),
+    );
+
+    assert!(result.is_none(), "no Result when the limit is out of reach");
+    match outcome {
+        Err(ErrorKind::SizeLimitUnreachable { best }) => assert!(best > 100),
+        other => panic!("expected SizeLimitUnreachable, got {other:?}"),
+    }
 }

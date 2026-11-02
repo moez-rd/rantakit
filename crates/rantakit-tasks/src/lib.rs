@@ -3,20 +3,34 @@
 //! Result.
 
 mod catalogue;
+mod compression;
 mod history;
+mod info;
 mod kinds;
 mod names;
+mod presets;
+mod recent;
+mod settings;
+mod store;
 mod task;
 
 pub use catalogue::{
-    Availability, CATALOGUE, Job, Platform, Tool, ToolId, tools_for, tools_for_files,
-    tools_for_kinds,
+    Availability, CATALOGUE, FileMatch, Job, Platform, Tool, ToolId, match_files, match_kinds,
+    tools_for, tools_for_files, tools_for_kinds,
 };
-pub use history::{Entry, History, HistoryError};
+pub use compression::{Compression, Level, dpi_to_side};
+pub use history::{Entry, EntryFile, History, HistoryError};
+pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};
 pub use names::result_path;
-pub use task::{Details, FileOutcome, ResultFile, Task, TaskEvent, ToolOptions, run_task};
+pub use presets::{Preset, Presets};
+pub use recent::{RECENT_LIMITS, RECENT_TOOLS, Recent, RecentLimits, RecentTools};
+pub use settings::{Settings, SettingsStore};
+pub use store::{JsonFile, StoreError};
+pub use task::{
+    Details, FileOutcome, PhotoSize, ResultFile, Task, TaskEvent, ToolOptions, run_task,
+};
 
 pub use rantakit_core::{CancelToken, ErrorKind, Progress};
-pub use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target};
+pub use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target, WHITE, thumbnail};
 pub use rantakit_pdf::PdfOptions;

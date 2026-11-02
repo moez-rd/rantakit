@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use rantakit_image::{
     CancelToken, Compressed, ErrorKind, ImageFormat, ImageOptions, OutputFormat, Progress, Target,
-    compress_image, detect_format,
+    WHITE, compress_image, detect_format,
 };
 
 const PHOTO: &[u8] = include_bytes!("fixtures/photo.jpg");
@@ -15,6 +15,7 @@ fn opts(format: OutputFormat, quality: u8, max_dimension: Option<u32>) -> ImageO
         format,
         target: Target::Quality(quality),
         max_dimension,
+        background: WHITE,
     }
 }
 
@@ -23,6 +24,7 @@ fn max_bytes(format: OutputFormat, max: u64) -> ImageOptions {
         format,
         target: Target::MaxBytes(max),
         max_dimension: None,
+        background: WHITE,
     }
 }
 
@@ -430,4 +432,54 @@ fn cancel_during_size_search_stops_it() {
     assert_eq!(outcome.unwrap_err(), ErrorKind::Cancelled);
     assert!(result.is_none());
     assert_eq!(steps_after_cancel, 0, "no step may run after cancelling");
+}
+
+#[test]
+fn photo_info_reads_the_header() {
+    let dir = scratch("photo-info");
+    let path = dir.join("photo.jpg");
+    fs::write(&path, PHOTO).unwrap();
+
+    let info = rantakit_image::photo_info(&path).unwrap();
+    assert_eq!(info.format, ImageFormat::Jpeg);
+    assert!(info.width > 0 && info.height > 0);
+}
+
+#[test]
+fn thumbnails_are_small_jpgs() {
+    let dir = scratch("thumbnail");
+    let path = dir.join("transparent.png");
+    fs::write(&path, TRANSPARENT).unwrap();
+
+    let bytes = rantakit_image::thumbnail(&path, 96).unwrap();
+    let thumb = ::image::load_from_memory(&bytes).unwrap();
+    assert!(thumb.width().max(thumb.height()) <= 96);
+    assert_eq!(detect_format_of(&bytes), ImageFormat::Jpeg);
+}
+
+fn detect_format_of(bytes: &[u8]) -> ImageFormat {
+    match ::image::guess_format(bytes).unwrap() {
+        ::image::ImageFormat::Jpeg => ImageFormat::Jpeg,
+        _ => ImageFormat::Png,
+    }
+}
+
+#[test]
+fn transparency_becomes_the_chosen_background_in_a_jpg() {
+    let dir = scratch("background");
+    let input = dir.join("logo.png");
+    fs::write(&input, TRANSPARENT).unwrap();
+    let output = dir.join("logo.jpg");
+    let black = ImageOptions {
+        background: [0, 0, 0],
+        ..opts(OutputFormat::To(ImageFormat::Jpeg), 95, None)
+    };
+
+    compress_image(&input, &output, &black, &mut |_| {}, &CancelToken::new()).unwrap();
+
+    let corner = ::image::open(&output).unwrap().to_rgb8().get_pixel(0, 0).0;
+    assert!(
+        corner.iter().all(|&c| c < 40),
+        "expected a dark corner, got {corner:?}"
+    );
 }

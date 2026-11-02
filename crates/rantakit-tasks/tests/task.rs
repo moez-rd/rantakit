@@ -7,7 +7,7 @@ use lopdf::{Document, Object, Stream, dictionary};
 use rantakit_tasks::{
     Availability, CATALOGUE, CancelToken, Details, ErrorKind, FileOutcome, ImageFormat,
     ImageOptions, OutputFormat, PdfOptions, Platform, Target, Task, TaskEvent, ToolId, ToolOptions,
-    detect_kind, run_task, tools_for_files,
+    WHITE, detect_kind, run_task, tools_for_files,
 };
 
 /// A noisy 600x400 photo, so compressing it really makes it smaller.
@@ -73,6 +73,7 @@ fn kompres_foto(target: Target) -> ToolOptions {
         format: OutputFormat::Same,
         target,
         max_dimension: None,
+        background: WHITE,
     })
 }
 
@@ -80,6 +81,7 @@ fn kompres_pdf() -> ToolOptions {
     ToolOptions::KompresPdf(PdfOptions {
         quality: 50,
         max_dimension: None,
+        max_bytes: None,
     })
 }
 
@@ -89,6 +91,9 @@ fn original_for(tool: &ToolOptions) -> (&'static str, Vec<u8>) {
     match tool {
         ToolOptions::KompresFoto(_) => ("foto.jpg", photo_jpg()),
         ToolOptions::KompresPdf(_) => ("ijazah.pdf", scan_pdf()),
+        ToolOptions::UbahFormatFoto(_) | ToolOptions::UbahUkuranFoto(_) => {
+            ("foto.jpg", photo_jpg())
+        }
     }
 }
 
@@ -101,8 +106,11 @@ fn every_tool() -> Vec<ToolOptions> {
             format: OutputFormat::To(ImageFormat::Png),
             target: Target::Quality(80),
             max_dimension: Some(300),
+            background: WHITE,
         }),
         kompres_pdf(),
+        ToolOptions::convert(ImageFormat::Png, 90, WHITE),
+        ToolOptions::resize(300),
     ]
 }
 
@@ -322,10 +330,69 @@ fn dropped_files_fit_tools_by_content_not_extension() {
 
     assert_eq!(
         tools_for_files(&[&photo_named_pdf, &png], on),
-        [ToolId::KompresFoto]
+        [
+            ToolId::KompresFoto,
+            ToolId::UbahFormatFoto,
+            ToolId::UbahUkuranFoto
+        ]
     );
     assert_eq!(tools_for_files(&[&pdf], on), [ToolId::KompresPdf]);
     assert!(tools_for_files(&[&photo_named_pdf, &pdf], on).is_empty());
     assert!(tools_for_files(&[&pdf, &text], on).is_empty());
     assert!(tools_for_files(&[dir.join("hilang.jpg")], on).is_empty());
+}
+
+#[test]
+fn a_photo_already_in_the_chosen_format_is_left_unchanged() {
+    let dir = scratch("unchanged_format");
+    let foto = dir.join("foto.jpg");
+    fs::write(&foto, photo_jpg()).unwrap();
+
+    let to_jpg = task(
+        ToolOptions::convert(ImageFormat::Jpeg, 90, WHITE),
+        vec![foto.clone()],
+    );
+    assert_eq!(run(&to_jpg), [Err(ErrorKind::Unchanged)]);
+    assert_eq!(
+        file_names(&dir).len(),
+        1,
+        "no Result for an unchanged photo"
+    );
+
+    let to_png = task(
+        ToolOptions::convert(ImageFormat::Png, 90, WHITE),
+        vec![foto],
+    );
+    let result = run(&to_png).remove(0).unwrap();
+    assert!(result.path.ends_with("foto (converted).png"));
+}
+
+#[test]
+fn photos_are_made_smaller_but_never_larger() {
+    let dir = scratch("resize");
+    let foto = dir.join("foto.jpg");
+    fs::write(&foto, photo_jpg()).unwrap();
+
+    let already_small = task(ToolOptions::resize(800), vec![foto.clone()]);
+    assert_eq!(run(&already_small), [Err(ErrorKind::Unchanged)]);
+    assert_eq!(file_names(&dir).len(), 1, "no Result for a small photo");
+
+    let result = run(&task(ToolOptions::resize(300), vec![foto]))
+        .remove(0)
+        .unwrap();
+    assert!(result.path.ends_with("foto (resized).jpg"));
+    match result.details {
+        Details::Photo { width, height, .. } => assert_eq!((width, height), (300, 200)),
+        other => panic!("expected a photo, got {other:?}"),
+    }
+}
+
+#[test]
+fn photo_sizes_are_plain_longest_sides() {
+    use rantakit_tasks::PhotoSize;
+    assert_eq!(PhotoSize::default(), PhotoSize::Medium);
+    assert_eq!(
+        [PhotoSize::Large, PhotoSize::Medium, PhotoSize::Small].map(PhotoSize::side),
+        [1920, 1280, 800]
+    );
 }

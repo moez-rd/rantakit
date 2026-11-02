@@ -69,6 +69,19 @@ pub enum Job {
     BagikanAman,
 }
 
+impl Job {
+    /// The stable id the frontend keys Job headings by.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::KecilkanUbah => "kecilkan-ubah",
+            Self::Scan => "scan",
+            Self::AturPdf => "atur-pdf",
+            Self::AmbilTeks => "ambil-teks",
+            Self::BagikanAman => "bagikan-aman",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Platform {
     Windows,
@@ -119,20 +132,8 @@ const OFFICE: &[FileKind] = &[Word, Excel, PowerPoint];
 pub const CATALOGUE: &[Tool] = &[
     tool(ToolId::KompresFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(ToolId::KompresPdf, KecilkanUbah, &[Pdf], ALL, Shipped),
-    tool(
-        ToolId::UbahFormatFoto,
-        KecilkanUbah,
-        &[Jpg, Png, Heic, Webp],
-        ALL,
-        ComingSoon,
-    ),
-    tool(
-        ToolId::UbahUkuranFoto,
-        KecilkanUbah,
-        PHOTOS,
-        ALL,
-        ComingSoon,
-    ),
+    tool(ToolId::UbahFormatFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
+    tool(ToolId::UbahUkuranFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(
         ToolId::KompresDokumen,
         KecilkanUbah,
@@ -237,6 +238,54 @@ pub fn tools_for_files(files: &[impl AsRef<Path>], platform: Platform) -> Vec<To
     }
 }
 
+/// What Rantakit can do with files dragged onto the window.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FileMatch {
+    /// The shipped Tools that accept every file, in catalogue order; never
+    /// empty. `kinds` has each file's kind, in order.
+    Fits {
+        kinds: Vec<FileKind>,
+        tools: Vec<ToolId>,
+    },
+    /// Some file is not one any shipped Tool opens.
+    Unsupported,
+    /// Each file fits some Tool, but no Tool takes them all, like photos and
+    /// PDFs together.
+    Mixed,
+}
+
+/// Which shipped Tools on `platform` can take all of `kinds`.
+pub fn match_kinds(kinds: &[FileKind], platform: Platform) -> FileMatch {
+    if kinds.is_empty() {
+        return FileMatch::Unsupported;
+    }
+    let tools = tools_for_kinds(kinds, platform);
+    if !tools.is_empty() {
+        return FileMatch::Fits {
+            kinds: kinds.to_vec(),
+            tools,
+        };
+    }
+    let each_fits = kinds
+        .iter()
+        .all(|kind| !tools_for_kinds(&[*kind], platform).is_empty());
+    if each_fits {
+        FileMatch::Mixed
+    } else {
+        FileMatch::Unsupported
+    }
+}
+
+/// [`match_kinds`] for files on disk, judged by content. A file that can't be
+/// read or recognized makes the whole set unsupported.
+pub fn match_files(files: &[impl AsRef<Path>], platform: Platform) -> FileMatch {
+    let kinds: Option<Vec<FileKind>> = files.iter().map(|f| detect_kind(f.as_ref())).collect();
+    match kinds {
+        Some(kinds) => match_kinds(&kinds, platform),
+        None => FileMatch::Unsupported,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
@@ -250,9 +299,16 @@ mod tests {
     }
 
     #[test]
-    fn photos_fit_kompres_foto_and_pdfs_fit_kompres_pdf() {
+    fn photos_fit_the_photo_tools_and_pdfs_fit_kompres_pdf() {
         let on = Platform::Windows;
-        assert_eq!(tools_for_kinds(&[Jpg, Png], on), [ToolId::KompresFoto]);
+        assert_eq!(
+            tools_for_kinds(&[Jpg, Png], on),
+            [
+                ToolId::KompresFoto,
+                ToolId::UbahFormatFoto,
+                ToolId::UbahUkuranFoto
+            ]
+        );
         assert_eq!(tools_for_kinds(&[Pdf, Pdf], on), [ToolId::KompresPdf]);
     }
 
@@ -265,6 +321,35 @@ mod tests {
     fn coming_soon_tools_never_match() {
         assert!(tools_for_kinds(&[Webp], Platform::Linux).is_empty());
         assert!(tools_for_kinds(&[Word], Platform::Linux).is_empty());
+    }
+
+    #[test]
+    fn matching_explains_why_nothing_fits() {
+        let on = Platform::Windows;
+        assert_eq!(
+            match_kinds(&[Jpg, Png], on),
+            FileMatch::Fits {
+                kinds: vec![Jpg, Png],
+                tools: vec![
+                    ToolId::KompresFoto,
+                    ToolId::UbahFormatFoto,
+                    ToolId::UbahUkuranFoto
+                ]
+            }
+        );
+        assert_eq!(match_kinds(&[Jpg, Pdf], on), FileMatch::Mixed);
+        assert_eq!(match_kinds(&[Jpg, Webp], on), FileMatch::Unsupported);
+        assert_eq!(match_kinds(&[Word], on), FileMatch::Unsupported);
+        assert_eq!(match_kinds(&[], on), FileMatch::Unsupported);
+    }
+
+    #[test]
+    fn unreadable_files_are_unsupported() {
+        let missing = ["definitely-not-here.jpg"];
+        assert_eq!(
+            match_files(&missing, Platform::Linux),
+            FileMatch::Unsupported
+        );
     }
 
     #[test]

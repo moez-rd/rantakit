@@ -1,11 +1,11 @@
 'use client';
+import {focusRing, tv, twMerge} from '@/lib/react-aria-utils';
 import {
   Tab as RACTab,
   TabList as RACTabList,
   TabPanels as RACTabPanels,
   TabPanel as RACTabPanel,
   Tabs as RACTabs,
-  SelectionIndicator,
   type TabListProps,
   type TabPanelProps,
   type TabPanelsProps,
@@ -13,9 +13,6 @@ import {
   type TabsProps
 } from 'react-aria-components/Tabs';
 import {composeRenderProps} from 'react-aria-components/composeRenderProps';
-import {tv} from 'tailwind-variants';
-import {focusRing} from '@/lib/react-aria-utils';
-import {twMerge} from 'tailwind-merge';
 
 const tabsStyles = tv({
   base: 'flex gap-4 font-sans max-w-full',
@@ -61,10 +58,10 @@ export function TabList<T>(props: TabListProps<T>) {
 
 const tabProps = tv({
   extend: focusRing,
-  base: 'group relative flex items-center cursor-default rounded-full px-3 py-1.5 text-sm font-medium transition forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
+  base: 'group relative flex items-center cursor-default rounded-full px-3 py-1.5 text-label font-medium transition text-text-muted hover:text-text selected:bg-brand-soft selected:text-brand-strong forced-color-adjust-none [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
-      true: 'text-neutral-200 dark:text-neutral-600 forced-colors:text-[GrayText] selected:text-white dark:selected:text-neutral-500 forced-colors:selected:text-[HighlightText] selected:bg-neutral-200 dark:selected:bg-neutral-600 forced-colors:selected:bg-[GrayText]'
+      true: 'text-text-disabled forced-colors:text-[GrayText] selected:bg-badge-bg forced-colors:selected:text-[HighlightText] forced-colors:selected:bg-[GrayText]'
     }
   }
 });
@@ -75,14 +72,8 @@ export function Tab(props: TabProps) {
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
         tabProps({...renderProps, className})
-      )}>
-      {composeRenderProps(props.children, children => (
-        <>
-          {children}
-          <SelectionIndicator className="absolute top-0 left-0 w-full h-full z-10 bg-white rounded-full mix-blend-difference group-disabled:bg-neutral-400 group-disabled:mix-blend-normal group-disabled:dark:bg-neutral-600 group-disabled:-z-1 motion-safe:transition-[translate,width,height] " />
-        </>
-      ))}
-    </RACTab>
+      )}
+    />
   );
 }
 
@@ -100,7 +91,7 @@ export function TabPanels<T>(props: TabPanelsProps<T>) {
 
 const tabPanelStyles = tv({
   extend: focusRing,
-  base: 'flex-1 box-border p-4 text-sm text-neutral-900 dark:text-neutral-100 transition entering:opacity-0 exiting:opacity-0 exiting:absolute exiting:top-0 exiting:left-0 exiting:w-full'
+  base: 'flex-1 box-border p-4 text-label text-text transition entering:opacity-0 exiting:opacity-0 exiting:absolute exiting:top-0 exiting:left-0 exiting:w-full'
 });
 
 export function TabPanel(props: TabPanelProps) {
