@@ -1,4 +1,5 @@
 import { NumberField as AriaNumberField } from "react-aria-components";
+import { Button } from "@/components/ui/Button";
 import { FieldGroup, Input } from "@/components/ui/Field";
 import { RadioCards } from "@/components/ui/RadioCards";
 import { Select, SelectItem } from "@/components/ui/Select";
@@ -6,6 +7,8 @@ import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { OptionField } from "@/features/tool/OptionField";
 import { useT } from "@/i18n";
+import { formatBytes } from "@/lib/format";
+import { asTyped, useRecentLimits } from "./recentLimits";
 import { LEVELS, type ShrinkSettings } from "./shrink";
 
 interface ShrinkOptionsProps {
@@ -16,7 +19,8 @@ interface ShrinkOptionsProps {
 
 /** The top of a compress Tool's Options: "Sesuaikan batas ukuran" or "Kecilkan saja". */
 export function ShrinkOptions({ noun, settings, onChange }: ShrinkOptionsProps) {
-  const { t } = useT();
+  const { t, locale } = useT();
+  const recent = useRecentLimits();
   return (
     <>
       <ToggleButtonGroup
@@ -59,6 +63,24 @@ export function ShrinkOptions({ noun, settings, onChange }: ShrinkOptionsProps) 
               <SelectItem id="MB">MB</SelectItem>
             </Select>
           </div>
+          {recent.length > 0 && (
+            <div role="group" aria-label={t("options.limit.recent")} className="flex flex-wrap items-center gap-1.5">
+              <span aria-hidden className="me-0.5 text-small text-text-muted">
+                {t("options.limit.recent")}
+              </span>
+              {recent.map((bytes) => (
+                <Button
+                  key={bytes}
+                  variant="secondary"
+                  size="row"
+                  className="min-h-8 rounded-full px-3 text-small"
+                  onPress={() => onChange(asTyped(bytes))}
+                >
+                  {formatBytes(bytes, locale)}
+                </Button>
+              ))}
+            </div>
+          )}
         </OptionField>
       )}
 

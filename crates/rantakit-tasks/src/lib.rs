@@ -7,7 +7,9 @@ mod compression;
 mod history;
 mod info;
 mod kinds;
+mod limits;
 mod names;
+mod store;
 mod task;
 
 pub use catalogue::{
@@ -18,7 +20,9 @@ pub use compression::{Compression, Level, dpi_to_side};
 pub use history::{Entry, History, HistoryError};
 pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};
+pub use limits::{RECENT_LIMITS, RecentLimits};
 pub use names::result_path;
+pub use store::{JsonFile, StoreError};
 pub use task::{
     Details, FileOutcome, PhotoSize, ResultFile, Task, TaskEvent, ToolOptions, run_task,
 };

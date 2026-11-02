@@ -72,15 +72,18 @@ async function fakeThumbnail(path: string, size: number) {
 }
 
 const cancelled = new Set<number>();
+const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
 let nextTask = 1;
 
 interface TaskArgs {
-  request: { options: { tool: string; to?: string; size?: string; maxSide?: number }; paths: string[] };
+  request: { options: { tool: string; to?: string; size?: string; maxSide?: number; limit?: number }; paths: string[] };
   onEvent: { onmessage: (message: unknown) => void };
 }
 
 function runTask({ request, onEvent }: TaskArgs) {
   const id = nextTask++;
+  const { limit } = request.options;
+  if (limit) recentLimits.splice(0, Infinity, ...[limit, ...recentLimits.filter((old) => old !== limit)].slice(0, 5));
   const send = (message: unknown) => onEvent.onmessage(message);
   const step = has("slow") ? 400 : 120;
   const suffix = request.options.tool.startsWith("ubah-format")
@@ -146,6 +149,8 @@ export function installDevMocks() {
         return TOOLS;
       case "list_history":
         return [];
+      case "recent_limits":
+        return has("recent") ? [...recentLimits] : [];
       case "recent_tools":
         return has("recent") ? ["kompres-pdf", "kompres-foto"] : [];
       case "match_files": {

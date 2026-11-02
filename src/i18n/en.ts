@@ -277,4 +277,7 @@ export const en: Messages = {
   "resize.side.placeholder": "for example 1280",
   "resize.side.overrides": "If filled in, this number is used and the choice above is ignored.",
   "unchanged.size": "Already small, not changed",
+
+  // Recent Size limits
+  "options.limit.recent": "Used before",
 };

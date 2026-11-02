@@ -1,4 +1,4 @@
-use rantakit_tasks::HistoryError;
+use rantakit_tasks::{HistoryError, StoreError};
 use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 
@@ -9,13 +9,16 @@ use serde::{Serialize, Serializer};
 pub enum Error {
     #[error(transparent)]
     History(#[from] HistoryError),
+
+    #[error(transparent)]
+    Store(#[from] StoreError),
 }
 
 impl Error {
     fn code(&self) -> &'static str {
         match self {
             Self::History(HistoryError::Newer(_)) => "history-from-newer-version",
-            Self::History(_) => "unexpected",
+            Self::History(_) | Self::Store(_) => "unexpected",
         }
     }
 }

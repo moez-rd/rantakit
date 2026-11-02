@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
     CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
-    PhotoSize, Progress, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
+    PhotoSize, Progress, RecentLimits, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -118,6 +118,18 @@ fn parse_color(hex: Option<&str>) -> [u8; 3] {
         .filter(|hex| hex.len() == 6)
         .and_then(|hex| Some([channel(hex, 0)?, channel(hex, 2)?, channel(hex, 4)?]))
         .unwrap_or(WHITE)
+}
+
+impl OptionsRequest {
+    /// The Size limit typed for a compress Tool, if any.
+    fn limit(&self) -> Option<u64> {
+        match self {
+            Self::KompresFoto { compression, .. } | Self::KompresPdf { compression } => {
+                compression.limit
+            }
+            _ => None,
+        }
+    }
 }
 
 /// The compress Tools' Options; `rantakit_tasks::Compression` turns them into engine options.
@@ -284,6 +296,12 @@ pub fn start_task(
     request: TaskRequest,
     on_event: Channel<TaskMessage>,
 ) -> u64 {
+    if let Some(limit) = request.options.limit() {
+        // Only a convenience for next time, so a failure is only logged.
+        if let Err(err) = app.state::<RecentLimits>().record(limit) {
+            eprintln!("could not remember the Size limit: {err}");
+        }
+    }
     let task = Task {
         tool: request.options.into(),
         originals: request.paths,

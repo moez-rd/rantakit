@@ -24,7 +24,7 @@ export function parseShrink(stored: unknown): ShrinkSettings {
   };
 }
 
-const UNIT_BYTES = { KB: 1024, MB: 1024 * 1024 };
+export const UNIT_BYTES = { KB: 1024, MB: 1024 * 1024 };
 
 /** The Size limit in bytes; undefined for "Kecilkan saja" or an empty field, which compress like Seimbang. */
 export function limitBytes(settings: ShrinkSettings): number | undefined {

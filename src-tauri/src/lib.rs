@@ -3,7 +3,7 @@ mod error;
 #[cfg(target_os = "macos")]
 mod menu;
 
-use rantakit_tasks::History;
+use rantakit_tasks::{History, RecentLimits};
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -12,8 +12,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            let path = app.path().app_data_dir()?.join("history.json");
-            app.manage(History::new(path));
+            let data = app.path().app_data_dir()?;
+            app.manage(History::new(data.join("history.json")));
+            app.manage(RecentLimits::new(data.join("recent-limits.json")));
             app.manage(commands::task::RunningTasks::default());
             Ok(())
         });
@@ -37,6 +38,7 @@ pub fn run() {
             commands::history::remove_history,
             commands::history::clear_history,
             commands::history::recent_tools,
+            commands::limits::recent_limits,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

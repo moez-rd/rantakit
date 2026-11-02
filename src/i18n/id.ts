@@ -280,4 +280,7 @@ export const id = {
   "resize.side.placeholder": "misalnya 1280",
   "resize.side.overrides": "Kalau diisi, angka ini dipakai dan pilihan di atas diabaikan.",
   "unchanged.size": "Sudah kecil, tidak diubah",
+
+  // Recent Size limits
+  "options.limit.recent": "Sebelumnya",
 } as const;
