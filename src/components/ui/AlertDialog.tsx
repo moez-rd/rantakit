@@ -38,12 +38,12 @@ export function AlertDialog({
           </div>
           <p className="mt-3 text-text-muted">{children}</p>
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" onPress={close}>
+            <Button variant="secondary" autoFocus={variant === 'danger'} onPress={close}>
               {cancelLabel}
             </Button>
             <Button
               variant={variant === 'danger' ? 'danger' : 'primary'}
-              autoFocus
+              autoFocus={variant !== 'danger'}
               onPress={chain(onAction, close)}>
               {actionLabel}
             </Button>

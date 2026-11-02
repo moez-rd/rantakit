@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { fileName } from "@/features/compress/imageApi";
 import { TOOL_ICONS, type ToolId } from "@/features/home/tools";
+import { setKeepHistory, useAppSettings } from "@/features/settings/appSettings";
 import { useT } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
 import { openPath } from "@/lib/files";
@@ -19,6 +20,8 @@ export function HistoryPage() {
   const { t } = tr;
   const [items, setItems] = useState<HistoryItem[] | null>(null);
   const [error, setError] = useState<string>();
+  const settings = useAppSettings();
+  const off = settings?.keepHistory === false;
 
   const load = useCallback(() => {
     listHistory()
@@ -52,7 +55,7 @@ export function HistoryPage() {
           <h1 className="font-display text-title">{t("history.title")}</h1>
           <p className="text-text-muted">{t("history.kept")}</p>
         </div>
-        {items.length > 0 && (
+        {items.length > 0 && !off && (
           <DialogTrigger>
             <Button variant="secondary" size="row">
               {t("history.clear")}
@@ -72,7 +75,15 @@ export function HistoryPage() {
         )}
       </header>
 
-      {items.length === 0 ? (
+      {off ? (
+        <Message
+          icon={History}
+          title={t("history.off")}
+          action={<Button onPress={() => setKeepHistory(true).then(load).catch(() => {})}>{t("history.turnOn")}</Button>}
+        >
+          {t("history.off.body")}
+        </Message>
+      ) : items.length === 0 ? (
         <Message icon={History} title={t("history.empty")}>
           {t("history.empty.hint")}
         </Message>
@@ -230,12 +241,21 @@ function FileLine({ file }: { file: HistoryFile }) {
   );
 }
 
-function Message({ icon: Icon, title, children }: { icon: typeof History; title: string; children: ReactNode }) {
+interface MessageProps {
+  icon: typeof History;
+  title: string;
+  children: ReactNode;
+  /** A button under the message. */
+  action?: ReactNode;
+}
+
+function Message({ icon: Icon, title, children, action }: MessageProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
       <Icon aria-hidden className="size-8 text-text-muted" />
       <h2 className="font-medium">{title}</h2>
-      <p className="max-w-xs text-small text-text-muted">{children}</p>
+      <p className="max-w-sm text-small text-text-muted">{children}</p>
+      {action && <div className="mt-3">{action}</div>}
     </div>
   );
 }

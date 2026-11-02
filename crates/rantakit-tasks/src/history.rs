@@ -34,8 +34,9 @@ pub type Result<T> = std::result::Result<T, HistoryError>;
 const VERSION: u32 = 2;
 /// Oldest entries are dropped beyond this.
 const MAX_ENTRIES: usize = 500;
-/// How many Tools "Terakhir dipakai" (Recent tools) shows on Home.
-pub const RECENT_TOOLS: usize = 4;
+/// Entries older than this are removed: "Disimpan 30 hari".
+pub const KEEP_DAYS: u64 = 30;
+const KEEP_MS: u64 = KEEP_DAYS * 24 * 60 * 60 * 1000;
 
 /// One finished Task with at least one Result.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -110,20 +111,6 @@ impl History {
         self.load()
     }
 
-    /// The last Tools used, newest first, each once, at most [`RECENT_TOOLS`].
-    pub fn recent_tools(&self) -> Result<Vec<String>> {
-        let mut tools: Vec<String> = Vec::with_capacity(RECENT_TOOLS);
-        for entry in self.list()? {
-            if tools.len() == RECENT_TOOLS {
-                break;
-            }
-            if !tools.contains(&entry.tool) {
-                tools.push(entry.tool);
-            }
-        }
-        Ok(tools)
-    }
-
     pub fn add(&self, entry: Entry) -> Result<()> {
         self.update(|entries| {
             entries.insert(0, entry);
@@ -179,7 +166,11 @@ impl History {
         };
 
         match Stored::parse(&text) {
-            Ok(Stored::Current(entries)) => Ok(entries),
+            Ok(Stored::Current(mut entries)) => {
+                let oldest = now_ms().saturating_sub(KEEP_MS);
+                entries.retain(|entry| entry.created_at >= oldest);
+                Ok(entries)
+            }
             // Written by a newer app version: leave it untouched rather than lose data.
             Ok(Stored::Newer(version)) => Err(HistoryError::Newer(version)),
             // An older layout: History starts afresh.
@@ -239,7 +230,7 @@ mod tests {
         Entry {
             id: id.into(),
             tool: tool.into(),
-            created_at: 0,
+            created_at: now_ms(),
             files: vec![EntryFile {
                 original_path: "in.jpg".into(),
                 result_path: "in (compressed).jpg".into(),
@@ -326,28 +317,6 @@ mod tests {
     }
 
     #[test]
-    fn recent_tools_are_distinct_and_newest_first() {
-        let (history, dir) = temp_history("recent");
-        assert!(history.recent_tools().unwrap().is_empty());
-
-        for (id, tool) in [
-            ("1", "kompres-foto"),
-            ("2", "kompres-pdf"),
-            ("3", "kompres-foto"),
-            ("4", "a"),
-            ("5", "b"),
-            ("6", "c"),
-        ] {
-            history.add(used(id, tool)).unwrap();
-        }
-        assert_eq!(
-            history.recent_tools().unwrap(),
-            ["c", "b", "a", "kompres-foto"]
-        );
-        fs::remove_dir_all(dir).unwrap();
-    }
-
-    #[test]
     fn history_from_version_1_is_removed() {
         let (history, dir) = temp_history("v1");
         fs::create_dir_all(&dir).unwrap();
@@ -391,6 +360,23 @@ mod tests {
             history.add(used("a", "kompres-foto")).is_err(),
             "must not overwrite a newer file"
         );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn entries_older_than_30_days_are_removed() {
+        let (history, dir) = temp_history("old");
+        let day = 24 * 60 * 60 * 1000;
+        let at = |id: &str, days: u64| Entry {
+            created_at: now_ms() - days * day,
+            ..used(id, "kompres-foto")
+        };
+        history
+            .save(vec![at("new", 1), at("month", 29), at("old", 31)])
+            .unwrap();
+
+        let ids: Vec<_> = history.list().unwrap().into_iter().map(|e| e.id).collect();
+        assert_eq!(ids, ["new", "month"]);
         fs::remove_dir_all(dir).unwrap();
     }
 

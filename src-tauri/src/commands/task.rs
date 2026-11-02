@@ -5,7 +5,8 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
     CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
-    PhotoSize, Progress, RecentLimits, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
+    PhotoSize, Progress, RecentLimits, RecentTools, SettingsStore, Task, TaskEvent, ToolOptions,
+    WHITE, dpi_to_side, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -307,6 +308,13 @@ pub fn start_task(
         originals: request.paths,
         results_folder: request.results_folder,
     };
+    // Recent tools are kept even while History is off.
+    if let Err(err) = app
+        .state::<RecentTools>()
+        .record(task.tool.id().as_str().into())
+    {
+        eprintln!("could not remember the Tool: {err}");
+    }
     let cancel = CancelToken::new();
     let id = running.add(cancel.clone());
 
@@ -335,7 +343,11 @@ pub fn start_task(
         );
 
         // The Results are already saved, so a History failure is only logged.
-        if let Err(err) = app.state::<History>().record(&task, &outcomes) {
+        let keep = app
+            .state::<SettingsStore>()
+            .get()
+            .map_or(true, |settings| settings.keep_history);
+        if keep && let Err(err) = app.state::<History>().record(&task, &outcomes) {
             eprintln!("task {id}: could not record history: {err}");
         }
         app.state::<RunningTasks>().remove(id);

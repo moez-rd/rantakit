@@ -59,9 +59,3 @@ pub fn list_history(history: State<'_, History>) -> Result<Vec<HistoryItem>> {
 pub fn clear_history(history: State<'_, History>) -> Result<()> {
     Ok(history.clear()?)
 }
-
-/// The last Tools used, newest first, for "Terakhir dipakai" (Recent tools).
-#[tauri::command]
-pub fn recent_tools(history: State<'_, History>) -> Result<Vec<String>> {
-    Ok(history.recent_tools()?)
-}

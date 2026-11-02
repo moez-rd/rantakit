@@ -128,7 +128,7 @@ export const en: Messages = {
   "history.empty.hint": "Results from every Tool will show up here.",
   "history.clear": "Clear history",
   "history.clear.title": "Clear all history?",
-  "history.clear.body": "This list will be emptied. Your Results are not deleted.",
+  "history.clear.body": "This list will be emptied. Result files you've saved are not deleted.",
   "history.clear.cancel": "Cancel",
   "history.missing": "The Result file was moved or deleted",
 
@@ -300,4 +300,14 @@ export const en: Messages = {
   "history.yesterday": "Yesterday",
   "history.andMore": "{name} and {count} more",
   "history.seeFiles": "See {count} files",
+
+  // Keeping History
+  "history.off": "History is turned off",
+  "history.off.body": "Rantakit doesn't record any Task until history is turned on again.",
+  "history.turnOn": "Turn on history",
+  "settings.keepHistory": "Keep history",
+  "settings.keepHistory.description": "Record each Task in History for 30 days.",
+  "settings.keepHistory.offTitle": "Turn off history?",
+  "settings.keepHistory.offBody": "Your current history will be cleared. Result files are not deleted.",
+  "settings.keepHistory.off": "Turn off",
 };

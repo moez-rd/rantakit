@@ -7,9 +7,10 @@ mod compression;
 mod history;
 mod info;
 mod kinds;
-mod limits;
 mod names;
 mod presets;
+mod recent;
+mod settings;
 mod store;
 mod task;
 
@@ -21,9 +22,10 @@ pub use compression::{Compression, Level, dpi_to_side};
 pub use history::{Entry, EntryFile, History, HistoryError};
 pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};
-pub use limits::{RECENT_LIMITS, RecentLimits};
 pub use names::result_path;
 pub use presets::{Preset, Presets};
+pub use recent::{RECENT_LIMITS, RECENT_TOOLS, Recent, RecentLimits, RecentTools};
+pub use settings::{Settings, SettingsStore};
 pub use store::{JsonFile, StoreError};
 pub use task::{
     Details, FileOutcome, PhotoSize, ResultFile, Task, TaskEvent, ToolOptions, run_task,

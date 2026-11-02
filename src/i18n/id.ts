@@ -130,7 +130,7 @@ export const id = {
   "history.empty.hint": "Hasil dari setiap alat akan muncul di sini.",
   "history.clear": "Hapus riwayat",
   "history.clear.title": "Hapus semua riwayat?",
-  "history.clear.body": "Daftar ini akan dikosongkan. File hasil tidak ikut terhapus.",
+  "history.clear.body": "Daftar ini akan dikosongkan. File hasil yang sudah tersimpan tidak ikut terhapus.",
   "history.clear.cancel": "Batal",
   "history.missing": "File hasil sudah dipindah atau dihapus",
 
@@ -303,4 +303,14 @@ export const id = {
   "history.yesterday": "Kemarin",
   "history.andMore": "{name} dan {count} lainnya",
   "history.seeFiles": "Lihat {count} file",
+
+  // Keeping History
+  "history.off": "Riwayat sedang dimatikan",
+  "history.off.body": "Rantakit tidak mencatat tugas apa pun sampai riwayat dinyalakan lagi.",
+  "history.turnOn": "Nyalakan riwayat",
+  "settings.keepHistory": "Simpan riwayat",
+  "settings.keepHistory.description": "Catat setiap tugas di Riwayat selama 30 hari.",
+  "settings.keepHistory.offTitle": "Matikan riwayat?",
+  "settings.keepHistory.offBody": "Riwayat yang ada akan dihapus. File hasil tidak ikut terhapus.",
+  "settings.keepHistory.off": "Matikan",
 } as const;

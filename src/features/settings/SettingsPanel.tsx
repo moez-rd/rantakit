@@ -1,14 +1,19 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { DialogTrigger } from "react-aria-components";
 import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
 import { Monitor, Moon, Sun } from "@keyline-icons/react";
+import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Link } from "@/components/ui/Link";
+import { Modal } from "@/components/ui/Modal";
+import { Switch } from "@/components/ui/Switch";
 import { Radio, RadioGroup } from "@/components/ui/RadioGroup";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/Tabs";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { useT } from "@/i18n";
 import { LICENSE_URL, openExternal } from "@/lib/links";
+import { setKeepHistory, useAppSettings } from "./appSettings";
 import { systemLanguage, usePreferences, type Language, type LanguageChoice, type TextSize, type Theme } from "./preferences";
 
 /** Each language is named in itself, whatever the UI language. */
@@ -82,7 +87,41 @@ function GeneralTab() {
           </Radio>
         </RadioGroup>
       </Row>
+
+      <Row label={t("settings.keepHistory")} description={t("settings.keepHistory.description")}>
+        <KeepHistorySwitch />
+      </Row>
     </div>
+  );
+}
+
+/** "Simpan riwayat": turning it off asks first, since it clears History. */
+export function KeepHistorySwitch() {
+  const { t } = useT();
+  const settings = useAppSettings();
+  const [asking, setAsking] = useState(false);
+  return (
+    <>
+      <Switch
+        aria-label={t("settings.keepHistory")}
+        isDisabled={settings === null}
+        isSelected={settings?.keepHistory ?? true}
+        onChange={(keep) => (keep ? setKeepHistory(true).catch(() => {}) : setAsking(true))}
+      />
+      <DialogTrigger isOpen={asking} onOpenChange={setAsking}>
+        <Modal isDismissable>
+          <AlertDialog
+            title={t("settings.keepHistory.offTitle")}
+            variant="danger"
+            actionLabel={t("settings.keepHistory.off")}
+            cancelLabel={t("common.cancel")}
+            onAction={() => setKeepHistory(false).catch(() => {})}
+          >
+            {t("settings.keepHistory.offBody")}
+          </AlertDialog>
+        </Modal>
+      </DialogTrigger>
+    </>
   );
 }
 

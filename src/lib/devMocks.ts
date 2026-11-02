@@ -7,7 +7,8 @@ import type { ToolInfo } from "@/features/home/tools";
  * crates/rantakit-tasks/src/catalogue.rs on desktop.
  *
  * URL switches: `?recent` fills Recent tools, `?fail` makes the second file
- * of every Task miss its Size limit, `?slow` makes Tasks take longer.
+ * of every Task miss its Size limit, `?slow` makes Tasks take longer, and
+ * `?historyOff` starts with History turned off.
  */
 const TOOLS: ToolInfo[] = [
   { id: "kompres-foto", job: "kecilkan-ubah", comingSoon: false },
@@ -98,6 +99,7 @@ function sampleHistory() {
   ];
 }
 
+const appSettings = { keepHistory: !has("historyOff") };
 const cancelled = new Set<number>();
 const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
 const presets: { id: string; tool: string; name: string; options: object }[] = [];
@@ -179,6 +181,11 @@ export function installDevMocks() {
         return has("recent") ? sampleHistory() : [];
       case "clear_history":
         return null;
+      case "get_settings":
+        return { ...appSettings };
+      case "set_keep_history":
+        appSettings.keepHistory = (args as { keep: boolean }).keep;
+        return { ...appSettings };
       case "recent_limits":
         return has("recent") ? [...recentLimits] : [];
       case "list_presets": {
