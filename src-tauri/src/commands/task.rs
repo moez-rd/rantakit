@@ -4,8 +4,8 @@ use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
-    CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, OutputFormat, Progress,
-    Task, TaskEvent, ToolOptions, run_task,
+    CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
+    Progress, Task, TaskEvent, ToolOptions, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -75,9 +75,11 @@ pub enum Format {
 #[derive(Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompressionRequest {
-    /// The Size limit in bytes; omit to compress without one.
+    /// The Size limit in bytes; omit to compress by `level`.
     #[serde(default)]
     pub limit: Option<u64>,
+    #[serde(default)]
+    pub level: LevelRequest,
     /// The exact quality from Advanced options.
     #[serde(default)]
     pub quality: Option<u8>,
@@ -85,10 +87,24 @@ pub struct CompressionRequest {
     pub max_dimension: Option<u32>,
 }
 
+#[derive(Debug, Default, Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum LevelRequest {
+    Smallest,
+    #[default]
+    Balanced,
+    Clearest,
+}
+
 impl From<CompressionRequest> for Compression {
     fn from(request: CompressionRequest) -> Self {
         Self {
             limit: request.limit,
+            level: match request.level {
+                LevelRequest::Smallest => Level::Smallest,
+                LevelRequest::Balanced => Level::Balanced,
+                LevelRequest::Clearest => Level::Clearest,
+            },
             quality: request.quality,
             max_dimension: request.max_dimension,
         }

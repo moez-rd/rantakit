@@ -4,9 +4,14 @@ export interface ShrinkSettings {
   /** The Size limit as typed, in `unit`; null when the field is empty. */
   limit: number | null;
   unit: "KB" | "MB";
+  /** "Kecilkan saja": how small. */
+  level: Level;
 }
 
-export const SHRINK_DEFAULTS: ShrinkSettings = { mode: "limit", limit: null, unit: "KB" };
+export type Level = "smallest" | "balanced" | "clearest";
+export const LEVELS: Level[] = ["smallest", "balanced", "clearest"];
+
+export const SHRINK_DEFAULTS: ShrinkSettings = { mode: "limit", limit: null, unit: "KB", level: "balanced" };
 
 /** Falls back to the defaults for anything missing or invalid. */
 export function parseShrink(stored: unknown): ShrinkSettings {
@@ -15,6 +20,7 @@ export function parseShrink(stored: unknown): ShrinkSettings {
     mode: s.mode === "smaller" ? "smaller" : SHRINK_DEFAULTS.mode,
     limit: typeof s.limit === "number" && s.limit > 0 && Number.isFinite(s.limit) ? s.limit : null,
     unit: s.unit === "MB" ? "MB" : SHRINK_DEFAULTS.unit,
+    level: LEVELS.includes(s.level as Level) ? (s.level as Level) : SHRINK_DEFAULTS.level,
   };
 }
 
@@ -24,4 +30,9 @@ const UNIT_BYTES = { KB: 1024, MB: 1024 * 1024 };
 export function limitBytes(settings: ShrinkSettings): number | undefined {
   if (settings.mode !== "limit" || settings.limit === null) return undefined;
   return Math.round(settings.limit * UNIT_BYTES[settings.unit]);
+}
+
+/** The Level to send: the chosen one for "Kecilkan saja"; a limit left empty compresses like Seimbang. */
+export function levelOf(settings: ShrinkSettings): Level | undefined {
+  return settings.mode === "smaller" ? settings.level : undefined;
 }

@@ -14,7 +14,7 @@ pub use catalogue::{
     Availability, CATALOGUE, FileMatch, Job, Platform, Tool, ToolId, match_files, match_kinds,
     tools_for, tools_for_files, tools_for_kinds,
 };
-pub use compression::Compression;
+pub use compression::{Compression, Level, dpi_to_side};
 pub use history::{Entry, History, HistoryError};
 pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};

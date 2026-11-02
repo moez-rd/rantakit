@@ -1,5 +1,5 @@
 import { useStoredState } from "@/lib/storedState";
-import { limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
+import { levelOf, limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
 
 export type OutputFormat = "same" | "jpeg" | "png";
@@ -32,6 +32,7 @@ export function toImageOptions(settings: ImageSettings): ToolOptions {
     tool: "kompres-foto",
     format: settings.format === "same" ? undefined : settings.format,
     limit: limitBytes(settings),
+    level: levelOf(settings),
     maxDimension: settings.maxDimension || undefined,
   };
 }

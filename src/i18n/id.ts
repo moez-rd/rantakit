@@ -177,6 +177,16 @@ export const id = {
   "error.unexpected": "Ada yang tidak beres. Coba lagi.",
 
   // Tool page
+  "level.label": "Seberapa kecil",
+  "level.smallest": "Paling kecil",
+  "level.balanced": "Seimbang",
+  "level.clearest": "Paling jernih",
+  "level.smallest.description.photo": "File paling hemat",
+  "level.balanced.description.photo": "Pilihan aman untuk kebanyakan foto",
+  "level.clearest.description.photo": "Foto tetap tajam",
+  "level.smallest.description.pdf": "File paling hemat",
+  "level.balanced.description.pdf": "Pilihan aman untuk kebanyakan PDF",
+  "level.clearest.description.pdf": "Gambar tetap tajam",
   "shrink.label": "Cara mengecilkan",
   "shrink.limit": "Sesuaikan batas ukuran",
   "shrink.smaller": "Kecilkan saja",

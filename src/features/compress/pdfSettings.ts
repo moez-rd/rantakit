@@ -1,6 +1,6 @@
 import { useStoredState } from "@/lib/storedState";
 import { MAX_DIMENSIONS } from "./imageSettings";
-import { limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
+import { levelOf, limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
 
 export interface PdfSettings extends ShrinkSettings {
@@ -25,6 +25,7 @@ export function toPdfOptions(settings: PdfSettings): ToolOptions {
   return {
     tool: "kompres-pdf",
     limit: limitBytes(settings),
+    level: levelOf(settings),
     maxDimension: settings.maxDimension || undefined,
   };
 }

@@ -6,16 +6,20 @@ export type ToolOptions =
       tool: "kompres-foto";
       /** Output format; omit to keep the Original's format. */
       format?: "jpeg" | "png";
-      /** The Size limit in bytes; omit to compress without one. */
+      /** The Size limit in bytes; omit to compress by `level`. */
       limit?: number;
+      /** "Kecilkan saja"; defaults to "balanced" on the Rust side. */
+      level?: "smallest" | "balanced" | "clearest";
       /** Exact quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
       maxDimension?: number;
     }
   | {
       tool: "kompres-pdf";
-      /** The Size limit in bytes; omit to compress without one. */
+      /** The Size limit in bytes; omit to compress by `level`. */
       limit?: number;
+      /** "Kecilkan saja"; defaults to "balanced" on the Rust side. */
+      level?: "smallest" | "balanced" | "clearest";
       /** Exact image quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
       maxDimension?: number;

@@ -1,11 +1,12 @@
 import { NumberField as AriaNumberField } from "react-aria-components";
 import { FieldGroup, Input } from "@/components/ui/Field";
+import { RadioCards } from "@/components/ui/RadioCards";
 import { Select, SelectItem } from "@/components/ui/Select";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { OptionField } from "@/features/tool/OptionField";
 import { useT } from "@/i18n";
-import type { ShrinkSettings } from "./shrink";
+import { LEVELS, type ShrinkSettings } from "./shrink";
 
 interface ShrinkOptionsProps {
   noun: "photo" | "pdf";
@@ -59,6 +60,19 @@ export function ShrinkOptions({ noun, settings, onChange }: ShrinkOptionsProps) 
             </Select>
           </div>
         </OptionField>
+      )}
+
+      {settings.mode === "smaller" && (
+        <RadioCards
+          label={t("level.label")}
+          value={settings.level}
+          onChange={(level) => onChange({ level })}
+          options={LEVELS.map((level) => ({
+            id: level,
+            label: t(`level.${level}`),
+            description: t(`level.${level}.description.${noun}`),
+          }))}
+        />
       )}
     </>
   );

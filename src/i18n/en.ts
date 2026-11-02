@@ -174,6 +174,16 @@ export const en: Messages = {
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
+  "level.label": "How small",
+  "level.smallest": "Smallest",
+  "level.balanced": "Balanced",
+  "level.clearest": "Clearest",
+  "level.smallest.description.photo": "The smallest file",
+  "level.balanced.description.photo": "A safe choice for most photos",
+  "level.clearest.description.photo": "Photos stay sharp",
+  "level.smallest.description.pdf": "The smallest file",
+  "level.balanced.description.pdf": "A safe choice for most PDFs",
+  "level.clearest.description.pdf": "Images stay sharp",
   "shrink.label": "How to shrink",
   "shrink.limit": "Fit a size limit",
   "shrink.smaller": "Just make it smaller",
