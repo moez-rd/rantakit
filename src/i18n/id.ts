@@ -10,6 +10,7 @@ export const id = {
   "nav.home": "Beranda",
   "nav.history": "Riwayat",
   "nav.settings": "Pengaturan",
+  "nav.open": "Buka",
   "menu.label": "Menu",
   "menu.kompresFoto": "Kompres Foto…",
   "menu.kompresPdf": "Kompres PDF…",
@@ -74,6 +75,8 @@ export const id = {
   "picker.photos": "Pilih foto",
   "picker.photos.filter": "Foto",
   "picker.pdfs": "Pilih PDF",
+  "picker.files": "Pilih file",
+  "picker.files.filter": "Foto dan PDF",
 
   // Home
   "home.recent": "Terakhir dipakai",
@@ -327,4 +330,10 @@ export const id = {
   "settings.results.change": "Ganti folder",
   "settings.results.pick": "Pilih folder untuk file hasil",
   "about.source": "Lihat kode sumber",
+
+  // Title bar
+  "window.minimize": "Perkecil",
+  "window.maximize": "Perbesar",
+  "window.restore": "Kembalikan ukuran",
+  "window.close": "Tutup",
 } as const;

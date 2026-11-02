@@ -28,7 +28,8 @@ tauri-plugin-dialog = "2"
 thiserror = "2"
 serde_json = "1"
 
-# The system share sheet ("Bagikan") on the Result page.
+# The system share sheet ("Bagikan") on the Result page, and the rounded
+# corners of the undecorated window.
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = [
   "ApplicationModel_DataTransfer",
@@ -36,6 +37,7 @@ windows = { version = "0.62", features = [
   "Storage",
   "Storage_Streams",
   "Win32_Foundation",
+  "Win32_Graphics_Dwm",
   "Win32_UI_Shell",
 ] }
 windows-collections = "0.3"

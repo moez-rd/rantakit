@@ -19,6 +19,10 @@ pub fn run() {
             app.manage(SettingsStore::new(data.join("settings.json")));
             app.manage(Presets::new(data.join("presets.json")));
             app.manage(commands::task::RunningTasks::default());
+            #[cfg(windows)]
+            if let Some(window) = app.get_webview_window("main") {
+                round_corners(&window);
+            }
             Ok(())
         });
 
@@ -51,4 +55,25 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+/// Asks Windows 11 to round the undecorated window like a native one (about
+/// 8 px). Windows 10 ignores it and keeps square corners.
+#[cfg(windows)]
+fn round_corners(window: &tauri::WebviewWindow) {
+    use windows::Win32::Graphics::Dwm::{
+        DWM_WINDOW_CORNER_PREFERENCE, DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND,
+        DwmSetWindowAttribute,
+    };
+    let Ok(hwnd) = window.hwnd() else { return };
+    let preference = DWMWCP_ROUND;
+    // Cosmetic only: a failure leaves the system default corners.
+    let _ = unsafe {
+        DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_WINDOW_CORNER_PREFERENCE,
+            (&raw const preference).cast(),
+            size_of::<DWM_WINDOW_CORNER_PREFERENCE>() as u32,
+        )
+    };
 }

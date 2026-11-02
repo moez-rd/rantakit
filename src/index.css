@@ -27,6 +27,7 @@
   --color-*: initial;
 
   --color-bg: #ffffff;
+  --color-canvas: #eceef1;
   --color-sidebar: #f9fafb;
   --color-surface: #ffffff;
   --color-panel: #f9fafb;
@@ -96,6 +97,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-bg: #121212;
+  --color-canvas: #0e0e0e;
   --color-sidebar: #171717;
   --color-surface: #1c1c1c;
   --color-panel: #151515;
@@ -126,22 +128,60 @@
 }
 
 @layer base {
+
   html,
   body,
   #root {
     height: 100%;
   }
 
+  /* The shell stays put: no elastic bounce when a touchpad or finger swipes
+     past the edge (WebView2 and WebKit both bounce the root by default). */
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   body {
     @apply bg-bg text-text font-sans text-body antialiased;
     /* keep content clear of notches and gesture bars on mobile */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
-      env(safe-area-inset-left);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /*
+   * Thin scrollbar in the app's colors instead of the OS one. Uses the
+   * ::-webkit-scrollbar pseudo-elements, the one syntax WebView2, WebKitGTK
+   * and WKWebView all style; setting `scrollbar-color` would make WebView2
+   * ignore them. Touch screens keep their own overlay scrollbars.
+   */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* The transparent border keeps the thumb clear of the edges, and of a
+       card's rounded corners. */
+    ::-webkit-scrollbar-thumb {
+      border: 3px solid transparent;
+      border-radius: 9999px;
+      background: var(--color-border-strong) padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--color-control);
+    }
   }
 }
 
 /* iOS zooms into inputs smaller than 16px; unlayered so it wins over utilities */
 @media (pointer: coarse) {
+
   input,
   textarea,
   select {

@@ -7,7 +7,7 @@ const card = tv({
   extend: focusRing,
   base: [
     "flex flex-1 border border-border bg-surface text-start",
-    "cursor-default select-none transition-colors hovered:border-brand",
+    "cursor-default select-none transition-colors hover:border-brand",
     "[-webkit-tap-highlight-color:transparent]",
   ],
   variants: {

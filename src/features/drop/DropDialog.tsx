@@ -13,7 +13,7 @@ const toolRow = tv({
   extend: focusRing,
   base: [
     "flex w-full items-center gap-3.5 rounded-[14px] border border-border bg-surface py-3 ps-3.5 pe-3 text-start",
-    "cursor-default transition-colors hovered:border-brand",
+    "cursor-default transition-colors hover:border-brand",
   ],
 });
 

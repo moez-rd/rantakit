@@ -7,6 +7,7 @@ import { DropDialog } from "@/features/drop/DropDialog";
 import { dropHint } from "@/features/drop/dropHint";
 import { matchFiles, useDropMatch, type DropMatch } from "@/features/drop/dropMatch";
 import { DropOverlay } from "@/features/drop/DropOverlay";
+import { pickAnyFiles } from "@/features/drop/pickFiles";
 import { HomePage } from "@/features/home/HomePage";
 import type { ToolId } from "@/features/home/tools";
 import { HistoryPage } from "@/features/history/HistoryPage";
@@ -101,13 +102,16 @@ function App() {
   const [dropped, setDropped] = useState<Dropped | null>(null);
   const pageTool = page === "home" ? tool : null;
 
-  const dragging = useFileDrop(async (dropPaths) => {
-    if (job.isRunning) return;
-    const match = await matchFiles(dropPaths);
+  /** Files dropped on the window or chosen with "Buka": ask for a Tool, or add them to the open one. */
+  const receiveFiles = async (received: string[]) => {
+    if (job.isRunning || received.length === 0) return;
+    const match = await matchFiles(received);
     if (match.status !== "fits") return;
-    if (!pageTool) setDropped({ paths: dropPaths, match });
-    else if (match.tools.includes(pageTool)) addFiles(dropPaths);
-  });
+    if (!pageTool) setDropped({ paths: received, match });
+    else if (match.tools.includes(pageTool)) addFiles(received);
+  };
+
+  const dragging = useFileDrop(receiveFiles);
   const draggedMatch = useDropMatch(dragging);
 
   const chooseDropTool = (id: ToolId) => {
@@ -155,7 +159,11 @@ function App() {
   const noun = tool ? toolDef(tool).noun : "photo";
 
   return (
-    <AppShell page={page} onNavigate={(next) => navigate(next)} onCommand={runCommand}>
+    <AppShell
+      page={page}
+      onNavigate={(next) => navigate(next)}
+      onOpen={async () => receiveFiles(await pickAnyFiles())}
+    >
       {page === "home" &&
         (tool ? (
           <ToolPage

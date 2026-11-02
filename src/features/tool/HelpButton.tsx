@@ -8,7 +8,7 @@ const button = tv({
   extend: focusRing,
   base: [
     "inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-border-strong",
-    "text-[12px] leading-none font-bold text-text-muted cursor-default hovered:text-text",
+    "text-[12px] leading-none font-bold text-text-muted cursor-default hover:text-text",
   ],
 });
 

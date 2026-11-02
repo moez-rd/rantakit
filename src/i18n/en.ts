@@ -8,6 +8,7 @@ export const en: Messages = {
   "nav.home": "Home",
   "nav.history": "History",
   "nav.settings": "Settings",
+  "nav.open": "Open",
   "menu.label": "Menu",
   "menu.kompresFoto": "Compress Photo…",
   "menu.kompresPdf": "Compress PDF…",
@@ -72,6 +73,8 @@ export const en: Messages = {
   "picker.photos": "Choose photos",
   "picker.photos.filter": "Photos",
   "picker.pdfs": "Choose PDFs",
+  "picker.files": "Choose files",
+  "picker.files.filter": "Photos and PDFs",
 
   // Home
   "home.recent": "Recent tools",
@@ -324,4 +327,10 @@ export const en: Messages = {
   "settings.results.change": "Change folder",
   "settings.results.pick": "Choose a folder for result files",
   "about.source": "View source code",
+
+  // Title bar
+  "window.minimize": "Minimize",
+  "window.maximize": "Maximize",
+  "window.restore": "Restore",
+  "window.close": "Close",
 };

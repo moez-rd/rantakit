@@ -12,7 +12,7 @@ const box = tv({
 
 const clear = tv({
   extend: focusRing,
-  base: "flex size-11 shrink-0 items-center justify-center rounded-[10px] text-text-muted hovered:bg-badge-bg hovered:text-text",
+  base: "flex size-11 shrink-0 items-center justify-center rounded-[10px] text-text-muted hover:bg-badge-bg hover:text-text",
 });
 
 interface SearchBoxProps {
