@@ -24,11 +24,19 @@ export type ToolOptions =
       quality?: number;
       /** "Resolusi gambar maksimum", in dpi on an A4 page. */
       maxDpi?: number;
+    }
+  | {
+      tool: "ubah-format-foto";
+      to: "jpeg" | "png";
+      /** JPG quality 1–100; defaults to 90 on the Rust side. */
+      quality?: number;
+      /** "#rrggbb" behind transparent parts when a PNG becomes a JPG; white when omitted. */
+      background?: string;
     };
 
 /** The Size limit in bytes these options aim for, if any. */
 export function limitOf(options: ToolOptions): number | undefined {
-  return options.limit;
+  return "limit" in options ? options.limit : undefined;
 }
 
 /** Mirrors `TaskRequest` in `src-tauri/src/commands/task.rs`. */

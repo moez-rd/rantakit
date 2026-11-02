@@ -10,7 +10,7 @@ use std::path::Path;
 use ::image::{DynamicImage, ImageDecoder, ImageError, ImageFormat as RawFormat, ImageReader};
 use rantakit_core::{Tracker, read_original, write_result};
 
-pub use options::{Compressed, ImageFormat, ImageOptions, OutputFormat, Target};
+pub use options::{Compressed, ImageFormat, ImageOptions, OutputFormat, Target, WHITE};
 pub use preview::{PhotoInfo, photo_info, thumbnail};
 pub use rantakit_core::{CancelToken, ErrorKind, Progress, Result};
 
@@ -46,6 +46,11 @@ pub fn compress_image(
     let img = match opts.max_dimension {
         Some(max) => resize::fit_within(img, max),
         None => img,
+    };
+    let img = if format == ImageFormat::Jpeg && img.color().has_alpha() {
+        DynamicImage::ImageRgb8(encode::flatten_on(&img, opts.background))
+    } else {
+        img
     };
     tracker.step(RESIZED)?;
 

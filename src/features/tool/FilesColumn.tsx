@@ -7,6 +7,7 @@ import { useT } from "@/i18n";
 import type { JobItem } from "@/features/compress/useCompressJob";
 import { formatBytes } from "@/lib/format";
 import { useFileInfo, useThumbnail, type FileInfo } from "./fileInfo";
+import { unchangedNote } from "./unchanged";
 
 export const NOUN_ICONS = { photo: Image, pdf: File };
 
@@ -15,12 +16,14 @@ interface FilesColumnProps {
   paths: string[];
   /** While a Task runs: each file's progress, in place of the remove buttons. */
   items?: JobItem[];
+  /** "Sudah JPG, tidak diubah" for a file the chosen options would leave as it is. */
+  skipNote?: (info: FileInfo) => string | null;
   onPick: () => void;
   onRemove: (path: string) => void;
 }
 
 /** The Files step: one drop zone while empty, then a row per file and "Tambah foto". */
-export function FilesColumn({ noun, paths, items, onPick, onRemove }: FilesColumnProps) {
+export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: FilesColumnProps) {
   const tr = useT();
   const { t, count, locale } = tr;
   const infos = useFileInfo(paths);
@@ -57,7 +60,14 @@ export function FilesColumn({ noun, paths, items, onPick, onRemove }: FilesColum
         {items
           ? items.map((item) => <WorkingRow key={item.path} item={item} noun={noun} />)
           : paths.map((path) => (
-              <ReadyRow key={path} path={path} noun={noun} info={infos[path]} onRemove={() => onRemove(path)} />
+              <ReadyRow
+                key={path}
+                path={path}
+                noun={noun}
+                info={infos[path]}
+                skipNote={infos[path] ? skipNote?.(infos[path]) : null}
+                onRemove={() => onRemove(path)}
+              />
             ))}
       </ul>
 
@@ -75,11 +85,13 @@ function ReadyRow({
   path,
   noun,
   info,
+  skipNote,
   onRemove,
 }: {
   path: string;
   noun: "photo" | "pdf";
   info?: FileInfo;
+  skipNote?: string | null;
   onRemove: () => void;
 }) {
   const { t, count, locale } = useT();
@@ -88,6 +100,7 @@ function ReadyRow({
   const meta = [
     info?.pages != null ? count("pages", info.pages) : null,
     info?.size != null ? formatBytes(info.size, locale) : null,
+    skipNote,
   ].filter(Boolean);
 
   return (
@@ -131,6 +144,8 @@ function WorkingRow({ item, noun }: { item: JobItem; noun: "photo" | "pdf" }) {
       );
     case "cancelled":
       return <FileRow {...common} status="skipped" note={t("task.file.cancelled")} />;
+    case "unchanged":
+      return <FileRow {...common} status="skipped" note={unchangedNote(t, item.options)} />;
     case "failed":
       return <FileRow {...common} status="failed" note={t("task.file.failed")} />;
   }

@@ -1,28 +1,32 @@
 import type { ComponentType } from "react";
-import { CircleStop, CircleX, TriangleAlert, type IconProps } from "@keyline-icons/react";
+import { CircleCheck, CircleStop, CircleX, TriangleAlert, type IconProps } from "@keyline-icons/react";
 import { Button } from "@/components/ui/Button";
 import { tv } from "@/lib/react-aria-utils";
 
-/** Red for a failed file, amber for a Size limit not reached, grey for a cancelled file. */
-export type ProblemTone = "failed" | "limit" | "cancelled";
+/**
+ * Red for a failed file, amber for a Size limit not reached, grey for a
+ * cancelled file or one already as asked.
+ */
+export type ProblemTone = "failed" | "limit" | "cancelled" | "unchanged";
 
 const TONE_ICON: Record<ProblemTone, ComponentType<IconProps>> = {
   failed: CircleX,
   limit: TriangleAlert,
   cancelled: CircleStop,
+  unchanged: CircleCheck,
 };
 
 const row = tv({
   base: "flex items-center gap-4 px-4 py-3.5",
   variants: {
-    tone: { failed: "bg-danger-soft", limit: "bg-warn-soft", cancelled: "" },
+    tone: { failed: "bg-danger-soft", limit: "bg-warn-soft", cancelled: "", unchanged: "" },
   },
 });
 
 const message = tv({
   base: "flex items-start gap-2 text-small font-medium",
   variants: {
-    tone: { failed: "text-danger", limit: "text-warn", cancelled: "text-text-muted" },
+    tone: { failed: "text-danger", limit: "text-warn", cancelled: "text-text-muted", unchanged: "text-text-muted" },
   },
 });
 

@@ -21,7 +21,13 @@ pub struct ImageOptions {
     pub format: OutputFormat,
     pub target: Target,
     pub max_dimension: Option<u32>,
+    /// What shows through transparent parts when the Result is a JPG, which
+    /// has no transparency.
+    pub background: [u8; 3],
 }
+
+/// The usual background for transparent parts: white.
+pub const WHITE: [u8; 3] = [255, 255, 255];
 
 #[derive(Debug, Clone)]
 pub struct Compressed {

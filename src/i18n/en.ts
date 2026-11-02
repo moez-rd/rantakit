@@ -99,7 +99,7 @@ export const en: Messages = {
   // Working and Result
   "task.cancel": "Cancel",
   "task.file.waiting": "Waiting",
-  "task.file.working": "Compressing… {percent}%",
+  "task.file.working": "{percent}%",
   "task.file.cancelled": "Cancelled",
   "task.showInFolder": "Show in folder",
   "task.retry": "Try again",
@@ -249,4 +249,19 @@ export const en: Messages = {
   "leave.body.pdf": "The PDFs you added will be removed from the list. Your original files stay safe.",
   "leave.leave": "Leave",
   "leave.stay": "Stay here",
+
+  // Ubah Format Foto
+  "main.ubah-format-foto": "Convert",
+  "working.ubah-format-foto": "Converting {current} of {files}…",
+  "convert.to": "Convert to",
+  "convert.quality": "JPG quality (1–100)",
+  "convert.quality.help": "Higher makes a clearer photo but a larger file. 90 is already very clear for almost any use.",
+  "convert.background": "Background color",
+  "convert.background.help": "Used when a PNG has transparent parts. A JPG can't be transparent, so those parts are filled with this color.",
+  "convert.background.white": "White",
+  "convert.background.black": "Black",
+  "convert.background.custom": "Choose color",
+  "unchanged.format": "Already {format}, not changed",
+  "error.unchanged": "Not changed",
+  "result.nothingChanged": "Every file was already as asked, so nothing was changed.",
 };

@@ -12,9 +12,9 @@ import type { ToolInfo } from "@/features/home/tools";
 const TOOLS: ToolInfo[] = [
   { id: "kompres-foto", job: "kecilkan-ubah", comingSoon: false },
   { id: "kompres-pdf", job: "kecilkan-ubah", comingSoon: false },
+  { id: "ubah-format-foto", job: "kecilkan-ubah", comingSoon: false },
   ...(
     [
-      ["ubah-format-foto", "kecilkan-ubah"],
       ["ubah-ukuran-foto", "kecilkan-ubah"],
       ["kompres-dokumen", "kecilkan-ubah"],
       ["kompres-audio", "kecilkan-ubah"],
@@ -51,6 +51,7 @@ function sizeOf(path: string) {
 }
 
 const isPdf = (path: string) => path.toLowerCase().endsWith(".pdf");
+const kindOf = (path: string) => (isPdf(path) ? "pdf" : path.toLowerCase().endsWith(".png") ? "png" : "jpg");
 
 /** A soft gradient as a JPG, in place of a real thumbnail. */
 async function fakeThumbnail(path: string, size: number) {
@@ -72,7 +73,7 @@ const cancelled = new Set<number>();
 let nextTask = 1;
 
 interface TaskArgs {
-  request: { options: { tool: string }; paths: string[] };
+  request: { options: { tool: string; to?: string }; paths: string[] };
   onEvent: { onmessage: (message: unknown) => void };
 }
 
@@ -98,6 +99,11 @@ function runTask({ request, onEvent }: TaskArgs) {
         continue;
       }
       const size = sizeOf(path);
+      const { to } = request.options;
+      if (to && kindOf(path) === (to === "jpeg" ? "jpg" : "png")) {
+        send({ event: "fileDone", file, outcome: { status: "failed", error: { code: "unchanged" } } });
+        continue;
+      }
       if (has("fail") && file === 1) {
         send({
           event: "fileDone",
@@ -107,6 +113,7 @@ function runTask({ request, onEvent }: TaskArgs) {
         continue;
       }
       const dot = path.lastIndexOf(".");
+      const extension = to ? (to === "jpeg" ? ".jpg" : ".png") : path.slice(dot);
       send({
         event: "fileDone",
         file,
@@ -114,7 +121,7 @@ function runTask({ request, onEvent }: TaskArgs) {
           status: "done",
           result: {
             inputPath: path,
-            outputPath: `${path.slice(0, dot)} (${suffix})${path.slice(dot)}`,
+            outputPath: `${path.slice(0, dot)} (${suffix})${extension}`,
             originalBytes: size,
             compressedBytes: Math.round(size * 0.12),
           },
@@ -139,12 +146,12 @@ export function installDevMocks() {
         const paths = (args as { paths: string[] }).paths;
         if (paths.every(isPdf)) return { status: "fits", kinds: ["pdf"], tools: ["kompres-pdf"] };
         if (paths.some(isPdf)) return { status: "mixed" };
-        return { status: "fits", kinds: ["jpg"], tools: ["kompres-foto"] };
+        return { status: "fits", kinds: ["jpg"], tools: ["kompres-foto", "ubah-format-foto"] };
       }
       case "file_info":
         return (args as { paths: string[] }).paths.map((path) => ({
           size: sizeOf(path),
-          kind: isPdf(path) ? "pdf" : "jpg",
+          kind: kindOf(path),
           pages: isPdf(path) ? 1 + (sizeOf(path) % 5) : null,
           longestSide: isPdf(path) ? null : 4000,
         }));

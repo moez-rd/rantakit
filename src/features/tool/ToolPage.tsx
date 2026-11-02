@@ -7,9 +7,11 @@ import { TOOL_ICONS } from "@/features/home/tools";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
+import { useFileInfo, type FileInfo } from "./fileInfo";
 import { FilesColumn } from "./FilesColumn";
 import { ResultView } from "./ResultView";
 import { toolDef, type ShippedTool } from "./tools";
+import { unchangedNote } from "./unchanged";
 
 interface ToolPageProps {
   tool: ShippedTool;
@@ -30,6 +32,12 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
   const { t, count } = useT();
   const def = toolDef(tool);
   const [settings, update] = def.useSettings();
+  const infos = useFileInfo(paths);
+  const files = paths.flatMap((path) => (infos[path] ? [infos[path]] : []));
+  const request = def.toRequest(settings, files);
+  const skipNote = def.leavesUnchanged
+    ? (info: FileInfo) => (def.leavesUnchanged!(request, info) ? unchangedNote(t, request) : null)
+    : undefined;
   const Icon = TOOL_ICONS[tool];
   const running = job.isRunning;
   const hasResult = !running && job.items.length > 0;
@@ -60,6 +68,7 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
               noun={def.noun}
               paths={paths}
               items={running ? job.items : undefined}
+              skipNote={skipNote}
               onPick={onPick}
               onRemove={onRemove}
             />
@@ -73,10 +82,10 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
               inert={running}
               className={`flex flex-col gap-[22px] overflow-y-auto p-5 transition-opacity ${running ? "opacity-45" : ""}`}
             >
-              <def.Main settings={settings} onChange={update} />
-              {def.Advanced && (
+              <def.Main settings={settings} onChange={update} files={files} />
+              {def.Advanced && (def.showAdvanced?.(settings, files) ?? true) && (
                 <MoreOptions tool={tool}>
-                  <def.Advanced settings={settings} onChange={update} />
+                  <def.Advanced settings={settings} onChange={update} files={files} />
                 </MoreOptions>
               )}
             </div>
@@ -91,8 +100,8 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
                   onCancel={job.cancel}
                 />
               ) : (
-                <Button isDisabled={paths.length === 0} onPress={() => onStart(def.toRequest(settings))}>
-                {t(`main.${tool}`)}
+                <Button isDisabled={paths.length === 0} onPress={() => onStart(request)}>
+                  {t(`main.${tool}`)}
                 </Button>
               )}
               {!running && paths.length === 0 && (

@@ -23,6 +23,7 @@ import { isWindowsApp } from "@/lib/platform";
 import { tv } from "@/lib/react-aria-utils";
 import { useThumbnail } from "./fileInfo";
 import { NOUN_ICONS } from "./FilesColumn";
+import { unchangedNote } from "./unchanged";
 
 interface ResultViewProps {
   job: CompressJob;
@@ -62,18 +63,25 @@ export function ResultView({ job, noun, resultsFolder, onProcessAnother }: Resul
   const done = items.flatMap((item) => (item.status === "done" ? [item] : []));
   const cancelled = items.some((item) => item.status === "cancelled");
   const failed = items.filter((item) => item.status === "failed").length;
+  const unchanged = items.filter((item) => item.status === "unchanged").length;
+  const finished = done.length + unchanged;
   const tone = cancelled ? "cancelled" : failed > 0 ? "partial" : "done";
   const files = count(`files.${noun}`, items.length);
   const limit = done.length > 0 ? limitOf(done[0].options) : undefined;
 
   const title = {
     done: t("result.done", { files }),
-    partial: t("result.partial", { done: done.length, files }),
-    cancelled: t("result.cancelled", { done: done.length, files }),
+    partial: t("result.partial", { done: finished, files }),
+    cancelled: t("result.cancelled", { done: finished, files }),
   }[tone];
   const saved = resultsFolder ? t("result.savedIn", { folder: resultsFolder }) : t("result.savedNext");
   const body = {
-    done: limit ? `${t("result.underLimit.all", { limit: formatBytes(limit, locale) })} ${saved}` : saved,
+    done:
+      done.length === 0
+        ? t("result.nothingChanged")
+        : limit
+          ? `${t("result.underLimit.all", { limit: formatBytes(limit, locale) })} ${saved}`
+          : saved,
     partial: t("result.partial.body", { failed: count(`files.${noun}`, failed) }),
     cancelled: t(`result.cancelled.body.${noun}`),
   }[tone];
@@ -213,6 +221,8 @@ function ResultRow({ tr, item, noun, canRetry, onRetry }: ResultRowProps) {
         </li>
       );
     }
+    case "unchanged":
+      return <ProblemRow {...common} tone="unchanged" message={unchangedNote(t, item.options)} />;
     case "cancelled":
     case "pending":
     case "working":

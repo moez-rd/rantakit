@@ -132,13 +132,7 @@ const OFFICE: &[FileKind] = &[Word, Excel, PowerPoint];
 pub const CATALOGUE: &[Tool] = &[
     tool(ToolId::KompresFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(ToolId::KompresPdf, KecilkanUbah, &[Pdf], ALL, Shipped),
-    tool(
-        ToolId::UbahFormatFoto,
-        KecilkanUbah,
-        &[Jpg, Png, Heic, Webp],
-        ALL,
-        ComingSoon,
-    ),
+    tool(ToolId::UbahFormatFoto, KecilkanUbah, PHOTOS, ALL, Shipped),
     tool(
         ToolId::UbahUkuranFoto,
         KecilkanUbah,
@@ -311,9 +305,12 @@ mod tests {
     }
 
     #[test]
-    fn photos_fit_kompres_foto_and_pdfs_fit_kompres_pdf() {
+    fn photos_fit_the_photo_tools_and_pdfs_fit_kompres_pdf() {
         let on = Platform::Windows;
-        assert_eq!(tools_for_kinds(&[Jpg, Png], on), [ToolId::KompresFoto]);
+        assert_eq!(
+            tools_for_kinds(&[Jpg, Png], on),
+            [ToolId::KompresFoto, ToolId::UbahFormatFoto]
+        );
         assert_eq!(tools_for_kinds(&[Pdf, Pdf], on), [ToolId::KompresPdf]);
     }
 
@@ -335,7 +332,7 @@ mod tests {
             match_kinds(&[Jpg, Png], on),
             FileMatch::Fits {
                 kinds: vec![Jpg, Png],
-                tools: vec![ToolId::KompresFoto]
+                tools: vec![ToolId::KompresFoto, ToolId::UbahFormatFoto]
             }
         );
         assert_eq!(match_kinds(&[Jpg, Pdf], on), FileMatch::Mixed);

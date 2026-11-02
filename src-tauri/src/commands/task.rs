@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
     CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
-    Progress, Task, TaskEvent, ToolOptions, dpi_to_side, run_task,
+    Progress, Task, TaskEvent, ToolOptions, WHITE, dpi_to_side, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -62,6 +62,16 @@ pub enum OptionsRequest {
         #[serde(flatten)]
         compression: CompressionRequest,
     },
+    UbahFormatFoto {
+        to: Format,
+        /// JPG quality; ignored for PNG.
+        #[serde(default = "default_convert_quality")]
+        quality: u8,
+        /// "#rrggbb" behind transparent parts of a PNG that becomes a JPG;
+        /// white when omitted or unreadable.
+        #[serde(default)]
+        background: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -69,6 +79,19 @@ pub enum OptionsRequest {
 pub enum Format {
     Jpeg,
     Png,
+}
+
+fn default_convert_quality() -> u8 {
+    90
+}
+
+/// "#1a2b3c" as RGB; white for anything else.
+fn parse_color(hex: Option<&str>) -> [u8; 3] {
+    let channel = |hex: &str, at: usize| u8::from_str_radix(hex.get(at..at + 2)?, 16).ok();
+    hex.and_then(|hex| hex.strip_prefix('#'))
+        .filter(|hex| hex.len() == 6)
+        .and_then(|hex| Some([channel(hex, 0)?, channel(hex, 2)?, channel(hex, 4)?]))
+        .unwrap_or(WHITE)
 }
 
 /// The compress Tools' Options; `rantakit_tasks::Compression` turns them into engine options.
@@ -128,6 +151,18 @@ impl From<OptionsRequest> for ToolOptions {
             OptionsRequest::KompresPdf { compression } => {
                 Self::KompresPdf(Compression::from(compression).pdf())
             }
+            OptionsRequest::UbahFormatFoto {
+                to,
+                quality,
+                background,
+            } => Self::convert(
+                match to {
+                    Format::Jpeg => ImageFormat::Jpeg,
+                    Format::Png => ImageFormat::Png,
+                },
+                quality,
+                parse_color(background.as_deref()),
+            ),
         }
     }
 }
@@ -294,8 +329,17 @@ mod tests {
                 format: OutputFormat::Same,
                 target: Target::MaxBytes(200_000),
                 max_dimension: None,
+                ..
             })
         ));
+    }
+
+    #[test]
+    fn background_colors_are_read_from_hex() {
+        assert_eq!(parse_color(Some("#000000")), [0, 0, 0]);
+        assert_eq!(parse_color(Some("#1a2B3c")), [0x1a, 0x2b, 0x3c]);
+        assert_eq!(parse_color(Some("merah")), WHITE);
+        assert_eq!(parse_color(None), WHITE);
     }
 
     #[test]

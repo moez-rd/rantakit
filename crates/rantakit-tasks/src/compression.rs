@@ -2,7 +2,7 @@
 //! options. Every number the user never sees lives here, in one place, to be
 //! tuned with real documents.
 
-use rantakit_image::{ImageOptions, OutputFormat, Target};
+use rantakit_image::{ImageOptions, OutputFormat, Target, WHITE};
 use rantakit_pdf::PdfOptions;
 
 /// "Kecilkan saja": how small, in plain words.
@@ -71,6 +71,7 @@ impl Compression {
             format,
             target,
             max_dimension,
+            background: WHITE,
         }
     }
 

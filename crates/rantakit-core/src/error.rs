@@ -29,6 +29,11 @@ pub enum ErrorKind {
     /// The cancel token was set. An outcome, not a problem.
     #[error("cancelled")]
     Cancelled,
+
+    /// The file is already what the Tool would make, such as a JPG for
+    /// "Ubah ke JPG". No Result is written. An outcome, not a problem.
+    #[error("already as asked, nothing to change")]
+    Unchanged,
 }
 
 pub type Result<T> = std::result::Result<T, ErrorKind>;
@@ -45,6 +50,7 @@ impl ErrorKind {
             Self::CannotWrite => "cannot-write",
             Self::OriginalMissing => "original-missing",
             Self::Cancelled => "cancelled",
+            Self::Unchanged => "unchanged",
         }
     }
 

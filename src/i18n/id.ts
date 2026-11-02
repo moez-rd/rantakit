@@ -101,7 +101,7 @@ export const id = {
   // Working and Result
   "task.cancel": "Batalkan",
   "task.file.waiting": "Menunggu",
-  "task.file.working": "Mengompres… {percent}%",
+  "task.file.working": "{percent}%",
   "task.file.cancelled": "Dibatalkan",
   "task.showInFolder": "Tampilkan di folder",
   "task.retry": "Coba lagi",
@@ -252,4 +252,19 @@ export const id = {
   "leave.body.pdf": "PDF yang sudah ditambahkan akan dihapus dari daftar. File aslinya tetap aman.",
   "leave.leave": "Tinggalkan",
   "leave.stay": "Tetap di sini",
+
+  // Ubah Format Foto
+  "main.ubah-format-foto": "Ubah",
+  "working.ubah-format-foto": "Mengubah {current} dari {files}…",
+  "convert.to": "Ubah ke",
+  "convert.quality": "Kualitas JPG (1–100)",
+  "convert.quality.help": "Makin tinggi, foto makin jelas tapi filenya makin besar. 90 sudah sangat jelas untuk hampir semua keperluan.",
+  "convert.background": "Warna latar",
+  "convert.background.help": "Dipakai kalau foto PNG punya bagian transparan. JPG tidak bisa transparan, jadi bagian itu diisi warna ini.",
+  "convert.background.white": "Putih",
+  "convert.background.black": "Hitam",
+  "convert.background.custom": "Pilih warna",
+  "unchanged.format": "Sudah {format}, tidak diubah",
+  "error.unchanged": "Tidak diubah",
+  "result.nothingChanged": "Semua file sudah sesuai, jadi tidak ada yang diubah.",
 } as const;

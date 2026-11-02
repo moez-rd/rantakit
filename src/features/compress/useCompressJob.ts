@@ -17,7 +17,8 @@ interface ItemBase {
 }
 
 export type JobItem =
-  | (ItemBase & { status: "pending" | "cancelled" })
+  /** "unchanged": already as asked, so no Result was written. */
+  | (ItemBase & { status: "pending" | "cancelled" | "unchanged" })
   | (ItemBase & { status: "working"; fraction: number })
   | (ItemBase & { status: "done"; result: TaskResult })
   | (ItemBase & { status: "failed"; error: TaskError });
@@ -69,6 +70,7 @@ export function useCompressJob() {
               const base = { path, name, options };
               if (outcome.status === "done") return { ...base, status: "done", result: outcome.result };
               if (outcome.error.code === "cancelled") return { ...base, status: "cancelled" };
+              if (outcome.error.code === "unchanged") return { ...base, status: "unchanged" };
               return { ...base, status: "failed", error: outcome.error };
             });
           }

@@ -11,6 +11,7 @@ type ErrorCode =
   | "cannot-write"
   | "original-missing"
   | "cancelled"
+  | "unchanged"
   | "history-from-newer-version"
   | "unexpected";
 
@@ -23,6 +24,7 @@ const CODES: ErrorCode[] = [
   "cannot-write",
   "original-missing",
   "cancelled",
+  "unchanged",
   "history-from-newer-version",
   "unexpected",
 ];

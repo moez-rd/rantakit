@@ -22,5 +22,5 @@ pub use names::result_path;
 pub use task::{Details, FileOutcome, ResultFile, Task, TaskEvent, ToolOptions, run_task};
 
 pub use rantakit_core::{CancelToken, ErrorKind, Progress};
-pub use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target, thumbnail};
+pub use rantakit_image::{ImageFormat, ImageOptions, OutputFormat, Target, WHITE, thumbnail};
 pub use rantakit_pdf::PdfOptions;
