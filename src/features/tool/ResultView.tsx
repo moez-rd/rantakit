@@ -18,6 +18,7 @@ import { limitOf, type TaskResult } from "@/features/compress/taskApi";
 import type { CompressJob, JobItem } from "@/features/compress/useCompressJob";
 import { useT, type Translator } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
+import { openPath } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
 import { isWindowsApp } from "@/lib/platform";
 import { tv } from "@/lib/react-aria-utils";
@@ -123,10 +124,6 @@ export function ResultView({ job, noun, resultsFolder, onProcessAnother }: Resul
 
 type DoneItem = Extract<JobItem, { status: "done" }>;
 
-function openResult(path: string) {
-  invoke("open_path", { path }).catch(() => {});
-}
-
 function shareResults(paths: string[]) {
   invoke("share_files", { paths }).catch(() => {});
 }
@@ -140,7 +137,7 @@ function ResultActions({ result, name }: { result: TaskResult; name: string }) {
         variant="secondary"
         size="row"
         aria-label={t("result.openName", { name })}
-        onPress={() => openResult(result.outputPath)}
+        onPress={() => openPath(result.outputPath)}
       >
         <SquareArrowOutUpRight aria-hidden className="size-[18px]" /> {t("result.open")}
       </Button>

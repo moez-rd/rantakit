@@ -9,7 +9,7 @@ import { matchFiles, useDropMatch, type DropMatch } from "@/features/drop/dropMa
 import { DropOverlay } from "@/features/drop/DropOverlay";
 import { HomePage } from "@/features/home/HomePage";
 import type { ToolId } from "@/features/home/tools";
-import { RecentsPage } from "@/features/recents/RecentsPage";
+import { HistoryPage } from "@/features/history/HistoryPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import {
   hasSettingsWindow,
@@ -143,8 +143,8 @@ function App() {
     switch (command) {
       case "go_home":
         return navigate("home");
-      case "go_recents":
-        return navigate("recents");
+      case "go_history":
+        return navigate("history");
       case "open_settings":
         return navigate("settings");
       case "open_about":
@@ -188,7 +188,7 @@ function App() {
         ) : (
           <HomePage onOpenTool={(id) => isShipped(id) && openTool(id)} />
         ))}
-      {page === "recents" && <RecentsPage />}
+      {page === "history" && <HistoryPage />}
       {page === "settings" && <SettingsPage tab={settingsTab} onTabChange={setSettingsTab} />}
       {dragging && (
         <DropOverlay

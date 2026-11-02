@@ -12,7 +12,7 @@ use tauri_plugin_opener::OpenerExt;
 pub const COMPRESS_IMAGE: &str = "compress_image";
 pub const COMPRESS_PDF: &str = "compress_pdf";
 pub const GO_HOME: &str = "go_home";
-pub const GO_RECENTS: &str = "go_recents";
+pub const GO_HISTORY: &str = "go_history";
 pub const OPEN_SOURCE: &str = "open_source";
 pub const OPEN_LICENSE: &str = "open_license";
 pub const OPEN_SETTINGS: &str = "open_settings";
@@ -192,7 +192,7 @@ fn build_in<R: Runtime>(app: &AppHandle<R>, l: &Labels) -> tauri::Result<Menu<R>
         true,
         &[
             &MenuItem::with_id(app, GO_HOME, l.home, true, Some("CmdOrCtrl+1"))?,
-            &MenuItem::with_id(app, GO_RECENTS, l.history, true, Some("CmdOrCtrl+2"))?,
+            &MenuItem::with_id(app, GO_HISTORY, l.history, true, Some("CmdOrCtrl+2"))?,
         ],
     )?;
 
@@ -226,7 +226,7 @@ pub fn handle_event<R: Runtime>(app: &AppHandle<R>, event: MenuEvent) {
     match event.id().as_ref() {
         OPEN_SOURCE => open_url(app, SOURCE_URL),
         OPEN_LICENSE => open_url(app, LICENSE_URL),
-        id @ (COMPRESS_IMAGE | COMPRESS_PDF | GO_HOME | GO_RECENTS | OPEN_SETTINGS) => {
+        id @ (COMPRESS_IMAGE | COMPRESS_PDF | GO_HOME | GO_HISTORY | OPEN_SETTINGS) => {
             if let Err(err) = app.emit_to("main", MENU_EVENT, id) {
                 eprintln!("failed to forward menu item {id}: {err}");
             }

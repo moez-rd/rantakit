@@ -71,6 +71,33 @@ async function fakeThumbnail(path: string, size: number) {
   return blob ? await blob.arrayBuffer() : new ArrayBuffer(0);
 }
 
+/** A day of Tasks, one from yesterday, and an older one whose Result was moved. */
+function sampleHistory() {
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const file = (name: string, suffix: string, exists = true) => {
+    const dot = name.lastIndexOf(".");
+    const originalPath = FOLDER + name;
+    return {
+      originalPath,
+      resultPath: `${FOLDER}${name.slice(0, dot)} (${suffix})${name.slice(dot)}`,
+      originalBytes: sizeOf(originalPath),
+      resultBytes: Math.round(sizeOf(originalPath) * 0.15),
+      exists,
+    };
+  };
+  return [
+    {
+      id: "3",
+      tool: "kompres-foto",
+      createdAt: now - 60 * 60 * 1000,
+      files: ["KTP.jpg", "Pas foto.jpg", "Ijazah scan.jpg"].map((name) => file(name, "compressed")),
+    },
+    { id: "2", tool: "kompres-pdf", createdAt: now - day, files: [file("Ijazah.pdf", "compressed")] },
+    { id: "1", tool: "ubah-format-foto", createdAt: now - 9 * day, files: [file("Logo.jpg", "converted", false)] },
+  ];
+}
+
 const cancelled = new Set<number>();
 const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
 const presets: { id: string; tool: string; name: string; options: object }[] = [];
@@ -149,7 +176,9 @@ export function installDevMocks() {
       case "list_tools":
         return TOOLS;
       case "list_history":
-        return [];
+        return has("recent") ? sampleHistory() : [];
+      case "clear_history":
+        return null;
       case "recent_limits":
         return has("recent") ? [...recentLimits] : [];
       case "list_presets": {

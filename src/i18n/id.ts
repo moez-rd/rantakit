@@ -127,13 +127,12 @@ export const id = {
   "history.title": "Riwayat",
   "history.loadFailed": "Riwayat tidak bisa dibuka",
   "history.empty": "Belum ada riwayat",
-  "history.empty.hint": "File yang kamu kompres akan muncul di sini.",
+  "history.empty.hint": "Hasil dari setiap alat akan muncul di sini.",
   "history.clear": "Hapus riwayat",
   "history.clear.title": "Hapus semua riwayat?",
   "history.clear.body": "Daftar ini akan dikosongkan. File hasil tidak ikut terhapus.",
   "history.clear.cancel": "Batal",
-  "history.missing": "File tidak ditemukan",
-  "history.remove": "Hapus dari riwayat",
+  "history.missing": "File hasil sudah dipindah atau dihapus",
 
   // Settings
   "settings.title": "Pengaturan",
@@ -297,4 +296,11 @@ export const id = {
   "preset.name.hint": "Pilih nama yang mudah dikenali, misalnya \"Pas foto CPNS: JPG, 200 KB\".",
   "preset.nameOf": "Nama preset {name}",
   "preset.remove": "Hapus {name}",
+
+  // Riwayat
+  "history.kept": "Disimpan 30 hari. File hasilnya tidak ikut terhapus.",
+  "history.today": "Hari ini",
+  "history.yesterday": "Kemarin",
+  "history.andMore": "{name} dan {count} lainnya",
+  "history.seeFiles": "Lihat {count} file",
 } as const;

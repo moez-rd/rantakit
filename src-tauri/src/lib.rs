@@ -36,7 +36,6 @@ pub fn run() {
             commands::task::start_task,
             commands::task::cancel_task,
             commands::history::list_history,
-            commands::history::remove_history,
             commands::history::clear_history,
             commands::history::recent_tools,
             commands::limits::recent_limits,

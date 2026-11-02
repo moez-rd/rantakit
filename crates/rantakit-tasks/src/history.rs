@@ -1,21 +1,19 @@
-//! History, stored as one JSON file in the app data folder. The shell says
-//! where that folder is.
+//! History ("Riwayat"): one entry per finished Task, stored as one JSON file
+//! in the app data folder. The shell says where that folder is.
 //!
 //! All access goes through [`History`], so the storage can later move to
 //! SQLite without touching the shells or the frontend.
 
 use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use rantakit_image::ImageFormat;
 use serde::{Deserialize, Serialize};
 
-use crate::catalogue::ToolId;
-use crate::task::{Details, FileOutcome, ResultFile, Task, ToolOptions};
+use crate::task::{FileOutcome, Task};
 
 #[derive(Debug, thiserror::Error)]
 pub enum HistoryError {
@@ -31,33 +29,34 @@ pub enum HistoryError {
 
 pub type Result<T> = std::result::Result<T, HistoryError>;
 
-/// Bump when the file layout changes, and migrate older versions on load.
-const VERSION: u32 = 1;
+/// Bump when the file layout changes. Version 1 kept one entry per file;
+/// v0.2 starts History afresh rather than migrating it.
+const VERSION: u32 = 2;
 /// Oldest entries are dropped beyond this.
 const MAX_ENTRIES: usize = 500;
 /// How many Tools "Terakhir dipakai" (Recent tools) shows on Home.
 pub const RECENT_TOOLS: usize = 4;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// One finished Task with at least one Result.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
     pub id: String,
-    /// The Tool that made this Result, by `ToolId::as_str`. Entries saved
-    /// before Tools were recorded get one from their format on load.
-    #[serde(default)]
+    /// The Tool that ran, by `ToolId::as_str`.
     pub tool: String,
     /// Unix time in milliseconds.
     pub created_at: u64,
-    pub input_path: PathBuf,
-    pub output_path: PathBuf,
+    /// Each Result, in the order the files were given.
+    pub files: Vec<EntryFile>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EntryFile {
+    pub original_path: PathBuf,
+    pub result_path: PathBuf,
     pub original_bytes: u64,
-    pub compressed_bytes: u64,
-    /// "jpeg", "png" or "pdf".
-    pub format: String,
-    /// Pixel size for images; `None` for PDFs.
-    pub width: Option<u32>,
-    pub height: Option<u32>,
-    pub quality: Option<u8>,
+    pub result_bytes: u64,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -65,6 +64,30 @@ struct HistoryFile {
     version: u32,
     /// Newest first.
     entries: Vec<Entry>,
+}
+
+/// Read before the rest, to tell an old or newer file from a broken one.
+#[derive(Deserialize)]
+struct Header {
+    version: u32,
+}
+
+/// What the history file holds.
+enum Stored {
+    Current(Vec<Entry>),
+    Older,
+    Newer(u32),
+}
+
+impl Stored {
+    fn parse(text: &str) -> serde_json::Result<Self> {
+        let header: Header = serde_json::from_str(text)?;
+        Ok(match header.version {
+            VERSION => Self::Current(serde_json::from_str::<HistoryFile>(text)?.entries),
+            newer if newer > VERSION => Self::Newer(newer),
+            _ => Self::Older,
+        })
+    }
 }
 
 pub struct History {
@@ -108,32 +131,33 @@ impl History {
         })
     }
 
-    /// Adds every Result of a finished Task, one entry per file.
+    /// Adds a finished Task as one entry with each of its Results. A Task
+    /// without any Result leaves no entry.
     pub fn record(&self, task: &Task, outcomes: &[FileOutcome]) -> Result<()> {
-        let created_at = now_ms();
-        let added: Vec<Entry> = task
+        let files: Vec<EntryFile> = task
             .originals
             .iter()
             .zip(outcomes)
             .filter_map(|(original, outcome)| {
                 let result = outcome.as_ref().ok()?;
-                Some(entry(&task.tool, original, result, created_at))
+                Some(EntryFile {
+                    original_path: original.clone(),
+                    result_path: result.path.clone(),
+                    original_bytes: result.original_size,
+                    result_bytes: result.size,
+                })
             })
             .collect();
-        if added.is_empty() {
+        if files.is_empty() {
             return Ok(());
         }
-
-        self.update(|entries| {
-            for entry in added {
-                entries.insert(0, entry);
-            }
-            entries.truncate(MAX_ENTRIES);
+        let created_at = now_ms();
+        self.add(Entry {
+            id: new_id(created_at),
+            tool: task.tool.id().as_str().into(),
+            created_at,
+            files,
         })
-    }
-
-    pub fn remove(&self, id: &str) -> Result<()> {
-        self.update(|entries| entries.retain(|entry| entry.id != id))
     }
 
     pub fn clear(&self) -> Result<()> {
@@ -154,10 +178,15 @@ impl History {
             Err(err) => return Err(err.into()),
         };
 
-        match serde_json::from_str::<HistoryFile>(&text) {
+        match Stored::parse(&text) {
+            Ok(Stored::Current(entries)) => Ok(entries),
             // Written by a newer app version: leave it untouched rather than lose data.
-            Ok(file) if file.version > VERSION => Err(HistoryError::Newer(file.version)),
-            Ok(file) => Ok(file.entries.into_iter().map(with_tool).collect()),
+            Ok(Stored::Newer(version)) => Err(HistoryError::Newer(version)),
+            // An older layout: History starts afresh.
+            Ok(Stored::Older) => {
+                fs::remove_file(&self.path)?;
+                Ok(Vec::new())
+            }
             Err(err) => {
                 // Keep the broken file for inspection and start over.
                 eprintln!("history file is unreadable, moving it aside: {err}");
@@ -183,64 +212,6 @@ impl History {
     }
 }
 
-/// Fills in the Tool of an entry saved before Tools were recorded: only
-/// Kompres Foto and Kompres PDF existed then.
-fn with_tool(mut entry: Entry) -> Entry {
-    if entry.tool.is_empty() {
-        let tool = if entry.format == "pdf" {
-            ToolId::KompresPdf
-        } else {
-            ToolId::KompresFoto
-        };
-        entry.tool = tool.as_str().into();
-    }
-    entry
-}
-
-fn entry(tool: &ToolOptions, original: &Path, result: &ResultFile, created_at: u64) -> Entry {
-    let (format, width, height, quality) = match &result.details {
-        Details::Photo {
-            format,
-            width,
-            height,
-            quality,
-        } => {
-            let format = match format {
-                ImageFormat::Jpeg => "jpeg",
-                ImageFormat::Png => "png",
-            };
-            (format, Some(*width), Some(*height), *quality)
-        }
-        Details::Pdf {
-            images_recompressed,
-            ..
-        } => {
-            // Only meaningful when an image was actually re-encoded.
-            let quality = match tool {
-                ToolOptions::KompresPdf(opts) if *images_recompressed > 0 => {
-                    Some(opts.quality.clamp(1, 100))
-                }
-                _ => None,
-            };
-            ("pdf", None, None, quality)
-        }
-    };
-
-    Entry {
-        id: new_id(created_at),
-        tool: tool.id().as_str().into(),
-        created_at,
-        input_path: original.to_path_buf(),
-        output_path: result.path.clone(),
-        original_bytes: result.original_size,
-        compressed_bytes: result.size,
-        format: format.into(),
-        width,
-        height,
-        quality,
-    }
-}
-
 /// Milliseconds since the Unix epoch.
 pub(crate) fn now_ms() -> u64 {
     SystemTime::now()
@@ -259,25 +230,22 @@ pub(crate) fn new_id(created_at: u64) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::path::Path;
 
-    fn entry(id: &str) -> Entry {
-        used(id, "kompres-foto")
-    }
+    use super::*;
+    use crate::task::{Details, ResultFile, ToolOptions};
 
     fn used(id: &str, tool: &str) -> Entry {
         Entry {
             id: id.into(),
             tool: tool.into(),
             created_at: 0,
-            input_path: "in.jpg".into(),
-            output_path: "in-rantakit.jpg".into(),
-            original_bytes: 100,
-            compressed_bytes: 50,
-            format: "jpeg".into(),
-            width: Some(1),
-            height: Some(1),
-            quality: Some(80),
+            files: vec![EntryFile {
+                original_path: "in.jpg".into(),
+                result_path: "in (compressed).jpg".into(),
+                original_bytes: 100,
+                result_bytes: 50,
+            }],
         }
     }
 
@@ -288,17 +256,14 @@ mod tests {
     }
 
     #[test]
-    fn add_remove_clear_round_trip() {
+    fn add_and_clear_round_trip() {
         let (history, dir) = temp_history("round-trip");
         assert!(history.list().unwrap().is_empty());
 
-        history.add(entry("a")).unwrap();
-        history.add(entry("b")).unwrap();
+        history.add(used("a", "kompres-foto")).unwrap();
+        history.add(used("b", "kompres-foto")).unwrap();
         let ids: Vec<_> = history.list().unwrap().into_iter().map(|e| e.id).collect();
         assert_eq!(ids, ["b", "a"], "newest entry should come first");
-
-        history.remove("b").unwrap();
-        assert_eq!(history.list().unwrap().len(), 1);
 
         history.clear().unwrap();
         assert!(history.list().unwrap().is_empty());
@@ -306,49 +271,57 @@ mod tests {
     }
 
     #[test]
-    fn records_each_result_of_a_task_newest_first() {
+    fn a_task_is_one_entry_with_each_of_its_results() {
         let (history, dir) = temp_history("record");
         let task = Task {
             tool: ToolOptions::KompresPdf(crate::PdfOptions {
-                quality: 150,
+                quality: 70,
                 max_dimension: None,
                 max_bytes: None,
             }),
             originals: vec!["a.pdf".into(), "b.pdf".into(), "c.pdf".into()],
             results_folder: None,
         };
-        let done = |path: &str, images_recompressed| {
+        let done = |path: &str| {
             Ok(ResultFile {
                 path: path.into(),
                 original_size: 100,
                 size: 40,
                 details: Details::Pdf {
                     images: 1,
-                    images_recompressed,
+                    images_recompressed: 1,
                 },
             })
         };
-
         let outcomes = [
-            done("a (compressed).pdf", 1),
+            done("a (compressed).pdf"),
             Err(crate::ErrorKind::Damaged),
-            done("c (compressed).pdf", 0),
+            done("c (compressed).pdf"),
         ];
         history.record(&task, &outcomes).unwrap();
 
         let entries = history.list().unwrap();
-        let outputs: Vec<_> = entries.iter().map(|e| e.output_path.clone()).collect();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0].tool, "kompres-pdf");
+        let files: Vec<(&Path, &Path)> = entries[0]
+            .files
+            .iter()
+            .map(|f| (f.original_path.as_path(), f.result_path.as_path()))
+            .collect();
         assert_eq!(
-            outputs,
+            files,
             [
-                PathBuf::from("c (compressed).pdf"),
-                PathBuf::from("a (compressed).pdf")
+                (Path::new("a.pdf"), Path::new("a (compressed).pdf")),
+                (Path::new("c.pdf"), Path::new("c (compressed).pdf"))
             ]
         );
-        assert_eq!(entries[0].quality, None, "no image was re-encoded");
-        assert_eq!(entries[1].quality, Some(100));
-        assert_eq!(entries[1].input_path, PathBuf::from("a.pdf"));
-        assert_eq!(entries[1].tool, "kompres-pdf");
+
+        let failed = [
+            Err(crate::ErrorKind::Damaged),
+            Err(crate::ErrorKind::Unchanged),
+        ];
+        history.record(&task, &failed).unwrap();
+        assert_eq!(history.list().unwrap().len(), 1, "no Result, no entry");
         fs::remove_dir_all(dir).unwrap();
     }
 
@@ -375,28 +348,14 @@ mod tests {
     }
 
     #[test]
-    fn entries_from_before_tools_were_recorded_get_one_from_their_format() {
-        let (history, dir) = temp_history("no-tool");
+    fn history_from_version_1_is_removed() {
+        let (history, dir) = temp_history("v1");
         fs::create_dir_all(&dir).unwrap();
-        let old = |id: &str, format: &str| {
-            format!(
-                r#"{{"id":"{id}","createdAt":0,"inputPath":"a","outputPath":"b","originalBytes":2,"compressedBytes":1,"format":"{format}","width":null,"height":null,"quality":null}}"#
-            )
-        };
-        let file = format!(
-            r#"{{"version":1,"entries":[{},{}]}}"#,
-            old("a", "pdf"),
-            old("b", "jpeg")
-        );
-        fs::write(&history.path, file).unwrap();
+        let old = r#"{"version":1,"entries":[{"id":"a","createdAt":0,"inputPath":"a","outputPath":"b","originalBytes":2,"compressedBytes":1,"format":"pdf","width":null,"height":null,"quality":null}]}"#;
+        fs::write(&history.path, old).unwrap();
 
-        let tools: Vec<_> = history
-            .list()
-            .unwrap()
-            .into_iter()
-            .map(|e| e.tool)
-            .collect();
-        assert_eq!(tools, ["kompres-pdf", "kompres-foto"]);
+        assert!(history.list().unwrap().is_empty());
+        assert!(!history.path.exists(), "the old file is removed");
         fs::remove_dir_all(dir).unwrap();
     }
 
@@ -405,11 +364,11 @@ mod tests {
         let (history, dir) = temp_history("cap");
         let full = (0..MAX_ENTRIES)
             .rev()
-            .map(|i| entry(&i.to_string()))
+            .map(|i| used(&i.to_string(), "kompres-foto"))
             .collect();
         history.save(full).unwrap();
 
-        history.add(entry("new")).unwrap();
+        history.add(used("new", "kompres-foto")).unwrap();
         let entries = history.list().unwrap();
         assert_eq!(entries.len(), MAX_ENTRIES);
         assert_eq!(entries[0].id, "new");
@@ -429,7 +388,7 @@ mod tests {
 
         assert!(matches!(history.list(), Err(HistoryError::Newer(99))));
         assert!(
-            history.add(entry("a")).is_err(),
+            history.add(used("a", "kompres-foto")).is_err(),
             "must not overwrite a newer file"
         );
         fs::remove_dir_all(dir).unwrap();

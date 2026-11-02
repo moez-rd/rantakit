@@ -18,7 +18,7 @@ pub use catalogue::{
     tools_for, tools_for_files, tools_for_kinds,
 };
 pub use compression::{Compression, Level, dpi_to_side};
-pub use history::{Entry, History, HistoryError};
+pub use history::{Entry, EntryFile, History, HistoryError};
 pub use info::{FileInfo, file_info};
 pub use kinds::{FileKind, detect_kind};
 pub use limits::{RECENT_LIMITS, RecentLimits};

@@ -6,7 +6,7 @@ import {
   Settings as SettingsFill,
 } from "@keyline-icons/react/fill";
 
-export type Page = "home" | "recents" | "settings";
+export type Page = "home" | "history" | "settings";
 
 type Icon = ComponentType<IconProps>;
 
@@ -20,7 +20,7 @@ export interface NavItem {
 
 export const MAIN_NAV: NavItem[] = [
   { id: "home", label: "nav.home", icon: House, currentIcon: HouseFill },
-  { id: "recents", label: "nav.history", icon: History, currentIcon: HistoryFill },
+  { id: "history", label: "nav.history", icon: History, currentIcon: HistoryFill },
 ];
 
 export const SETTINGS_NAV: NavItem = {

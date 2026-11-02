@@ -125,13 +125,12 @@ export const en: Messages = {
   "history.title": "History",
   "history.loadFailed": "History can't be opened",
   "history.empty": "No history yet",
-  "history.empty.hint": "Files you compress will show up here.",
+  "history.empty.hint": "Results from every Tool will show up here.",
   "history.clear": "Clear history",
   "history.clear.title": "Clear all history?",
   "history.clear.body": "This list will be emptied. Your Results are not deleted.",
   "history.clear.cancel": "Cancel",
-  "history.missing": "File not found",
-  "history.remove": "Remove from history",
+  "history.missing": "The Result file was moved or deleted",
 
   // Settings
   "settings.title": "Settings",
@@ -294,4 +293,11 @@ export const en: Messages = {
   "preset.name.hint": "Pick a name you'll recognize, like \"CPNS ID photo: JPG, 200 KB\".",
   "preset.nameOf": "Name of preset {name}",
   "preset.remove": "Delete {name}",
+
+  // Riwayat
+  "history.kept": "Kept for 30 days. Your Result files are not deleted.",
+  "history.today": "Today",
+  "history.yesterday": "Yesterday",
+  "history.andMore": "{name} and {count} more",
+  "history.seeFiles": "See {count} files",
 };
