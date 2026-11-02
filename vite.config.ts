@@ -16,13 +16,6 @@ export default defineConfig(() => ({
   // expose TAURI_ENV_PLATFORM etc. to the frontend
   envPrefix: ["VITE_", "TAURI_ENV_"],
 
-  // main window and the desktop settings window
-  build: {
-    rolldownOptions: {
-      input: ["index.html", "settings.html"],
-    },
-  },
-
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent Vite from obscuring rust errors

@@ -1,7 +1,7 @@
 import { Link } from "react-aria-components";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
-import { MAIN_NAV, SETTINGS_NAV, type Page } from "./navigation";
+import { MAIN_NAV, SETTINGS_NAV, type NavTarget, type Page } from "./navigation";
 
 const tabLink = tv({
   extend: focusRing,
@@ -15,7 +15,7 @@ const tabLink = tv({
 
 interface TabBarProps {
   page: Page;
-  onNavigate: (page: Page) => void;
+  onNavigate: (target: NavTarget) => void;
 }
 
 /** Bottom navigation for narrow (mobile) screens; replaces the sidebar. */

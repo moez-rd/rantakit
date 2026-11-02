@@ -8,6 +8,7 @@ import { TOOL_ICONS } from "@/features/home/tools";
 import { ManagePresetsDialog, SavePresetDialog } from "@/features/presets/PresetDialogs";
 import { PresetPicker } from "@/features/presets/PresetPicker";
 import { usePresets } from "@/features/presets/presetsApi";
+import { useAppSettings } from "@/features/settings/appSettings";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
@@ -44,6 +45,7 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
     updateSettings(patch);
     setPresetId(null);
   };
+  const appSettings = useAppSettings();
   const infos = useFileInfo(paths);
   const files = paths.flatMap((path) => (infos[path] ? [infos[path]] : []));
   const request = def.toRequest(settings, files);
@@ -72,7 +74,7 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
       </header>
 
       {hasResult ? (
-        <ResultView job={job} noun={def.noun} resultsFolder={null} onProcessAnother={onProcessAnother} />
+        <ResultView job={job} noun={def.noun} resultsFolder={appSettings?.resultsFolder ?? null} onProcessAnother={onProcessAnother} />
       ) : (
         <div className="flex flex-1 flex-col items-stretch gap-6 lg:flex-row lg:items-start">
           <section aria-label={t(`files.pick.${def.noun}`)} className="flex min-w-0 flex-1 flex-col">

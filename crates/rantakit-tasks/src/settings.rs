@@ -12,11 +12,17 @@ use crate::store::{JsonFile, Result};
 pub struct Settings {
     /// "Simpan riwayat": whether finished Tasks are added to History.
     pub keep_history: bool,
+    /// "Di folder pilihan": where every Result is saved. `None` saves each
+    /// Result next to its Original.
+    pub results_folder: Option<PathBuf>,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { keep_history: true }
+        Self {
+            keep_history: true,
+            results_folder: None,
+        }
     }
 }
 
@@ -49,6 +55,7 @@ mod tests {
         let dir = std::env::temp_dir().join("rantakit-settings-tests");
         let _ = std::fs::remove_dir_all(&dir);
         let store = SettingsStore::new(dir.join("settings.json"));
+        assert_eq!(store.get().unwrap(), Settings::default());
         assert!(store.get().unwrap().keep_history);
 
         store.update(|s| s.keep_history = false).unwrap();

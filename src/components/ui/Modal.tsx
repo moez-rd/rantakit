@@ -19,7 +19,8 @@ const modalStyles = tv({
   variants: {
     size: {
       normal: 'max-w-[min(90vw,450px)]',
-      wide: 'max-w-[min(90vw,560px)]'
+      wide: 'max-w-[min(90vw,560px)]',
+      large: 'max-w-[min(92vw,800px)]'
     },
     isEntering: {
       true: 'animate-in zoom-in-105 ease-out duration-200'
@@ -30,7 +31,7 @@ const modalStyles = tv({
   }
 });
 
-export function Modal({size = 'normal', ...props}: ModalOverlayProps & {size?: 'normal' | 'wide'}) {
+export function Modal({size = 'normal', ...props}: ModalOverlayProps & {size?: 'normal' | 'wide' | 'large'}) {
   return (
     <ModalOverlay {...props} className={overlayStyles}>
       <div className="sticky top-0 left-0 w-full h-(--visual-viewport-height) flex items-center justify-center box-border">

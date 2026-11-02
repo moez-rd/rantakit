@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use rantakit_tasks::{History, Settings, SettingsStore};
 use tauri::State;
 
@@ -19,4 +21,14 @@ pub fn set_keep_history(
         history.clear()?;
     }
     Ok(settings.update(|s| s.keep_history = keep)?)
+}
+
+/// "Tempat menyimpan hasil": a folder for every Result, or `None` for next
+/// to each Original.
+#[tauri::command]
+pub fn set_results_folder(
+    settings: State<'_, SettingsStore>,
+    folder: Option<PathBuf>,
+) -> Result<Settings> {
+    Ok(settings.update(|s| s.results_folder = folder)?)
 }

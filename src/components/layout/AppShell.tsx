@@ -3,11 +3,11 @@ import type { AppCommand } from "@/lib/appCommands";
 import { isMacApp } from "@/lib/platform";
 import { Sidebar } from "./Sidebar";
 import { TabBar } from "./TabBar";
-import type { Page } from "./navigation";
+import type { NavTarget, Page } from "./navigation";
 
 interface AppShellProps {
   page: Page;
-  onNavigate: (page: Page) => void;
+  onNavigate: (target: NavTarget) => void;
   onCommand: (command: AppCommand) => void;
   children: ReactNode;
 }

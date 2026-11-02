@@ -6,12 +6,14 @@ import {
   Settings as SettingsFill,
 } from "@keyline-icons/react/fill";
 
-export type Page = "home" | "history" | "settings";
+export type Page = "home" | "history";
+/** Where a navigation item leads: a page, or the Settings dialog over it. */
+export type NavTarget = Page | "settings";
 
 type Icon = ComponentType<IconProps>;
 
 export interface NavItem {
-  id: Page;
+  id: NavTarget;
   label: "nav.home" | "nav.history" | "nav.settings";
   icon: Icon;
   /** Shown while the item is the current page. */

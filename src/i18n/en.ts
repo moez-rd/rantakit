@@ -134,7 +134,6 @@ export const en: Messages = {
 
   // Settings
   "settings.title": "Settings",
-  "settings.tab.general": "General",
   "settings.tab.about": "About",
   "settings.theme": "Theme",
   "settings.theme.system": "Follow system",
@@ -310,4 +309,19 @@ export const en: Messages = {
   "settings.keepHistory.offTitle": "Turn off history?",
   "settings.keepHistory.offBody": "Your current history will be cleared. Result files are not deleted.",
   "settings.keepHistory.off": "Turn off",
+
+  // Settings dialog
+  "settings.tab.appearance": "Appearance",
+  "settings.tab.language": "Language",
+  "settings.tab.results": "Result files",
+  "settings.tab.history": "History",
+  "settings.textSize.sample": "This is how large your text will be.",
+  "settings.results.title": "Where Results are saved",
+  "settings.results.next": "Next to the original file",
+  "settings.results.next.description": "Each Result is saved in the same folder as its original.",
+  "settings.results.folder": "In a folder you choose",
+  "settings.results.folder.description": "Every Result is saved in one folder.",
+  "settings.results.change": "Change folder",
+  "settings.results.pick": "Choose a folder for Result files",
+  "about.source": "View source code",
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import type { Page } from "@/components/layout/navigation";
+import type { NavTarget, Page } from "@/components/layout/navigation";
 import type { ToolOptions } from "@/features/compress/taskApi";
 import { useCompressJob } from "@/features/compress/useCompressJob";
 import { DropDialog } from "@/features/drop/DropDialog";
@@ -10,12 +10,7 @@ import { DropOverlay } from "@/features/drop/DropOverlay";
 import { HomePage } from "@/features/home/HomePage";
 import type { ToolId } from "@/features/home/tools";
 import { HistoryPage } from "@/features/history/HistoryPage";
-import { SettingsPage } from "@/features/settings/SettingsPage";
-import {
-  hasSettingsWindow,
-  openSettingsWindow,
-  type SettingsTab,
-} from "@/features/settings/settingsWindow";
+import { SettingsDialog, type SettingsTab } from "@/features/settings/SettingsDialog";
 import { LeaveDialog } from "@/features/tool/LeaveDialog";
 import { ToolPage } from "@/features/tool/ToolPage";
 import { isShipped, toolDef, type ShippedTool } from "@/features/tool/tools";
@@ -38,7 +33,8 @@ function App() {
   const tr = useT();
   const { t } = tr;
   const [page, setPage] = useState<Page>("home");
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
+  /** The Settings dialog's tab while it is open over the page. */
+  const [settingsTab, setSettingsTab] = useState<SettingsTab | null>(null);
   /** The Tool page on screen, over Home. */
   const [tool, setTool] = useState<ShippedTool | null>(null);
   /** The Originals added to that page. */
@@ -46,15 +42,6 @@ function App() {
   const job = useCompressJob();
   /** What to do once the user agrees to leave the Tool page, and whether that stops a Task. */
   const [leaving, setLeaving] = useState<{ action: () => void; working: boolean } | null>(null);
-
-  const openPage = (next: Page, tab: SettingsTab) => {
-    if (next === "settings" && hasSettingsWindow) {
-      openSettingsWindow(tab);
-    } else {
-      if (next === "settings") setSettingsTab(tab);
-      setPage(next);
-    }
-  };
 
   /** Clears the Tool page; a running Task is stopped, and its finished Results stay. */
   const closeTool = () => {
@@ -70,12 +57,12 @@ function App() {
     else action();
   };
 
-  const navigate = (next: Page, tab: SettingsTab = "general") => {
-    // The settings window opens on top; the Tool page stays as it is.
-    if (next === "settings" && hasSettingsWindow) return openSettingsWindow(tab);
+  const navigate = (next: NavTarget, tab: SettingsTab = "appearance") => {
+    // Settings opens over the page; the Tool page stays as it is.
+    if (next === "settings") return setSettingsTab(tab);
     leaveTool(() => {
       closeTool();
-      openPage(next, tab);
+      setPage(next satisfies Page);
     });
   };
 
@@ -130,7 +117,7 @@ function App() {
 
   // Escape leaves the Tool page, asking first when files would be lost.
   useEffect(() => {
-    if (!pageTool || leaving || dropped) return;
+    if (!pageTool || leaving || dropped || settingsTab) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !e.defaultPrevented) leaveTool(closeTool);
     };
@@ -189,7 +176,9 @@ function App() {
           <HomePage onOpenTool={(id) => isShipped(id) && openTool(id)} />
         ))}
       {page === "history" && <HistoryPage />}
-      {page === "settings" && <SettingsPage tab={settingsTab} onTabChange={setSettingsTab} />}
+      {settingsTab && (
+        <SettingsDialog tab={settingsTab} onTabChange={setSettingsTab} onClose={() => setSettingsTab(null)} />
+      )}
       {dragging && (
         <DropOverlay
           {...dropHint(tr, { busy: job.isRunning, openTool: pageTool, match: draggedMatch, count: dragging.length })}

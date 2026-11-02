@@ -43,6 +43,7 @@ pub fn run() {
             commands::recent::recent_tools,
             commands::settings::get_settings,
             commands::settings::set_keep_history,
+            commands::settings::set_results_folder,
             commands::presets::list_presets,
             commands::presets::save_preset,
             commands::presets::rename_preset,

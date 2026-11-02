@@ -4,7 +4,7 @@ import { isMacApp } from "@/lib/platform";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { AppMenu } from "./AppMenu";
-import { MAIN_NAV, SETTINGS_NAV, type NavItem, type Page } from "./navigation";
+import { MAIN_NAV, SETTINGS_NAV, type NavItem, type NavTarget, type Page } from "./navigation";
 
 /** Sidebar item, 44 px: hover changes only the background. */
 const navLink = tv({
@@ -19,7 +19,7 @@ const navLink = tv({
 
 interface SidebarProps {
   page: Page;
-  onNavigate: (page: Page) => void;
+  onNavigate: (target: NavTarget) => void;
   onCommand: (command: AppCommand) => void;
 }
 

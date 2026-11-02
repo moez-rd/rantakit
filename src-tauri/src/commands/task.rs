@@ -40,9 +40,6 @@ impl RunningTasks {
 pub struct TaskRequest {
     pub options: OptionsRequest,
     pub paths: Vec<PathBuf>,
-    /// The Results folder chosen in Settings; omit to save next to each Original.
-    #[serde(default)]
-    pub results_folder: Option<PathBuf>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -303,10 +300,12 @@ pub fn start_task(
             eprintln!("could not remember the Size limit: {err}");
         }
     }
+    // "Tempat menyimpan hasil" from Settings; unreadable settings save next to each Original.
+    let settings = app.state::<SettingsStore>().get().unwrap_or_default();
     let task = Task {
         tool: request.options.into(),
         originals: request.paths,
-        results_folder: request.results_folder,
+        results_folder: settings.results_folder.clone(),
     };
     // Recent tools are kept even while History is off.
     if let Err(err) = app
@@ -343,11 +342,9 @@ pub fn start_task(
         );
 
         // The Results are already saved, so a History failure is only logged.
-        let keep = app
-            .state::<SettingsStore>()
-            .get()
-            .map_or(true, |settings| settings.keep_history);
-        if keep && let Err(err) = app.state::<History>().record(&task, &outcomes) {
+        if settings.keep_history
+            && let Err(err) = app.state::<History>().record(&task, &outcomes)
+        {
             eprintln!("task {id}: could not record history: {err}");
         }
         app.state::<RunningTasks>().remove(id);
@@ -381,7 +378,6 @@ mod tests {
         }))
         .unwrap();
 
-        assert!(request.results_folder.is_none());
         assert!(matches!(
             request.options.into(),
             ToolOptions::KompresFoto(ImageOptions {

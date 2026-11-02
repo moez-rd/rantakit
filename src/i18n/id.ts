@@ -136,7 +136,6 @@ export const id = {
 
   // Settings
   "settings.title": "Pengaturan",
-  "settings.tab.general": "Umum",
   "settings.tab.about": "Tentang",
   "settings.theme": "Tema",
   "settings.theme.system": "Ikuti sistem",
@@ -313,4 +312,19 @@ export const id = {
   "settings.keepHistory.offTitle": "Matikan riwayat?",
   "settings.keepHistory.offBody": "Riwayat yang ada akan dihapus. File hasil tidak ikut terhapus.",
   "settings.keepHistory.off": "Matikan",
+
+  // Settings dialog
+  "settings.tab.appearance": "Tampilan",
+  "settings.tab.language": "Bahasa",
+  "settings.tab.results": "File hasil",
+  "settings.tab.history": "Riwayat",
+  "settings.textSize.sample": "Begini besar teks yang kamu pilih.",
+  "settings.results.title": "Tempat menyimpan hasil",
+  "settings.results.next": "Di sebelah file aslinya",
+  "settings.results.next.description": "Hasil disimpan di folder yang sama dengan file aslinya.",
+  "settings.results.folder": "Di folder pilihan",
+  "settings.results.folder.description": "Semua hasil disimpan di satu folder.",
+  "settings.results.change": "Ganti folder",
+  "settings.results.pick": "Pilih folder untuk file hasil",
+  "about.source": "Lihat kode sumber",
 } as const;

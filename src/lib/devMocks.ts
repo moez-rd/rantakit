@@ -99,7 +99,7 @@ function sampleHistory() {
   ];
 }
 
-const appSettings = { keepHistory: !has("historyOff") };
+const appSettings = { keepHistory: !has("historyOff"), resultsFolder: null as string | null };
 const cancelled = new Set<number>();
 const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
 const presets: { id: string; tool: string; name: string; options: object }[] = [];
@@ -185,6 +185,9 @@ export function installDevMocks() {
         return { ...appSettings };
       case "set_keep_history":
         appSettings.keepHistory = (args as { keep: boolean }).keep;
+        return { ...appSettings };
+      case "set_results_folder":
+        appSettings.resultsFolder = (args as { folder: string | null }).folder;
         return { ...appSettings };
       case "recent_limits":
         return has("recent") ? [...recentLimits] : [];

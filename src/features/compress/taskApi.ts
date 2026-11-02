@@ -50,8 +50,6 @@ export function limitOf(options: ToolOptions): number | undefined {
 export interface TaskRequest {
   options: ToolOptions;
   paths: string[];
-  /** The Results folder chosen in Settings; omit to save next to each Original. */
-  resultsFolder?: string;
 }
 
 /** Mirrors `ResultMessage` in `src-tauri/src/commands/task.rs`. */
