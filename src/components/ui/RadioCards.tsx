@@ -17,7 +17,7 @@ const dot = tv({
   base: "mt-0.5 size-4.5 shrink-0 rounded-full border bg-surface transition-all",
   variants: {
     isSelected: {
-      false: "border-border-strong",
+      false: "border-control",
       true: "border-[calc(var(--spacing)*1.5)] border-brand-strong forced-colors:border-[Highlight]!",
     },
   },
