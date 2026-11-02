@@ -92,12 +92,9 @@ export const en: Messages = {
   "options.pdf.intro": "Text stays sharp. Only the images inside the PDF get smaller.",
   "options.advanced": "More options",
   "options.quality": "Quality (1–100)",
-  "options.quality.pdf": "Photo quality",
-  "options.quality.pdf.hint": "For JPG photos inside the PDF. Text and line drawings stay the same.",
+  "options.quality.pdf": "Image quality (1–100)",
   "options.dimension": "Image size",
-  "options.dimension.pdf.hint": "Limit for the longest side of photos inside the PDF.",
   "options.dimension.original": "Unchanged",
-  "options.dimension.px": "{px} px",
 
   // Working and Result
   "task.cancel": "Cancel",
@@ -171,6 +168,8 @@ export const en: Messages = {
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
+  "options.dpi": "Maximum image resolution",
+  "options.dpi.help": "How densely the dots of the images inside the PDF are packed. A low number makes the file smaller, but images may look less clear when zoomed in or printed. 150 dpi is usually enough for reading on screen.",
   "photoSize.large": "Large",
   "photoSize.medium": "Medium",
   "photoSize.small": "Small",

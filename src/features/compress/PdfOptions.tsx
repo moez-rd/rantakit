@@ -1,10 +1,11 @@
+import { Select, SelectItem } from "@/components/ui/Select";
+import { NumberInput } from "@/features/tool/NumberInput";
 import { OptionField } from "@/features/tool/OptionField";
 import { defineTool, type OptionsProps } from "@/features/tool/toolDef";
 import { useT } from "@/i18n";
-import { Select, SelectItem } from "@/components/ui/Select";
 import { pickPdfs } from "./pdfApi";
+import { MAX_DPIS, toPdfOptions, usePdfSettings, type PdfSettings } from "./pdfSettings";
 import { ShrinkOptions } from "./ShrinkOptions";
-import { MAX_DIMENSIONS, toPdfOptions, usePdfSettings, type PdfSettings } from "./pdfSettings";
 
 function Main({ settings, onChange }: OptionsProps<PdfSettings>) {
   const { t } = useT();
@@ -20,15 +21,29 @@ function Advanced({ settings, onChange }: OptionsProps<PdfSettings>) {
   const { t } = useT();
   return (
     <>
-      <OptionField label={t("options.dimension")} description={t("options.dimension.pdf.hint")}>
+      <OptionField
+        label={t("options.quality.pdf")}
+        help={t("options.quality.pdf.help")}
+        description={t("options.quality.overrides")}
+      >
+        <NumberInput
+          label={t("options.quality.pdf")}
+          minValue={1}
+          maxValue={100}
+          placeholder={t("options.quality.auto")}
+          value={settings.quality}
+          onChange={(quality) => onChange({ quality: quality === null ? null : Math.round(quality) })}
+        />
+      </OptionField>
+      <OptionField label={t("options.dpi")} help={t("options.dpi.help")}>
         <Select
-          aria-label={t("options.dimension")}
-          value={String(settings.maxDimension)}
-          onChange={(key) => onChange({ maxDimension: Number(key) })}
+          aria-label={t("options.dpi")}
+          value={String(settings.maxDpi)}
+          onChange={(key) => onChange({ maxDpi: Number(key) })}
         >
-          {MAX_DIMENSIONS.map((size) => (
-            <SelectItem key={size} id={String(size)}>
-              {size === 0 ? t("options.dimension.original") : t("options.dimension.px", { px: size })}
+          {MAX_DPIS.map((dpi) => (
+            <SelectItem key={dpi} id={String(dpi)}>
+              {dpi === 0 ? t("options.dimension.original") : `${dpi} dpi`}
             </SelectItem>
           ))}
         </Select>

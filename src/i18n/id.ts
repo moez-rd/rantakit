@@ -94,12 +94,9 @@ export const id = {
   "options.pdf.intro": "Teks tetap tajam. Hanya gambar di dalam PDF yang dikecilkan.",
   "options.advanced": "Pilihan lanjutan",
   "options.quality": "Kualitas (1–100)",
-  "options.quality.pdf": "Kualitas foto",
-  "options.quality.pdf.hint": "Untuk foto JPG di dalam PDF. Teks dan gambar garis tidak berubah.",
+  "options.quality.pdf": "Kualitas gambar (1–100)",
   "options.dimension": "Ukuran gambar",
-  "options.dimension.pdf.hint": "Batas sisi terpanjang foto di dalam PDF.",
   "options.dimension.original": "Tidak diubah",
-  "options.dimension.px": "{px} px",
 
   // Working and Result
   "task.cancel": "Batalkan",
@@ -174,6 +171,8 @@ export const id = {
   "error.unexpected": "Ada yang tidak beres. Coba lagi.",
 
   // Tool page
+  "options.dpi": "Resolusi gambar maksimum",
+  "options.dpi.help": "Seberapa rapat titik-titik gambar di dalam PDF. Angka kecil membuat file lebih kecil, tapi gambar bisa kurang jelas saat diperbesar atau dicetak. 150 dpi biasanya cukup untuk dibaca di layar.",
   "photoSize.large": "Besar",
   "photoSize.medium": "Sedang",
   "photoSize.small": "Kecil",

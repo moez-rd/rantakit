@@ -22,7 +22,8 @@ export type ToolOptions =
       level?: "smallest" | "balanced" | "clearest";
       /** Exact image quality 1–100 from Advanced options; wins over the limit. */
       quality?: number;
-      maxDimension?: number;
+      /** "Resolusi gambar maksimum", in dpi on an A4 page. */
+      maxDpi?: number;
     };
 
 /** The Size limit in bytes these options aim for, if any. */

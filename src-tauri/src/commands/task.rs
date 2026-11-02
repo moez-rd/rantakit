@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use rantakit_tasks::{
     CancelToken, Compression, ErrorKind, FileOutcome, History, ImageFormat, Level, OutputFormat,
-    Progress, Task, TaskEvent, ToolOptions, run_task,
+    Progress, Task, TaskEvent, ToolOptions, dpi_to_side, run_task,
 };
 use serde::{Deserialize, Serialize};
 use tauri::ipc::Channel;
@@ -85,6 +85,9 @@ pub struct CompressionRequest {
     pub quality: Option<u8>,
     #[serde(default)]
     pub max_dimension: Option<u32>,
+    /// Kompres PDF's "Resolusi gambar maksimum", in dpi on an A4 page.
+    #[serde(default)]
+    pub max_dpi: Option<u32>,
 }
 
 #[derive(Debug, Default, Clone, Copy, Deserialize)]
@@ -106,7 +109,7 @@ impl From<CompressionRequest> for Compression {
                 LevelRequest::Clearest => Level::Clearest,
             },
             quality: request.quality,
-            max_dimension: request.max_dimension,
+            max_dimension: request.max_dimension.or(request.max_dpi.map(dpi_to_side)),
         }
     }
 }
