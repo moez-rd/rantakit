@@ -13,7 +13,7 @@ let styles = tv({
     isSelected: {
       false:
         'border-transparent bg-transparent text-text-muted hover:text-text forced-colors:bg-[ButtonFace]! forced-colors:text-[ButtonText]!',
-      true: 'border-border bg-surface text-text forced-colors:bg-[Highlight]! forced-colors:text-[HighlightText]!'
+      true: 'border-control bg-surface text-text forced-colors:bg-[Highlight]! forced-colors:text-[HighlightText]!'
     },
     isDisabled: {
       true: 'border-transparent bg-badge-bg forced-colors:bg-[ButtonFace]! text-text-disabled forced-colors:text-[GrayText]!'

@@ -17,7 +17,7 @@ import {Popover} from '@/components/ui/Popover';
 
 const styles = tv({
   extend: focusRing,
-  base: 'flex items-center text-start gap-4 w-full font-sans border border-border cursor-default rounded-lg pl-3 pr-2 h-9 min-w-0 transition bg-badge-bg [-webkit-tap-highlight-color:transparent]',
+  base: 'flex items-center text-start gap-4 w-full font-sans border border-control cursor-default rounded-lg pl-3 pr-2 h-9 min-w-0 transition bg-badge-bg [-webkit-tap-highlight-color:transparent]',
   variants: {
     isDisabled: {
       false:

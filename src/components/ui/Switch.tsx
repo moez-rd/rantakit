@@ -7,7 +7,7 @@ const track = tv({
   base: "flex h-6 w-10 shrink-0 cursor-default items-center rounded-full border border-transparent px-0.5 transition duration-200 ease-in-out",
   variants: {
     isSelected: {
-      false: "bg-border-strong",
+      false: "bg-control",
       true: "bg-brand-strong forced-colors:bg-[Highlight]!",
     },
     isDisabled: { true: "bg-badge-bg" },

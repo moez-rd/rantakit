@@ -110,7 +110,7 @@ export const en: Messages = {
   "drop.addTo": "Drop to add to {tool}",
   "drop.busy": "Wait until the files are done",
   "drop.unsupported": "Rantakit can't open this kind of file yet",
-  "drop.accepted": "What works: JPG, PNG, PDF",
+  "drop.accepted": "It can open: JPG, PNG, PDF",
   "drop.mixed": "Photos and PDFs can't be processed together",
   "drop.mixed.hint": "Drag only photos or only PDFs",
   "drop.ask.single": "What should we do with this {noun}?",
@@ -125,12 +125,12 @@ export const en: Messages = {
   "history.title": "History",
   "history.loadFailed": "History can't be opened",
   "history.empty": "No history yet",
-  "history.empty.hint": "Results from every Tool will show up here.",
+  "history.empty.hint": "Results from every tool will show up here.",
   "history.clear": "Clear history",
   "history.clear.title": "Clear all history?",
   "history.clear.body": "This list will be emptied. Result files you've saved are not deleted.",
   "history.clear.cancel": "Cancel",
-  "history.missing": "The Result file was moved or deleted",
+  "history.missing": "The result file was moved or deleted",
 
   // Settings
   "settings.title": "Settings",
@@ -160,9 +160,9 @@ export const en: Messages = {
   "error.size-limit-unreachable.shrink": "Also shrink the image dimensions?",
   "error.accepted": "It can open: {formats}.",
   "error.not-enough-space": "Storage is full. Free up some space, then try again.",
-  "error.cannot-write": "The Result can't be saved in this folder. Choose another folder in Settings.",
+  "error.cannot-write": "The result can't be saved in this folder. Choose another folder in Settings.",
   "error.original-missing": "The original file was moved or deleted.",
-  "error.history-from-newer-version": "This History was made by a newer Rantakit. Update Rantakit to open it.",
+  "error.history-from-newer-version": "This history was made by a newer Rantakit. Update Rantakit to open it.",
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
@@ -294,7 +294,7 @@ export const en: Messages = {
   "preset.remove": "Delete {name}",
 
   // Riwayat
-  "history.kept": "Kept for 30 days. Your Result files are not deleted.",
+  "history.kept": "Kept for 30 days. Your result files are not deleted.",
   "history.today": "Today",
   "history.yesterday": "Yesterday",
   "history.andMore": "{name} and {count} more",
@@ -302,10 +302,10 @@ export const en: Messages = {
 
   // Keeping History
   "history.off": "History is turned off",
-  "history.off.body": "Rantakit doesn't record any Task until history is turned on again.",
+  "history.off.body": "Rantakit doesn't record any tasks until history is turned on again.",
   "history.turnOn": "Turn on history",
   "settings.keepHistory": "Keep history",
-  "settings.keepHistory.description": "Record each Task in History for 30 days.",
+  "settings.keepHistory.description": "Record each task in History for 30 days.",
   "settings.keepHistory.offTitle": "Turn off history?",
   "settings.keepHistory.offBody": "Your current history will be cleared. Result files are not deleted.",
   "settings.keepHistory.off": "Turn off",
@@ -316,12 +316,12 @@ export const en: Messages = {
   "settings.tab.results": "Result files",
   "settings.tab.history": "History",
   "settings.textSize.sample": "This is how large your text will be.",
-  "settings.results.title": "Where Results are saved",
+  "settings.results.title": "Where results are saved",
   "settings.results.next": "Next to the original file",
-  "settings.results.next.description": "Each Result is saved in the same folder as its original.",
+  "settings.results.next.description": "Each result is saved in the same folder as its original.",
   "settings.results.folder": "In a folder you choose",
-  "settings.results.folder.description": "Every Result is saved in one folder.",
+  "settings.results.folder.description": "Every result is saved in one folder.",
   "settings.results.change": "Change folder",
-  "settings.results.pick": "Choose a folder for Result files",
+  "settings.results.pick": "Choose a folder for result files",
   "about.source": "View source code",
 };

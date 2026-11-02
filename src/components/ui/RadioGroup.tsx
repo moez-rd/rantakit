@@ -43,7 +43,7 @@ const styles = tv({
   variants: {
     isSelected: {
       false:
-        'border-border-strong group-pressed:border-border-strong',
+        'border-control',
       true: 'border-[calc(var(--spacing)*1.5)] border-brand-strong forced-colors:border-[Highlight]!'
     },
     isInvalid: {

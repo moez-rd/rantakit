@@ -24,6 +24,23 @@ Semua proses berjalan di perangkatmu, jadi aplikasi tetap berfungsi tanpa koneks
 > [!WARNING]
 > Rantakit masih dalam tahap awal pengembangan dan belum stabil. Fitur dan perilaku aplikasi bisa berubah sewaktu-waktu.
 
+## Tangkapan layar
+
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/id/home.png" alt="Beranda" /><br /><sub><b>Beranda</b>: semua alat di satu tempat, yang terakhir dipakai paling atas</sub></td>
+    <td width="50%"><img src="screenshots/id/tool.png" alt="Kompres Foto" /><br /><sub><b>Halaman alat</b>: tambah berkas, lalu atur batas ukuran atau kecilkan saja</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/id/result.png" alt="Hasil" /><br /><sub><b>Hasil</b>: ukuran sebelum dan sesudah, buka atau tampilkan di folder</sub></td>
+    <td width="50%"><img src="screenshots/id/history.png" alt="Riwayat" /><br /><sub><b>Riwayat</b>: proses sebelumnya per hari, disimpan 30 hari</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/id/settings.png" alt="Pengaturan" /><br /><sub><b>Pengaturan</b>: tema, ukuran teks, bahasa, tempat menyimpan hasil</sub></td>
+    <td width="50%"><img src="screenshots/id/home-dark.png" alt="Beranda dengan tema gelap" /><br /><sub><b>Tema gelap</b></sub></td>
+  </tr>
+</table>
+
 ## Rencana pengembangan
 
 Fitur yang sudah ada dan yang direncanakan, menurut rilis. Rilis tidak punya tanggal; lihat [ROADMAP.md](../../ROADMAP.md) (bahasa Inggris) untuk detailnya.

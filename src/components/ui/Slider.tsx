@@ -28,7 +28,7 @@ const fillStyles = tv({
   base: 'rounded-full',
   variants: {
     isDisabled: {
-      false: 'bg-brand forced-colors:bg-[Highlight]',
+      false: 'bg-brand-strong forced-colors:bg-[Highlight]',
       true: 'bg-track forced-colors:bg-[GrayText]'
     }
   }
@@ -36,7 +36,7 @@ const fillStyles = tv({
 
 const thumbStyles = tv({
   extend: focusRing,
-  base: 'w-4.5 h-4.5 group-orientation-horizontal:mt-5 group-orientation-vertical:ml-2.5 rounded-full bg-badge-bg border border-border-strong',
+  base: 'w-4.5 h-4.5 group-orientation-horizontal:mt-5 group-orientation-vertical:ml-2.5 rounded-full bg-badge-bg border border-control',
   variants: {
     isDragging: {
       true: 'bg-track forced-colors:bg-[ButtonBorder]'
