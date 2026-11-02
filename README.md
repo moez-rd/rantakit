@@ -24,6 +24,23 @@ Everything runs on your device. That means it works with no internet connection.
 > [!WARNING]
 > Rantakit is in early development and is not stable yet. Features and behavior may change at any time.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/readme/screenshots/en/home.png" alt="Home" /><br /><sub><b>Home</b>: every tool in one place, recent tools first</sub></td>
+    <td width="50%"><img src="docs/readme/screenshots/en/tool.png" alt="Compress Photo" /><br /><sub><b>A tool</b>: add files, then set a size limit or just make them smaller</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/readme/screenshots/en/result.png" alt="Result" /><br /><sub><b>Result</b>: sizes before and after, open or show in folder</sub></td>
+    <td width="50%"><img src="docs/readme/screenshots/en/history.png" alt="History" /><br /><sub><b>History</b>: past tasks by day, kept for 30 days</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/readme/screenshots/en/settings.png" alt="Settings" /><br /><sub><b>Settings</b>: theme, text size, language, where results are saved</sub></td>
+    <td width="50%"><img src="docs/readme/screenshots/en/home-dark.png" alt="Home in dark theme" /><br /><sub><b>Dark theme</b></sub></td>
+  </tr>
+</table>
+
 ## Roadmap
 
 The features Rantakit has and plans, by release. Releases have no dates; see [ROADMAP.md](ROADMAP.md) for details.
