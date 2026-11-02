@@ -87,19 +87,16 @@ export const en: Messages = {
   "setup.remove": "Remove {name} from the list",
   "setup.cancel": "Cancel",
   "options.format": "Result format",
-  "options.format.hint": "PNG keeps photos sharp, but is usually bigger.",
   "options.format.same": "Same as the original",
   "options.limit": "Size limit",
   "options.pdf.intro": "Text stays sharp. Only the images inside the PDF get smaller.",
   "options.advanced": "More options",
-  "options.quality": "Quality",
-  "options.quality.hint": "Lower is smaller. Doesn't apply to PNG.",
+  "options.quality": "Quality (1–100)",
   "options.quality.pdf": "Photo quality",
   "options.quality.pdf.hint": "For JPG photos inside the PDF. Text and line drawings stay the same.",
   "options.dimension": "Image size",
-  "options.dimension.hint": "Limit for the longest side.",
   "options.dimension.pdf.hint": "Limit for the longest side of photos inside the PDF.",
-  "options.dimension.original": "Original size",
+  "options.dimension.original": "Unchanged",
   "options.dimension.px": "{px} px",
 
   // Working and Result
@@ -174,6 +171,11 @@ export const en: Messages = {
   "error.unexpected": "Something went wrong. Try again.",
 
   // Tool page
+  "photoSize.large": "Large",
+  "photoSize.medium": "Medium",
+  "photoSize.small": "Small",
+  "options.quality.auto": "Automatic",
+  "options.quality.overrides": "If filled in, this number is used and the size limit is ignored.",
   "level.label": "How small",
   "level.smallest": "Smallest",
   "level.balanced": "Balanced",

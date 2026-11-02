@@ -1,16 +1,20 @@
-import { useStoredState } from "@/lib/storedState";
+import { isInt, useStoredState } from "@/lib/storedState";
 import { levelOf, limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
 
 export type OutputFormat = "same" | "jpeg" | "png";
 
+/** Plain sizes for a photo's longest side, shared by Kompres Foto and Ubah Ukuran Foto. */
+export type PhotoSize = "large" | "medium" | "small";
+export const PHOTO_SIZES: Record<PhotoSize, number> = { large: 1920, medium: 1280, small: 800 };
+
 export interface ImageSettings extends ShrinkSettings {
   format: OutputFormat;
-  /** Longest side in pixels; 0 keeps the original size. */
-  maxDimension: number;
+  /** "Ukuran gambar"; "original" leaves it to the choice above. */
+  size: PhotoSize | "original";
+  /** "Kualitas (1–100)"; null lets Rantakit choose. */
+  quality: number | null;
 }
-
-export const MAX_DIMENSIONS = [0, 3840, 2560, 1920, 1280];
 
 /** Falls back to the defaults for anything missing or invalid. */
 function parse(stored: unknown): ImageSettings {
@@ -18,7 +22,8 @@ function parse(stored: unknown): ImageSettings {
   return {
     ...parseShrink(stored),
     format: s.format === "jpeg" || s.format === "png" ? s.format : "same",
-    maxDimension: MAX_DIMENSIONS.includes(s.maxDimension as number) ? (s.maxDimension as number) : 0,
+    size: typeof s.size === "string" && s.size in PHOTO_SIZES ? (s.size as PhotoSize) : "original",
+    quality: isInt(s.quality, 1, 100) ? s.quality : null,
   };
 }
 
@@ -33,7 +38,8 @@ export function toImageOptions(settings: ImageSettings): ToolOptions {
     format: settings.format === "same" ? undefined : settings.format,
     limit: limitBytes(settings),
     level: levelOf(settings),
-    maxDimension: settings.maxDimension || undefined,
+    quality: settings.quality ?? undefined,
+    maxDimension: settings.size === "original" ? undefined : PHOTO_SIZES[settings.size],
   };
 }
 

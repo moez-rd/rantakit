@@ -1,7 +1,8 @@
 import { useStoredState } from "@/lib/storedState";
-import { MAX_DIMENSIONS } from "./imageSettings";
 import { levelOf, limitBytes, parseShrink, type ShrinkSettings } from "./shrink";
 import type { ToolOptions } from "./taskApi";
+
+export const MAX_DIMENSIONS = [0, 3840, 2560, 1920, 1280];
 
 export interface PdfSettings extends ShrinkSettings {
   /** Longest side of images inside the PDF; 0 keeps them as they are. */

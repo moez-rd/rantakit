@@ -1,10 +1,10 @@
 import { OptionField } from "@/features/tool/OptionField";
 import { defineTool, type OptionsProps } from "@/features/tool/toolDef";
 import { useT } from "@/i18n";
-import { MaxDimensionSelect } from "./ImageOptions";
+import { Select, SelectItem } from "@/components/ui/Select";
 import { pickPdfs } from "./pdfApi";
 import { ShrinkOptions } from "./ShrinkOptions";
-import { toPdfOptions, usePdfSettings, type PdfSettings } from "./pdfSettings";
+import { MAX_DIMENSIONS, toPdfOptions, usePdfSettings, type PdfSettings } from "./pdfSettings";
 
 function Main({ settings, onChange }: OptionsProps<PdfSettings>) {
   const { t } = useT();
@@ -21,11 +21,17 @@ function Advanced({ settings, onChange }: OptionsProps<PdfSettings>) {
   return (
     <>
       <OptionField label={t("options.dimension")} description={t("options.dimension.pdf.hint")}>
-        <MaxDimensionSelect
-          label={t("options.dimension")}
-          value={settings.maxDimension}
-          onChange={(maxDimension) => onChange({ maxDimension })}
-        />
+        <Select
+          aria-label={t("options.dimension")}
+          value={String(settings.maxDimension)}
+          onChange={(key) => onChange({ maxDimension: Number(key) })}
+        >
+          {MAX_DIMENSIONS.map((size) => (
+            <SelectItem key={size} id={String(size)}>
+              {size === 0 ? t("options.dimension.original") : t("options.dimension.px", { px: size })}
+            </SelectItem>
+          ))}
+        </Select>
       </OptionField>
     </>
   );
