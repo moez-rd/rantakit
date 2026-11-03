@@ -4,7 +4,7 @@
  * by `t()`, and keys ending in ".one" and ".other" are counts.
  */
 export const id = {
-  // Navigation and menu
+  // Navigation
   "common.close": "Tutup",
   "nav.label": "Navigasi utama",
   "nav.home": "Beranda",
@@ -15,12 +15,6 @@ export const id = {
   "nav.forward": "Maju",
   "nav.sidebar.show": "Tampilkan navigasi",
   "nav.sidebar.hide": "Sembunyikan navigasi",
-  "menu.label": "Menu",
-  "menu.kompresFoto": "Kompres Foto…",
-  "menu.kompresPdf": "Kompres PDF…",
-  "menu.source": "Kode sumber",
-  "menu.license": "Lisensi",
-  "menu.about": "Tentang Rantakit",
 
   // Tools, by the ids in crates/rantakit-tasks/src/catalogue.rs
   "tool.kompres-foto": "Kompres Foto",
@@ -120,6 +114,7 @@ export const id = {
   "drop.busy": "Tunggu sampai file selesai diproses",
   "drop.unsupported": "Rantakit belum bisa membuka file jenis ini",
   "drop.accepted": "Yang bisa dibuka: JPG, PNG, PDF",
+  "drop.pickAgain": "Pilih file lain",
   "drop.mixed": "Foto dan PDF tidak bisa diproses bersamaan",
   "drop.mixed.hint": "Seret foto saja atau PDF saja",
   "drop.ask.single": "Mau diapakan {noun} ini?",
