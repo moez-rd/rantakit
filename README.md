@@ -82,12 +82,16 @@ Download the latest version from the [Releases page](https://github.com/moez-rd/
 | Debian, Ubuntu      | `Rantakit_<version>_amd64.deb`                     |
 | Fedora, openSUSE    | `Rantakit-<version>-1.x86_64.rpm`                  |
 | Other Linux distros | `Rantakit_<version>_amd64.AppImage`                |
+| Android             | `Rantakit_<version>_arm64.apk`                     |
+| Older Android       | `Rantakit_<version>_armv7.apk`                     |
 
 **Windows:** the installer is not code-signed yet, so Windows SmartScreen may show "Windows protected your PC". Click **More info**, then **Run anyway**.
 
 **Linux (.deb):** `sudo apt install ./Rantakit_<version>_amd64.deb`
 
 **Linux (AppImage):** run `chmod +x` on the file, then open it. On Ubuntu 22.04 and newer, AppImages also need `libfuse2` (`sudo apt install libfuse2`).
+
+**Android:** almost every phone since 2017 takes the arm64 APK. If Android says the app isn't compatible with your phone, use the armv7 one. Opening the APK asks you to allow installs from your browser or Files app the first time. A newer APK installs over the old one and keeps History, Presets, and Settings.
 
 macOS has not have release yet. You can also [build from source](#build-from-source).
 
