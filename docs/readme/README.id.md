@@ -82,12 +82,16 @@ Unduh versi terbaru dari [halaman Releases](https://github.com/moez-rd/rantakit/
 | Debian, Ubuntu    | `Rantakit_<versi>_amd64.deb`                   |
 | Fedora, openSUSE  | `Rantakit-<versi>-1.x86_64.rpm`                |
 | Distro Linux lain | `Rantakit_<versi>_amd64.AppImage`              |
+| Android           | `Rantakit_<versi>_arm64.apk`                   |
+| Android lama      | `Rantakit_<versi>_armv7.apk`                   |
 
 **Windows:** installer belum ditandatangani (*code signing*), jadi Windows SmartScreen mungkin menampilkan "Windows protected your PC". Klik **More info**, lalu **Run anyway**.
 
 **Linux (.deb):** `sudo apt install ./Rantakit_<versi>_amd64.deb`
 
 **Linux (AppImage):** jalankan `chmod +x` pada berkasnya, lalu buka. Di Ubuntu 22.04 ke atas, AppImage juga butuh `libfuse2` (`sudo apt install libfuse2`).
+
+**Android:** hampir semua HP sejak 2017 memakai APK arm64. Kalau Android bilang aplikasinya tidak cocok dengan HP kamu, pakai yang armv7. Saat APK dibuka pertama kali, kamu akan diminta mengizinkan pemasangan dari browser atau aplikasi Files. APK yang lebih baru dipasang di atas yang lama, dan Riwayat, Preset, serta Setelan tetap ada.
 
 macOS belum ada rilis. Kamu juga bisa [build dari kode sumber](#build-dari-kode-sumber).
 
