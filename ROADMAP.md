@@ -90,7 +90,7 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - **Share → Rantakit:** files shared into Rantakit open with only the Tools that fit them.
 - **Results in `Download/Rantakit/`**, visible in the Files and Gallery apps, and shared through the system share sheet.
 - **Tasks in the background:** every Task runs in a foreground service with a progress notification, so switching apps doesn't stop it.
-- **Riwayat (History) on Android.**
+- **History ("Riwayat") on Android.**
 - **"Versi baru" (New version)** ([RANTAKIT.md §7](RANTAKIT.md#distribution-and-updates)): installs updates on Windows and the Linux AppImage; the `.deb`, `.rpm`, and the APK from GitHub open the download page.
 
 **Done when:**
