@@ -4,6 +4,7 @@ use rantakit_tasks::{FileKind, file_info as read_info};
 use serde::Serialize;
 use tauri::AppHandle;
 use tauri::ipc::Response;
+#[cfg(not(target_os = "android"))]
 use tauri_plugin_opener::OpenerExt;
 
 #[cfg(target_os = "android")]
@@ -92,9 +93,15 @@ pub async fn thumbnail(app: AppHandle, path: PathBuf, size: u32) -> Response {
     Response::new(rantakit_tasks::thumbnail(&path, size).unwrap_or_default())
 }
 
-/// Opens a Result in the app the system uses for it ("Buka").
+/// Opens a Result in the app the system uses for it ("Buka"). Android asks
+/// which app, since other apps can't open a path there.
 #[tauri::command]
 pub fn open_path(app: AppHandle, path: PathBuf) {
+    #[cfg(target_os = "android")]
+    if let Err(error) = android::open(&app, &path) {
+        eprintln!("open failed: {error}");
+    }
+    #[cfg(not(target_os = "android"))]
     if let Err(error) = app.opener().open_path(path.to_string_lossy(), None::<&str>) {
         eprintln!("open failed: {error}");
     }

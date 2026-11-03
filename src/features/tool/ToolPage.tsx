@@ -10,6 +10,7 @@ import { PresetPicker } from "@/features/presets/PresetPicker";
 import { usePresets } from "@/features/presets/presetsApi";
 import { useAppSettings } from "@/features/settings/appSettings";
 import { useT } from "@/i18n";
+import { isDesktopApp } from "@/lib/platform";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 import { useStoredState } from "@/lib/storedState";
 import { useFileInfo, type FileInfo } from "./fileInfo";
@@ -35,7 +36,8 @@ interface ToolPageProps {
  *
  * Desktop fills the content card: the page never scrolls, the file list and
  * the Options scroll on their own, and the main button stays at the panel's
- * foot. Mobile stacks everything and pins the main button above the tab bar.
+ * foot. A phone stacks everything and pins the main button to the bottom of
+ * the screen, where the tab bar is on other pages.
  */
 export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, onProcessAnother }: ToolPageProps) {
   const { t, count } = useT();
@@ -67,8 +69,13 @@ export function ToolPage({ tool, paths, job, onPick, onRemove, onBack, onStart, 
         className="flex min-w-0 flex-col md:row-span-2 md:min-h-0"
       >
         <header className="flex h-14 shrink-0 items-center gap-2 px-2 md:px-4">
-          {/* Desktop goes back from the title bar. */}
-          <Button variant="icon" aria-label={t("tool.back")} onPress={onBack} className="md:hidden">
+          {/* The desktop app goes back from the title bar, which Android doesn't have. */}
+          <Button
+            variant="icon"
+            aria-label={t("tool.back")}
+            onPress={onBack}
+            className={isDesktopApp ? "md:hidden" : undefined}
+          >
             <ArrowLeft aria-hidden className="size-5" />
           </Button>
           <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">

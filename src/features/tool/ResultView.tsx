@@ -20,7 +20,7 @@ import { useT, type Translator } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
 import { openPath } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
-import { isAndroidApp, isWindowsApp } from "@/lib/platform";
+import { canShare, canShowInFolder, isAndroidApp } from "@/lib/platform";
 import { tv } from "@/lib/react-aria-utils";
 import { useThumbnail } from "./fileInfo";
 import { NOUN_ICONS } from "./FilesColumn";
@@ -108,7 +108,18 @@ export function ResultList({ job, noun }: { job: CompressJob; noun: "photo" | "p
 
   return (
     <div className="flex flex-1 flex-col md:min-h-0">
-      <h2 className="px-5 pb-3 text-section">{t("result.list")}</h2>
+      <div className="flex items-center justify-between gap-3 px-5 pb-3">
+        <h2 className="text-section">{t("result.list")}</h2>
+        {canShare && done.length > 1 && (
+          <Button
+            variant="secondary"
+            size="row"
+            onPress={() => shareResults(done.map((item) => item.result.outputPath))}
+          >
+            <Share2 aria-hidden className="size-[18px]" /> {t("result.shareAll")}
+          </Button>
+        )}
+      </div>
       <div className="px-5 pb-5 md:min-h-0 md:flex-1 md:overflow-y-auto">
         {items.length === 1 && done.length === 1 ? (
           <OneResult item={done[0]} noun={noun} />
@@ -140,7 +151,7 @@ function shareResults(paths: string[]) {
   invoke("share_files", { paths }).catch(() => {});
 }
 
-/** Buka, Tampilkan di folder, and on Windows Bagikan. */
+/** Buka, then Tampilkan di folder on desktop and Bagikan on Windows and Android. */
 function ResultActions({ result, name }: { result: TaskResult; name: string }) {
   const { t } = useT();
   return (
@@ -153,10 +164,12 @@ function ResultActions({ result, name }: { result: TaskResult; name: string }) {
       >
         <SquareArrowOutUpRight aria-hidden className="size-[18px]" /> {t("result.open")}
       </Button>
-      <Button variant="secondary" size="row" onPress={() => revealItemInDir(result.outputPath)}>
-        <FolderOpen aria-hidden className="size-[18px]" /> {t("task.showInFolder")}
-      </Button>
-      {isWindowsApp && (
+      {canShowInFolder && (
+        <Button variant="secondary" size="row" onPress={() => revealItemInDir(result.outputPath)}>
+          <FolderOpen aria-hidden className="size-[18px]" /> {t("task.showInFolder")}
+        </Button>
+      )}
+      {canShare && (
         <Button variant="secondary" size="row" onPress={() => shareResults([result.outputPath])}>
           <Share2 aria-hidden className="size-[18px]" /> {t("result.share")}
         </Button>
@@ -217,7 +230,8 @@ function ResultRow({ tr, item, noun, canRetry, onRetry }: ResultRowProps) {
       return (
         <li className="flex flex-wrap items-center gap-4 px-4 py-3.5">
           <ResultTile path={item.result.outputPath} noun={noun} size={112} />
-          <span className="flex min-w-0 flex-1 flex-col items-start gap-1">
+          {/* At least 10rem for the name; on a phone the actions wrap below it. */}
+          <span className="flex min-w-0 flex-1 basis-40 flex-col items-start gap-1">
             <span className="max-w-full truncate text-label" title={item.result.outputPath}>
               {name}
             </span>

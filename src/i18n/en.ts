@@ -207,6 +207,7 @@ export const en: Messages = {
   "result.open": "Open",
   "result.openName": "Open {name}",
   "result.share": "Share",
+  "result.shareAll": "Share all",
   "result.another": "Process another file",
   "result.list": "Results",
   "task.file.failed": "Didn't work",

@@ -1,8 +1,21 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
-import { Folder, Globe, History, Info, Monitor, Moon, Palette, Sun, X, type IconProps } from "@keyline-icons/react";
-import { DialogTrigger, Heading } from "react-aria-components";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Folder,
+  Globe,
+  History,
+  Info,
+  Monitor,
+  Moon,
+  Palette,
+  Sun,
+  X,
+  type IconProps,
+} from "@keyline-icons/react";
+import { Button as AriaButton, DialogTrigger, Heading } from "react-aria-components";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
@@ -16,19 +29,23 @@ import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { useT } from "@/i18n";
 import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
-import { isDesktopApp } from "@/lib/platform";
+import { isAndroidApp, isDesktopApp } from "@/lib/platform";
+import { focusRing, tv } from "@/lib/react-aria-utils";
 import { pickResultsFolder, setCheckUpdates, setKeepHistory, setResultsFolder, useAppSettings } from "./appSettings";
 import { systemLanguage, usePreferences, type Language, type LanguageChoice, type TextSize, type Theme } from "./preferences";
 
 export type SettingsTab = "appearance" | "language" | "results" | "history" | "about";
 
-const TABS: { id: SettingsTab; label: `settings.tab.${SettingsTab}`; icon: ComponentType<IconProps> }[] = [
+const ALL_TABS: { id: SettingsTab; label: `settings.tab.${SettingsTab}`; icon: ComponentType<IconProps> }[] = [
   { id: "appearance", label: "settings.tab.appearance", icon: Palette },
   { id: "language", label: "settings.tab.language", icon: Globe },
   { id: "results", label: "settings.tab.results", icon: Folder },
   { id: "history", label: "settings.tab.history", icon: History },
   { id: "about", label: "settings.tab.about", icon: Info },
 ];
+
+/** Android always saves Results in `Download/Rantakit/`, so it has no "File hasil". */
+const TABS = ALL_TABS.filter(({ id }) => !(isAndroidApp && id === "results"));
 
 /** Each language is named in itself, whatever the UI language. */
 const LANGUAGE_NAMES: Record<Language, string> = { id: "Bahasa Indonesia", en: "English" };
@@ -86,6 +103,57 @@ export function SettingsDialog({ tab, onTabChange, onClose }: SettingsDialogProp
         </Tabs>
       </Dialog>
     </Modal>
+  );
+}
+
+const row = tv({
+  extend: focusRing,
+  base: [
+    "flex min-h-14 w-full items-center gap-3 px-4 text-start text-label",
+    "cursor-default select-none [-webkit-tap-highlight-color:transparent] pressed:bg-badge-bg",
+  ],
+});
+
+interface SettingsPageProps {
+  /** The part on screen; null for the list of parts. */
+  tab: SettingsTab | null;
+  onTabChange: (tab: SettingsTab | null) => void;
+}
+
+/**
+ * "Pengaturan" on a phone, as a page of its own: the list of parts, and
+ * each part as its own page. Back from a part returns to the list.
+ */
+export function SettingsPage({ tab, onTabChange }: SettingsPageProps) {
+  const { t } = useT();
+  if (tab) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <header className="flex h-14 shrink-0 items-center gap-2 px-2">
+          <Button variant="icon" aria-label={t("nav.back")} onPress={() => onTabChange(null)}>
+            <ArrowLeft aria-hidden className="size-5" />
+          </Button>
+          <h1 className="truncate ps-1 font-display text-section">{t(`settings.tab.${tab}`)}</h1>
+        </header>
+        <div className="px-5 pt-2 pb-8">{PANELS[tab]}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-1 flex-col gap-6 px-5 pt-6 pb-8">
+      <h1 className="font-display text-title">{t("settings.title")}</h1>
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <li key={id}>
+            <AriaButton onPress={() => onTabChange(id)} className={(renderProps) => row(renderProps)}>
+              <Icon aria-hidden className="size-5 shrink-0 text-text-muted" />
+              <span className="flex-1">{t(label)}</span>
+              <ChevronRight aria-hidden className="size-5 shrink-0 text-text-muted" />
+            </AriaButton>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

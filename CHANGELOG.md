@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Versi baru" (New version): at launch Rantakit checks GitHub for a newer version and shows a quiet button in the title bar. On Windows and the Linux AppImage one click installs it; the .deb and .rpm open the download page. It can be turned off in Settings, under "Tentang" (About)
 - Android: photos and PDFs are chosen with the system file picker, keep their real names, are read where they are, and every Result is saved as a new file in `Download/Rantakit/`, where Gallery and Files find it. Android 8 and 9 ask for the storage permission at the first Task, after saying why
 - Android APKs on every release, signed with one release key so each new version installs over the last and keeps History, Presets, and Settings: `Rantakit_<version>_arm64.apk` for almost every phone, and `Rantakit_<version>_armv7.apk` for older ones
+- Android phone layout: the Tool page is one column with the main button at the bottom, and the Result is its own screen, where "Buka" (Open) asks which app to open it in and "Bagikan" (Share) opens the share sheet. Settings is a page listing its parts, without "File hasil" (Result files), since Results always go to `Download/Rantakit/`
+- Android back gesture: it closes an open dialog first, then goes back one step as Back does on desktop, asking first before files would be lost; on Home it closes the app
+- Android tablets and phones turned sideways use the wide layout from 768 px, and turning the phone keeps the files, options, and a running Task
+- "Bagikan semua" (Share all) above a list of Results, on Windows and Android
 
 ### Changed
 

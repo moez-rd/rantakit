@@ -15,5 +15,11 @@ export const isMacApp = isDesktopApp && platform === "darwin";
 /** The Android app: no title bar or keyboard shortcuts, Results in `Download/Rantakit/`. */
 export const isAndroidApp = isTauri() && platform === "android";
 
-/** The Windows app, the only one with a system share sheet Rantakit can open. */
+/** The Windows app. */
 export const isWindowsApp = isDesktopApp && platform === "windows";
+
+/** Windows and Android have a system share sheet Rantakit can open ("Bagikan"). */
+export const canShare = isWindowsApp || isAndroidApp;
+
+/** "Tampilkan di folder"; Android has no file manager to show a file in. */
+export const canShowInFolder = !isAndroidApp;

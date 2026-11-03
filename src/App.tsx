@@ -13,17 +13,19 @@ import { pickAnyFiles } from "@/features/drop/pickFiles";
 import { HomePage } from "@/features/home/HomePage";
 import type { ToolId } from "@/features/home/tools";
 import { HistoryPage } from "@/features/history/HistoryPage";
-import { SettingsDialog, type SettingsTab } from "@/features/settings/SettingsDialog";
+import { SettingsDialog, SettingsPage, type SettingsTab } from "@/features/settings/SettingsDialog";
 import { LeaveDialog } from "@/features/tool/LeaveDialog";
 import { ToolPage } from "@/features/tool/ToolPage";
 import { UpdateNotice } from "@/features/update/UpdateNotice";
 import { isShipped, toolDef, type ShippedTool } from "@/features/tool/tools";
 import { useShortcuts, type AppCommand } from "@/lib/appCommands";
+import { useBackButton } from "@/lib/backButton";
 import { useFileDrop } from "@/lib/fileDrop";
 import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
 import { useNavHistory } from "@/lib/navHistory";
 import { isAndroidApp, isMacApp } from "@/lib/platform";
 import { useStoredState } from "@/lib/storedState";
+import { useWideLayout } from "@/lib/wideLayout";
 import { useT } from "@/i18n";
 
 /** Dropped files waiting for the user to choose a Tool. */
@@ -43,8 +45,14 @@ function App() {
   const tr = useT();
   const { t } = tr;
   const [page, setPage] = useState<Page>("home");
-  /** The Settings dialog's tab while it is open over the page. */
-  const [settingsTab, setSettingsTab] = useState<SettingsTab | null>(null);
+  /**
+   * Settings while open: a dialog over the page, or on a phone a page of its
+   * own; "list" is the phone's list of parts, which the dialog shows as its
+   * first tab.
+   */
+  const [settingsTab, setSettingsTab] = useState<SettingsTab | "list" | null>(null);
+  const wide = useWideLayout();
+  const settingsPage = settingsTab !== null && !wide;
   /** The Tool page on screen, over Home. */
   const [tool, setTool] = useState<ShippedTool | null>(null);
   /** The Originals added to that page. */
@@ -67,10 +75,11 @@ function App() {
     else action();
   };
 
-  const navigate = (next: NavTarget, tab: SettingsTab = "appearance") => {
+  const navigate = (next: NavTarget) => {
     // Settings opens over the page; the Tool page stays as it is.
-    if (next === "settings") return setSettingsTab(tab);
+    if (next === "settings") return setSettingsTab("list");
     leaveTool(() => {
+      setSettingsTab(null);
       closeTool();
       setPage(next satisfies Page);
     });
@@ -202,6 +211,13 @@ function App() {
     };
   });
 
+  // Android's back gesture: Settings' parts, then the same steps as Back. With
+  // none left, Android closes the app itself. Open dialogs close first.
+  useBackButton(() => {
+    if (settingsPage) setSettingsTab(settingsTab === "list" ? null : "list");
+    else goHistory(-1);
+  }, settingsPage || history.canBack);
+
   /** Commands from the macOS menu bar and the keyboard shortcuts. */
   const runCommand = (command: AppCommand) => {
     switch (command) {
@@ -233,9 +249,10 @@ function App() {
 
   return (
     <AppShell
-      page={page}
-      onNavigate={(next) => navigate(next)}
+      current={settingsPage ? "settings" : page}
+      onNavigate={navigate}
       onOpen={openFiles}
+      tabBar={!pageTool || settingsPage}
       titleBar={{
         canBack: history.canBack,
         canForward: history.canForward,
@@ -246,6 +263,14 @@ function App() {
       }}
       titleBarEnd={<UpdateNotice busy={job.isRunning} />}
     >
+      {settingsPage && (
+        <SettingsPage
+          tab={settingsTab === "list" ? null : settingsTab}
+          onTabChange={(tab) => setSettingsTab(tab ?? "list")}
+        />
+      )}
+      {/* Hidden, not closed, under the Settings page, so a Tool page keeps its files and options. */}
+      <div className={settingsPage ? "hidden" : "contents"}>
       {page === "home" &&
         (tool ? (
           <ToolPage
@@ -266,8 +291,13 @@ function App() {
           <HomePage onOpenTool={(id) => isShipped(id) && openTool(id)} />
         ))}
       {page === "history" && <HistoryPage />}
-      {settingsTab && (
-        <SettingsDialog tab={settingsTab} onTabChange={setSettingsTab} onClose={() => setSettingsTab(null)} />
+      </div>
+      {settingsTab && wide && (
+        <SettingsDialog
+          tab={settingsTab === "list" ? "appearance" : settingsTab}
+          onTabChange={setSettingsTab}
+          onClose={() => setSettingsTab(null)}
+        />
       )}
       {dragging && (
         <DropOverlay
