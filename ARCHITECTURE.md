@@ -70,7 +70,10 @@ Native Android backends are called from Rust through the NDK (`ndk` crate), so e
 - **Reading:** Rust opens those URIs through `tauri-plugin-fs`, which returns an ordinary `std::fs::File`.
 - **Saving:** Results are written to `Download/Rantakit/` through `tauri-plugin-android-fs` (MediaStore on Android 10+).
 - **Permissions:** `WRITE_EXTERNAL_STORAGE` is declared with `maxSdkVersion="28"`, so only Android 8 and 9 ask for it.
-- **Builds:** one APK per ABI, arm64-v8a and armeabi-v7a.
+- **Tasks in the background:** a small Kotlin plugin runs every Task in a foreground service with a progress notification, started while the app is on screen (Android 12 and later forbid starting one from the background). It declares `FOREGROUND_SERVICE` and the permission for its service type, plus `POST_NOTIFICATIONS`, asked once on Android 13 and later; the Task runs even when that permission is refused.
+- **Picking files:** photos through the Android Photo Picker (no permission), PDFs through the system document picker.
+- **Update check:** `tauri-plugin-updater` is desktop only. The APK from GitHub reads `version` from the latest release's `latest.json` with a small HTTP client and only opens the download page, so it never needs `REQUEST_INSTALL_PACKAGES`. Store builds leave the check out.
+- **Builds:** one APK per ABI, arm64-v8a and armeabi-v7a, signed with a release keystore kept in GitHub secrets. Pull requests run `cargo check` for both Android targets; full APKs are built only by the release workflow.
 
 ## Size experiment
 
