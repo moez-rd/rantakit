@@ -223,7 +223,7 @@ The app cannot measure anything itself ([ADR 0001](docs/adr/0001-files-never-lea
 | **North star** | Monthly active installs reported by the stores (Play Console), plus GitHub Release and Flathub downloads | No target yet; record a baseline after the MVP launch |
 | **Quality** | Google Play rating | ≥ 4.5 |
 | | Reviews that mention ease ("gampang"), offline use, or safety ("aman"), read manually each quarter | Tracked, no target |
-| **Usability** | Test before each major release with 5 people from the primary audience (a parent, a CPNS applicant, a small-shop owner, …) on core scenarios: "Make this PDF under 1 MB", "Turn these 3 photos of your KK into one PDF", "Put 'Hanya untuk verifikasi Bank X' on this KTP photo" | At least 4 of 5 complete each scenario unaided in under 60 seconds |
+| **Usability** | Test the beta before 1.0, then each major release after it, with 5 people from the primary audience (a parent, a CPNS applicant, a small-shop owner, …) on core scenarios: "Make this PDF under 1 MB", "Turn these 3 photos of your KK into one PDF", "Put 'Hanya untuk verifikasi Bank X' on this KTP photo" | At least 4 of 5 complete each scenario unaided in under 60 seconds |
 | **Verified privacy** | Exodus Privacy report for the Android build | 0 trackers, no unexpected permissions |
 | | Check on every release that the app makes no network calls besides the update check and language downloads | Passes on every release |
 | **Performance** | Compress a 10-page scanned PDF on a low-end Android phone (~3 GB RAM) | Under 5 seconds |
