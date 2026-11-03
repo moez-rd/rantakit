@@ -81,22 +81,25 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 
 **Goal:** the same Tools as v0.2 work on a low-end Android phone, and people can reach them straight from WhatsApp, Gallery, or Files.
 
+**Stories:** [docs/stories/v0.3.md](docs/stories/v0.3.md)
+
 **Epics:**
 
-- **Android build** of the existing Tools: Kompres Foto, Kompres PDF, convert photo, resize photo.
-- **Phone layout:** one column, actions at the bottom, bottom navigation, Android back gesture; the Result as its own screen.
+- **Android build** of the existing Tools: Kompres Foto, Kompres PDF, convert photo, resize photo, as two signed APKs (arm64 and armv7) released with the desktop files from one tag.
+- **Phone layout:** one column, actions at the bottom, bottom navigation, Android back gesture; the Result as its own screen; Settings as a full page.
 - **Share → Rantakit:** files shared into Rantakit open with only the Tools that fit them.
 - **Results in `Download/Rantakit/`**, visible in the Files and Gallery apps, and shared through the system share sheet.
+- **Tasks in the background:** every Task runs in a foreground service with a progress notification, so switching apps doesn't stop it.
 - **Riwayat (History) on Android.**
-- **"Versi baru" (New version) on desktop** ([RANTAKIT.md §7](RANTAKIT.md#distribution-and-updates)): the in-app update check, so Windows and Linux users get 0.3 and later without visiting GitHub.
+- **"Versi baru" (New version)** ([RANTAKIT.md §7](RANTAKIT.md#distribution-and-updates)): installs updates on Windows and the Linux AppImage; the `.deb`, `.rpm`, and the APK from GitHub open the download page.
 
 **Done when:**
 
-- Compressing a 10-page scanned PDF on a ~3 GB RAM Android phone takes under 5 seconds.
+- Compressing a 10-page scanned PDF takes under 5 seconds on an Android 8.0 emulator with 3 GB of RAM, recorded as an estimate; the check on a real phone runs on the v0.11 beta.
 - Works on Android 8.0 and later.
-- The APK is published on GitHub Releases.
+- Both APKs are published on GitHub Releases, signed with the release keystore.
 
-**Open decisions:** none yet.
+**Open decisions:** none; settled while writing the stories (2026-11-03).
 
 ## v0.4 Arrange PDF
 
