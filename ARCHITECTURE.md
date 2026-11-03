@@ -67,8 +67,8 @@ Native Android backends are called from Rust through the NDK (`ndk` crate), so e
 ## Android
 
 - **Receiving shares:** a small Kotlin plugin of our own registers for the share sheet (one or several files) and hands `content://` URIs to Rust.
-- **Reading:** Rust opens those URIs through `tauri-plugin-fs`, which returns an ordinary `std::fs::File`.
-- **Saving:** Results are written to `Download/Rantakit/` through `tauri-plugin-android-fs` (MediaStore on Android 10+).
+- **Reading:** Rust opens those URIs through `tauri-plugin-android-fs`, which returns an ordinary `std::fs::File`. Android does not let the app reopen that file through a path such as `/proc/self/fd/N`, so the Files step reads size, kind, and pages from the open file (`rantakit_tasks::file_info_of`), and a Task copies each Original into the app's cache when its turn comes, because the engines take paths. The copy is removed once its Result is saved.
+- **Saving:** the engines write each Result into the cache; the shell then saves it as a new file in `Download/Rantakit/` through `tauri-plugin-android-fs` (MediaStore, which also makes photos show up in Gallery). The name follows `rantakit_tasks::result_name`, counted against the Results already there; MediaStore numbers any other taken name itself, so no file is replaced.
 - **Permissions:** `WRITE_EXTERNAL_STORAGE` is declared with `maxSdkVersion="28"`, so only Android 8 and 9 ask for it.
 - **Tasks in the background:** a small Kotlin plugin runs every Task in a foreground service with a progress notification, started while the app is on screen (Android 12 and later forbid starting one from the background). It declares `FOREGROUND_SERVICE` and the permission for its service type, plus `POST_NOTIFICATIONS`, asked once on Android 13 and later; the Task runs even when that permission is refused.
 - **WebView:** the frontend needs Chrome 111 or later (Tailwind v4 uses `color-mix()`, `oklch()`, and cascade layers). Android 8's factory WebView is Chrome 58 to 69, so a small old-JavaScript check in `index.html` shows how to update it from the Play Store instead of a blank screen.

@@ -1,4 +1,5 @@
-use std::io::Cursor;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Cursor, Seek};
 use std::path::Path;
 
 use ::image::ImageReader;
@@ -19,8 +20,14 @@ pub struct PhotoInfo {
 
 /// Format and pixel size from the file's header, without decoding the photo.
 pub fn photo_info(path: &Path) -> Result<PhotoInfo> {
-    let reader = ImageReader::open(path)
-        .map_err(|e| ErrorKind::reading(&e))?
+    let file = File::open(path).map_err(|e| ErrorKind::reading(&e))?;
+    photo_info_of(BufReader::new(file))
+}
+
+/// `photo_info` read from an open file, such as one Android handed over
+/// without a path.
+pub fn photo_info_of(file: impl BufRead + Seek) -> Result<PhotoInfo> {
+    let reader = ImageReader::new(file)
         .with_guessed_format()
         .map_err(|e| ErrorKind::reading(&e))?;
     let format = format_of(reader.format())?;

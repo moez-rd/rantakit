@@ -85,7 +85,7 @@ impl ToolOptions {
     }
 
     /// The English word in the Result name: `ijazah (compressed).pdf`.
-    fn suffix(&self) -> &'static str {
+    pub fn suffix(&self) -> &'static str {
         match self {
             Self::KompresFoto(_) | Self::KompresPdf(_) => "compressed",
             Self::UbahFormatFoto(_) => "converted",

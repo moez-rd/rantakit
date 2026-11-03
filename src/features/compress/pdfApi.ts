@@ -1,6 +1,7 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { currentTranslator } from "@/i18n";
+import { withNames } from "./imageApi";
 
 /** Ask the user for PDFs. Returns an empty list when cancelled or outside Tauri. */
 export async function pickPdfs(): Promise<string[]> {
@@ -12,5 +13,5 @@ export async function pickPdfs(): Promise<string[]> {
     directory: false,
     filters: [{ name: "PDF", extensions: ["pdf"] }],
   });
-  return selected ?? [];
+  return withNames(selected ?? []);
 }

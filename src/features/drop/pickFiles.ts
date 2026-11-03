@@ -1,6 +1,6 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import { IMAGE_EXTENSIONS } from "@/features/compress/imageApi";
+import { IMAGE_EXTENSIONS, withNames } from "@/features/compress/imageApi";
 import { currentTranslator } from "@/i18n";
 
 /**
@@ -18,5 +18,5 @@ export async function pickAnyFiles(): Promise<string[]> {
     directory: false,
     filters: [{ name: t("picker.files.filter"), extensions: [...IMAGE_EXTENSIONS, "pdf"] }],
   });
-  return selected ?? [];
+  return withNames(selected ?? []);
 }

@@ -3,7 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Modal } from "@/components/ui/Modal";
 import type { NavTarget, Page } from "@/components/layout/navigation";
-import type { ToolOptions } from "@/features/compress/taskApi";
+import { askToSaveResults, canSaveResults, type ToolOptions } from "@/features/compress/taskApi";
 import { useCompressJob } from "@/features/compress/useCompressJob";
 import { DropDialog } from "@/features/drop/DropDialog";
 import { dropHint } from "@/features/drop/dropHint";
@@ -106,7 +106,18 @@ function App() {
     });
   };
 
-  const startJob = (options: ToolOptions) => job.start(paths, options);
+  /** Android 8 and 9: why the storage permission is asked for, or that it was refused, before a Task. */
+  const [saving, setSaving] = useState<{ status: "ask" | "refused"; options: ToolOptions } | null>(null);
+
+  const startJob = async (options: ToolOptions) => {
+    if (await canSaveResults()) job.start(paths, options);
+    else setSaving({ status: "ask", options });
+  };
+
+  const askToSave = async (options: ToolOptions) => {
+    if (await askToSaveResults()) job.start(paths, options);
+    else setSaving({ status: "refused", options });
+  };
 
   const [dropped, setDropped] = useState<Dropped | null>(null);
   const pageTool = page === "home" ? tool : null;
@@ -280,6 +291,18 @@ function App() {
             onAction={openFiles}
           >
             {refused.detail}
+          </AlertDialog>
+        </Modal>
+      )}
+      {saving && (
+        <Modal isOpen isDismissable onOpenChange={(open) => !open && setSaving(null)}>
+          <AlertDialog
+            title={t(`saving.${saving.status}.title`)}
+            actionLabel={t(saving.status === "ask" ? "saving.ask.continue" : "saving.refused.retry")}
+            cancelLabel={t(saving.status === "ask" ? "common.cancel" : "common.close")}
+            onAction={() => askToSave(saving.options)}
+          >
+            {t(`saving.${saving.status}.body`)}
           </AlertDialog>
         </Modal>
       )}

@@ -1,10 +1,13 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use rantakit_tasks::{FileKind, file_info as read_info};
 use serde::Serialize;
 use tauri::AppHandle;
 use tauri::ipc::Response;
 use tauri_plugin_opener::OpenerExt;
+
+#[cfg(target_os = "android")]
+use crate::android;
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -18,11 +21,11 @@ pub struct FileInfo {
 /// What the Files step shows next to each Original: size, and the page count
 /// for PDFs. Reads file headers, so it runs off the main thread.
 #[tauri::command]
-pub async fn file_info(paths: Vec<PathBuf>) -> Vec<FileInfo> {
+pub async fn file_info(app: AppHandle, paths: Vec<PathBuf>) -> Vec<FileInfo> {
     paths
         .iter()
         .map(|path| {
-            let info = read_info(path);
+            let info = info(&app, path);
             FileInfo {
                 size: info.size,
                 kind: info.kind.map(FileKind::as_str),
@@ -33,11 +36,45 @@ pub async fn file_info(paths: Vec<PathBuf>) -> Vec<FileInfo> {
         .collect()
 }
 
+fn info(app: &AppHandle, path: &Path) -> rantakit_tasks::FileInfo {
+    #[cfg(target_os = "android")]
+    if android::is_content(path) {
+        return android::file_info(app, path);
+    }
+    let _ = app;
+    read_info(path)
+}
+
+/// The names of files chosen on Android, whose `content://` addresses do not
+/// contain them. `None` for a plain path, which ends in its name.
+#[tauri::command]
+pub async fn file_names(app: AppHandle, paths: Vec<PathBuf>) -> Vec<Option<String>> {
+    #[cfg(target_os = "android")]
+    return paths
+        .iter()
+        .map(|path| {
+            android::is_content(path)
+                .then(|| android::name(&app, path))
+                .flatten()
+        })
+        .collect();
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        vec![None; paths.len()]
+    }
+}
+
 /// A small JPG of a photo, as raw bytes, for the file rows and the Result
 /// preview. Fails quietly with an empty body; the row then shows an icon.
 #[tauri::command]
-pub async fn thumbnail(path: PathBuf, size: u32) -> Response {
+pub async fn thumbnail(app: AppHandle, path: PathBuf, size: u32) -> Response {
     let size = size.clamp(32, 1024);
+    #[cfg(target_os = "android")]
+    if android::is_content(&path) {
+        return Response::new(android::thumbnail(&app, &path, size).unwrap_or_default());
+    }
+    let _ = app;
     Response::new(rantakit_tasks::thumbnail(&path, size).unwrap_or_default())
 }
 
@@ -46,5 +83,30 @@ pub async fn thumbnail(path: PathBuf, size: u32) -> Response {
 pub fn open_path(app: AppHandle, path: PathBuf) {
     if let Err(error) = app.opener().open_path(path.to_string_lossy(), None::<&str>) {
         eprintln!("open failed: {error}");
+    }
+}
+
+/// Android 9 and earlier ask for the storage permission before the first
+/// Task, so that Results can be saved in `Download/`. Always true elsewhere.
+#[tauri::command]
+pub async fn can_save_results(app: AppHandle) -> bool {
+    #[cfg(target_os = "android")]
+    return android::can_save(&app).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        true
+    }
+}
+
+/// Shows the system's storage permission prompt, after the app has said why.
+#[tauri::command]
+pub async fn ask_to_save_results(app: AppHandle) -> bool {
+    #[cfg(target_os = "android")]
+    return android::ask_to_save(&app).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        true
     }
 }

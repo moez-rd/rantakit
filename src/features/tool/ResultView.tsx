@@ -20,7 +20,7 @@ import { useT, type Translator } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
 import { openPath } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
-import { isWindowsApp } from "@/lib/platform";
+import { isAndroidApp, isWindowsApp } from "@/lib/platform";
 import { tv } from "@/lib/react-aria-utils";
 import { useThumbnail } from "./fileInfo";
 import { NOUN_ICONS } from "./FilesColumn";
@@ -73,7 +73,9 @@ export function ResultSummary({ job, noun, resultsFolder }: ResultSummaryProps) 
     partial: t("result.partial", { done: finished, files }),
     cancelled: t("result.cancelled", { done: finished, files }),
   }[tone];
-  const saved = resultsFolder ? t("result.savedIn", { folder: resultsFolder }) : t("result.savedNext");
+  // Android always saves to Download/Rantakit/, whatever the desktop setting says.
+  const folder = isAndroidApp ? "Download/Rantakit" : resultsFolder;
+  const saved = folder ? t("result.savedIn", { folder }) : t("result.savedNext");
   const body = {
     done:
       done.length === 0

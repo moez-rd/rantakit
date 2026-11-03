@@ -42,10 +42,13 @@ const HEADER_BYTES: usize = 1024;
 /// `None` when it cannot be read or is not a kind Rantakit knows. Office,
 /// audio, and video files are recognized once their Tools ship.
 pub fn detect_kind(path: &Path) -> Option<FileKind> {
+    read_kind(&mut File::open(path).ok()?)
+}
+
+/// `detect_kind` from the start of an open file.
+pub fn read_kind(file: &mut impl Read) -> Option<FileKind> {
     let mut header = Vec::with_capacity(HEADER_BYTES);
-    File::open(path)
-        .ok()?
-        .take(HEADER_BYTES as u64)
+    file.take(HEADER_BYTES as u64)
         .read_to_end(&mut header)
         .ok()?;
     kind_of(&header)

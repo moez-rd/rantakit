@@ -346,4 +346,11 @@ export const en: Messages = {
   "settings.checkUpdates": "Check for new versions",
   "settings.checkUpdates.description":
     "Each time it opens, Rantakit asks GitHub whether a new version is out. Your files are never sent.",
+  "saving.ask.title": "Let Rantakit save your results",
+  "saving.ask.body": "So results can be saved in the Download folder.",
+  "saving.ask.continue": "Continue",
+  "saving.refused.title": "Results can't be saved yet",
+  "saving.refused.body":
+    "Open your phone's Settings, choose Apps, then Rantakit. Under Permissions, turn on Storage, then try again.",
+  "saving.refused.retry": "Try again",
 };

@@ -105,15 +105,20 @@ pub fn compress_pdf(
 
 /// How many pages the PDF at `path` has, for the Files step.
 pub fn page_count(path: &Path) -> Result<usize> {
-    let original = read_original(path)?;
-    if !is_pdf(&original) {
+    page_count_of(&read_original(path)?)
+}
+
+/// `page_count` of a PDF already in memory, such as one read from a file
+/// Android handed over without a path.
+pub fn page_count_of(original: &[u8]) -> Result<usize> {
+    if !is_pdf(original) {
         return Err(ErrorKind::UnsupportedFormat);
     }
     let load = LoadOptions {
         max_decompressed_size: Some(MAX_DECOMPRESSED_BYTES),
         ..Default::default()
     };
-    let doc = Document::load_mem_with_options(&original, load).map_err(load_error)?;
+    let doc = Document::load_mem_with_options(original, load).map_err(load_error)?;
     Ok(doc.get_pages().len())
 }
 

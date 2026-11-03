@@ -349,4 +349,11 @@ export const id = {
   "settings.checkUpdates": "Cek versi baru",
   "settings.checkUpdates.description":
     "Setiap dibuka, Rantakit bertanya ke GitHub apakah ada versi baru. File kamu tidak pernah ikut dikirim.",
+  "saving.ask.title": "Izinkan Rantakit menyimpan hasil",
+  "saving.ask.body": "Supaya hasil bisa disimpan di folder Download.",
+  "saving.ask.continue": "Lanjut",
+  "saving.refused.title": "Hasil belum bisa disimpan",
+  "saving.refused.body":
+    "Buka Setelan HP, pilih Aplikasi, lalu Rantakit. Di Izin, nyalakan Penyimpanan, lalu coba lagi.",
+  "saving.refused.retry": "Coba lagi",
 } as const;
