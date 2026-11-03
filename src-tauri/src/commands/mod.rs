@@ -7,3 +7,4 @@ pub mod settings;
 pub mod share;
 pub mod task;
 pub mod tools;
+pub mod update;

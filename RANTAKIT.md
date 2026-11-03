@@ -173,7 +173,7 @@ On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are st
 | Android | Google Play, F-Droid, APK on GitHub Releases |
 | Linux | Flathub (primary); .deb, .rpm, and AppImage on GitHub Releases |
 
-The in-app update check is on by default, shows a quiet "update available" notice with a one-click download, can be switched off in Settings, and is disabled where a store handles updates ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)). It is postponed while the maintainer is the only user, and ships before Rantakit is offered to anyone else.
+The in-app update check is on by default, shows a quiet "update available" notice with a one-click download, can be switched off in Settings, and is disabled where a store handles updates ([ADR 0001](docs/adr/0001-files-never-leave-the-device.md)). It ships in v0.3 for Windows and the Linux AppImage, which install the update themselves; the Linux .deb and .rpm open the download page instead.
 
 ### App size
 

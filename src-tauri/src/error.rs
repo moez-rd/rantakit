@@ -12,12 +12,18 @@ pub enum Error {
 
     #[error(transparent)]
     Store(#[from] StoreError),
+
+    #[cfg(desktop)]
+    #[error(transparent)]
+    Update(#[from] tauri_plugin_updater::Error),
 }
 
 impl Error {
     fn code(&self) -> &'static str {
         match self {
             Self::History(HistoryError::Newer(_)) => "history-from-newer-version",
+            #[cfg(desktop)]
+            Self::Update(_) => "update-failed",
             Self::History(_) | Self::Store(_) => "unexpected",
         }
     }

@@ -32,3 +32,9 @@ pub fn set_results_folder(
 ) -> Result<Settings> {
     Ok(settings.update(|s| s.results_folder = folder)?)
 }
+
+/// "Cek versi baru": whether the app looks for a newer version at launch.
+#[tauri::command]
+pub fn set_check_updates(settings: State<'_, SettingsStore>, check: bool) -> Result<Settings> {
+    Ok(settings.update(|s| s.check_updates = check)?)
+}

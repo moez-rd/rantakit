@@ -16,6 +16,7 @@ import { HistoryPage } from "@/features/history/HistoryPage";
 import { SettingsDialog, type SettingsTab } from "@/features/settings/SettingsDialog";
 import { LeaveDialog } from "@/features/tool/LeaveDialog";
 import { ToolPage } from "@/features/tool/ToolPage";
+import { UpdateNotice } from "@/features/update/UpdateNotice";
 import { isShipped, toolDef, type ShippedTool } from "@/features/tool/tools";
 import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
@@ -232,6 +233,7 @@ function App() {
         sidebarOpen: layout.sidebar,
         onToggleSidebar: toggleSidebar,
       }}
+      titleBarEnd={<UpdateNotice busy={job.isRunning} />}
     >
       {page === "home" &&
         (tool ? (

@@ -28,6 +28,11 @@ tauri-plugin-dialog = "2"
 thiserror = "2"
 serde_json = "1"
 
+# "Versi baru": the update check and install. Stores handle updates on
+# mobile, so the plugin is desktop only.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
+
 # The system share sheet ("Bagikan") on the Result page, and the rounded
 # corners of the undecorated window.
 [target.'cfg(windows)'.dependencies]

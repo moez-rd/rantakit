@@ -335,4 +335,18 @@ export const id = {
   "window.maximize": "Perbesar",
   "window.restore": "Kembalikan ukuran",
   "window.close": "Tutup",
+
+  // Versi baru
+  "update.notice": "Versi baru",
+  "update.title": "Rantakit {version} sudah ada",
+  "update.body": "Versi baru akan diunduh dan dipasang, lalu Rantakit dibuka lagi. File kamu tidak terpengaruh.",
+  "update.body.download": "Unduh versi baru dari halaman unduhan Rantakit, lalu pasang seperti biasa.",
+  "update.busy": "Tunggu tugas yang sedang berjalan selesai dulu.",
+  "update.failed": "Versi baru gagal dipasang. Coba lagi nanti, atau unduh dari halaman unduhan.",
+  "update.install": "Perbarui sekarang",
+  "update.download": "Buka halaman unduhan",
+  "update.later": "Nanti",
+  "settings.checkUpdates": "Cek versi baru",
+  "settings.checkUpdates.description":
+    "Setiap dibuka, Rantakit bertanya ke GitHub apakah ada versi baru. File kamu tidak pernah ikut dikirim.",
 } as const;

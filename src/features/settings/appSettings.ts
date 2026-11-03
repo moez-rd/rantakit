@@ -9,6 +9,8 @@ export interface AppSettings {
   keepHistory: boolean;
   /** "Di folder pilihan"; null saves each Result next to its Original. */
   resultsFolder: string | null;
+  /** "Cek versi baru". */
+  checkUpdates: boolean;
 }
 
 const CHANGE_EVENT = "rantakit:app-settings";
@@ -42,6 +44,11 @@ export function setKeepHistory(keep: boolean) {
 /** A folder for every Result, or null for next to each Original. */
 export function setResultsFolder(folder: string | null) {
   return invoke<AppSettings>("set_results_folder", { folder }).then(publish);
+}
+
+/** Takes effect at the next launch, when the check runs. */
+export function setCheckUpdates(check: boolean) {
+  return invoke<AppSettings>("set_check_updates", { check }).then(publish);
 }
 
 /** Ask the user for the Results folder. Null when cancelled. */

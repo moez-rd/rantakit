@@ -7,8 +7,9 @@ import type { ToolInfo } from "@/features/home/tools";
  * crates/rantakit-tasks/src/catalogue.rs on desktop.
  *
  * URL switches: `?recent` fills Recent tools, `?fail` makes the second file
- * of every Task miss its Size limit, `?slow` makes Tasks take longer, and
- * `?historyOff` starts with History turned off.
+ * of every Task miss its Size limit, `?slow` makes Tasks take longer,
+ * `?historyOff` starts with History turned off, `?update` finds version 0.3.0
+ * (with `?updateDeb`, as a Linux .deb that can't install it).
  */
 const TOOLS: ToolInfo[] = [
   { id: "kompres-foto", job: "kecilkan-ubah", comingSoon: false },
@@ -99,7 +100,7 @@ function sampleHistory() {
   ];
 }
 
-const appSettings = { keepHistory: !has("historyOff"), resultsFolder: null as string | null };
+const appSettings = { keepHistory: !has("historyOff"), resultsFolder: null as string | null, checkUpdates: true };
 const cancelled = new Set<number>();
 const recentLimits = [200 * 1024, 1024 * 1024, 500 * 1024];
 const presets: { id: string; tool: string; name: string; options: object }[] = [];
@@ -189,6 +190,14 @@ export function installDevMocks() {
       case "set_results_folder":
         appSettings.resultsFolder = (args as { folder: string | null }).folder;
         return { ...appSettings };
+      case "set_check_updates":
+        appSettings.checkUpdates = (args as { check: boolean }).check;
+        return { ...appSettings };
+      case "check_update":
+        return has("update") && appSettings.checkUpdates ? { version: "0.3.0", canInstall: !has("updateDeb") } : null;
+      case "install_update":
+        // Never restarts here; fails after a moment so the retry path shows.
+        return new Promise((_, reject) => setTimeout(() => reject({ code: "update-failed" }), 1500));
       case "recent_limits":
         return has("recent") ? [...recentLimits] : [];
       case "list_presets": {

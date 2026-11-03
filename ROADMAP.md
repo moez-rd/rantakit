@@ -88,6 +88,7 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - **Share → Rantakit:** files shared into Rantakit open with only the Tools that fit them.
 - **Results in `Download/Rantakit/`**, visible in the Files and Gallery apps, and shared through the system share sheet.
 - **Riwayat (History) on Android.**
+- **"Versi baru" (New version) on desktop** ([RANTAKIT.md §7](RANTAKIT.md#distribution-and-updates)): the in-app update check, so Windows and Linux users get 0.3 and later without visiting GitHub.
 
 **Done when:**
 
@@ -206,5 +207,4 @@ In order, without versions yet:
 ## Not in this roadmap
 
 - **Distribution channels** (SignPath, Microsoft Store, Google Play, F-Droid, Flathub): decided later.
-- **In-app update check** ([RANTAKIT.md §7](RANTAKIT.md#distribution-and-updates)): postponed while the maintainer is the only user; it ships before Rantakit is offered to anyone else.
 - **Where donations are mentioned** ([ADR 0002](docs/adr/0002-free-forever-no-feature-gating.md)): not scheduled.

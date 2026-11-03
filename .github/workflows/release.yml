@@ -20,7 +20,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.ref_name }}
-          PRERELEASE: ${{ startsWith(github.ref_name, 'v0.') || contains(github.ref_name, '-') }}
+          # Only release candidates: "Versi baru" reads the latest release,
+          # which GitHub never points at a pre-release.
+          PRERELEASE: ${{ contains(github.ref_name, '-') }}
         run: |
           # Drafts have no tag yet, so look them up in the list, not by tag.
           id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
@@ -78,7 +80,14 @@ jobs:
       - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the update files that "Versi baru" checks against the
+          # public key in tauri.conf.json.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tauriScript: bun tauri
+          # Only release builds make the signed update files and latest.json,
+          # so local builds need no signing key.
+          args: --config src-tauri/tauri.updater.conf.json
           # Upload into the release create-release made; never make another.
           releaseId: ${{ needs.create-release.outputs.release_id }}

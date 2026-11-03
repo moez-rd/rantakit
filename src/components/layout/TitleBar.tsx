@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ChevronLeft, ChevronRight, Copy, Minus, PanelLeft, Square, X } from "@keyline-icons/react";
 import { Button } from "react-aria-components";
@@ -30,11 +30,20 @@ export interface TitleBarNav {
 
 /**
  * The desktop title bar: the sidebar toggle, Back and Forward on the left,
- * the window controls on the right. macOS keeps its own traffic lights, so
- * the buttons start clear of them and the window controls are left out.
- * The empty strip moves the window; a double-click maximizes it.
+ * `children` (the "Versi baru" notice) and the window controls on the right.
+ * macOS keeps its own traffic lights, so the buttons start clear of them and
+ * the window controls are left out. The empty strip moves the window; a
+ * double-click maximizes it.
  */
-export function TitleBar({ canBack, canForward, onBack, onForward, sidebarOpen, onToggleSidebar }: TitleBarNav) {
+export function TitleBar({
+  canBack,
+  canForward,
+  onBack,
+  onForward,
+  sidebarOpen,
+  onToggleSidebar,
+  children,
+}: TitleBarNav & { children?: ReactNode }) {
   const { t } = useT();
 
   return (
@@ -59,6 +68,7 @@ export function TitleBar({ canBack, canForward, onBack, onForward, sidebarOpen, 
         </Button>
       </div>
       <div data-tauri-drag-region className="h-full flex-1" />
+      {children}
       {!isMacApp && <WindowControls />}
     </header>
   );
