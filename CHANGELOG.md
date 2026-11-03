@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
+Rantakit 0.2.0 for Windows and Linux: everything in 0.2.0-rc.1 and 0.2.0-rc.2, plus the changes below. Rantakit is in early development and is not stable yet.
+
+### Changed
+
+- Files chosen with "Buka" (Open) that no Tool can take now show why, with "Pilih file lain" (Choose other files) to pick again
+
 ## [0.2.0-rc.2] - 2026-11-02
 
 Second release candidate for 0.2.0, for Windows and Linux, with a new window layout. Rantakit is in early development and is not stable yet.
@@ -85,7 +93,8 @@ First public release, for Windows and Linux. Rantakit is in early development an
 - Settings for theme (light, dark, system) and UI zoom
 - Interface in Indonesian
 
-[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.2...HEAD
+[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.2...v0.2.0
 [0.2.0-rc.2]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.1...v0.2.0-rc.2
 [0.2.0-rc.1]: https://github.com/moez-rd/rantakit/compare/v0.1.0...v0.2.0-rc.1
 [0.1.0]: https://github.com/moez-rd/rantakit/releases/tag/v0.1.0
