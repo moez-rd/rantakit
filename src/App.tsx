@@ -22,7 +22,7 @@ import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
 import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
 import { useNavHistory } from "@/lib/navHistory";
-import { isMacApp } from "@/lib/platform";
+import { isAndroidApp, isMacApp } from "@/lib/platform";
 import { useStoredState } from "@/lib/storedState";
 import { useT } from "@/i18n";
 
@@ -215,8 +215,8 @@ function App() {
 
   useMenuEvents(runCommand);
   useMenuLanguage();
-  // On macOS the menu bar handles these as Cmd shortcuts.
-  useShortcuts(runCommand, !isMacApp);
+  // On macOS the menu bar handles these as Cmd shortcuts; Android has none.
+  useShortcuts(runCommand, !isMacApp && !isAndroidApp);
 
   const noun = tool ? toolDef(tool).noun : "photo";
 

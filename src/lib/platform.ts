@@ -12,5 +12,8 @@ export const isDesktopApp = isTauri() && !["android", "ios"].includes(platform);
  */
 export const isMacApp = isDesktopApp && platform === "darwin";
 
+/** The Android app: no title bar or keyboard shortcuts, Results in `Download/Rantakit/`. */
+export const isAndroidApp = isTauri() && platform === "android";
+
 /** The Windows app, the only one with a system share sheet Rantakit can open. */
 export const isWindowsApp = isDesktopApp && platform === "windows";

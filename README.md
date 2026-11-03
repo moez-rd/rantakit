@@ -107,6 +107,22 @@ bun run tauri dev       # development
 bun run tauri build     # production bundle
 ```
 
+**Android**
+
+Needs Android Studio with an SDK, the NDK (Side by side), and the SDK Command-line Tools, plus the Rust targets:
+
+```bash
+rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
+```
+
+Set `JAVA_HOME` (Android Studio's `jbr`), `ANDROID_HOME`, and `NDK_HOME`. On Windows, turn on Developer Mode, since the build links the Rust library into the Android project. tauri-cli 2.12 can't tell how `bun run` started it, so call the CLI directly and name bun:
+
+```bash
+npm_execpath="$(which bun)" bun node_modules/@tauri-apps/cli/tauri.js android build --debug --apk --target x86_64
+```
+
+The emulator, and any phone, needs Android System WebView 111 or later; older ones show how to update it.
+
 **Checks**
 
 ```bash
