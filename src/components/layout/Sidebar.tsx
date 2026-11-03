@@ -2,7 +2,7 @@ import { Plus } from "@keyline-icons/react";
 import { Button, Link } from "react-aria-components";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
-import { MAIN_NAV, SETTINGS_NAV, type NavItem, type NavTarget, type Page } from "./navigation";
+import { MAIN_NAV, SETTINGS_NAV, type NavItem, type NavTarget } from "./navigation";
 
 /** Sidebar item, 44 px: hover changes only the background. */
 const navLink = tv({
@@ -26,19 +26,19 @@ const openButton = tv({
 });
 
 interface SidebarProps {
-  page: Page;
+  current: NavTarget;
   onNavigate: (target: NavTarget) => void;
   onOpen: () => void;
 }
 
-export function Sidebar({ page, onNavigate, onOpen }: SidebarProps) {
+export function Sidebar({ current, onNavigate, onOpen }: SidebarProps) {
   const { t } = useT();
   const item = ({ id, label, icon, currentIcon }: NavItem) => {
-    const Icon = page === id ? currentIcon : icon;
+    const Icon = current === id ? currentIcon : icon;
     return (
       <Link
         key={id}
-        aria-current={page === id ? "page" : undefined}
+        aria-current={current === id ? "page" : undefined}
         onPress={() => onNavigate(id)}
         className={(renderProps) => navLink(renderProps)}
       >

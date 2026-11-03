@@ -1,7 +1,7 @@
 import { Link } from "react-aria-components";
 import { useT } from "@/i18n";
 import { focusRing, tv } from "@/lib/react-aria-utils";
-import { MAIN_NAV, SETTINGS_NAV, type NavTarget, type Page } from "./navigation";
+import { MAIN_NAV, SETTINGS_NAV, type NavTarget } from "./navigation";
 
 const tabLink = tv({
   extend: focusRing,
@@ -14,21 +14,21 @@ const tabLink = tv({
 });
 
 interface TabBarProps {
-  page: Page;
+  current: NavTarget;
   onNavigate: (target: NavTarget) => void;
 }
 
 /** Bottom navigation for narrow (mobile) screens; replaces the sidebar. */
-export function TabBar({ page, onNavigate }: TabBarProps) {
+export function TabBar({ current, onNavigate }: TabBarProps) {
   const { t } = useT();
   return (
     <nav aria-label={t("nav.label")} className="flex shrink-0 border-t border-border bg-bg px-2 md:hidden">
       {[...MAIN_NAV, SETTINGS_NAV].map(({ id, label, icon, currentIcon }) => {
-        const Icon = page === id ? currentIcon : icon;
+        const Icon = current === id ? currentIcon : icon;
         return (
           <Link
           key={id}
-          aria-current={page === id ? "page" : undefined}
+          aria-current={current === id ? "page" : undefined}
           onPress={() => onNavigate(id)}
           className={(renderProps) => tabLink(renderProps)}
         >

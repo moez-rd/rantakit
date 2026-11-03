@@ -12,6 +12,7 @@ import { useT } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
 import { openPath } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
+import { canShowInFolder } from "@/lib/platform";
 import { clearHistory, listHistory, type HistoryFile, type HistoryItem } from "./historyApi";
 
 /** "Riwayat": every Task with a Result, grouped by day, newest first. */
@@ -180,9 +181,11 @@ function HistoryEntry({ entry }: { entry: HistoryItem }) {
         {!missing && (
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             {entry.files.length === 1 && <OpenButton file={first} />}
-            <Button variant="secondary" size="row" onPress={() => revealItemInDir(existing[0].resultPath)}>
-              <FolderOpen aria-hidden className="size-[18px]" /> {t("task.showInFolder")}
-            </Button>
+            {canShowInFolder && (
+              <Button variant="secondary" size="row" onPress={() => revealItemInDir(existing[0].resultPath)}>
+                <FolderOpen aria-hidden className="size-[18px]" /> {t("task.showInFolder")}
+              </Button>
+            )}
             {entry.files.length > 1 && (
               <Button variant="secondary" size="row" aria-expanded={expanded} onPress={() => setExpanded(!expanded)}>
                 {t("history.seeFiles", { count: entry.files.length })}

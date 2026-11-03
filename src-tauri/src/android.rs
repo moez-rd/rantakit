@@ -76,6 +76,30 @@ pub fn thumbnail(app: &AppHandle, path: &Path, size: u32) -> Option<Vec<u8>> {
         .flatten()
 }
 
+/// The MediaStore address of a Result, which other apps can be given. Results
+/// are known by their path in `Download/Rantakit/`, the one History keeps.
+fn result_uri(app: &AppHandle, path: &Path) -> tauri_plugin_android_fs::Result<FsUri> {
+    if is_content(path) {
+        return Ok(uri(path));
+    }
+    app.android_fs().public_storage().scan_by_path(path, None)
+}
+
+/// "Buka": the system asks which app opens the Result.
+pub fn open(app: &AppHandle, path: &Path) -> tauri_plugin_android_fs::Result<()> {
+    let uri = result_uri(app, path)?;
+    app.android_fs().opener().open_file(&uri)
+}
+
+/// "Bagikan": the system share sheet, with every Result as one share.
+pub fn share(app: &AppHandle, paths: &[PathBuf]) -> tauri_plugin_android_fs::Result<()> {
+    let uris = paths
+        .iter()
+        .map(|path| result_uri(app, path))
+        .collect::<tauri_plugin_android_fs::Result<Vec<_>>>()?;
+    app.android_fs().opener().share_files(&uris)
+}
+
 /// Android 9 and earlier need the storage permission to save Results; later
 /// versions always have it.
 pub async fn can_save(app: &AppHandle) -> bool {

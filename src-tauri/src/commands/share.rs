@@ -2,15 +2,20 @@ use std::path::PathBuf;
 
 use tauri::WebviewWindow;
 
-/// Opens the system share sheet for Results ("Bagikan"). Windows only; the
-/// frontend shows the button nowhere else, and elsewhere this does nothing.
+/// Opens the system share sheet for Results ("Bagikan"). Windows and Android
+/// only; the frontend shows the button nowhere else, and elsewhere this does
+/// nothing.
 #[tauri::command]
 pub async fn share_files(window: WebviewWindow, paths: Vec<PathBuf>) {
     #[cfg(windows)]
     if let Err(error) = windows_share::share(&window, paths) {
         eprintln!("share failed: {error}");
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "android")]
+    if let Err(error) = crate::android::share(tauri::Manager::app_handle(&window), &paths) {
+        eprintln!("share failed: {error}");
+    }
+    #[cfg(not(any(windows, target_os = "android")))]
     let _ = (window, paths);
 }
 

@@ -29,7 +29,8 @@ export function ShrinkOptions({ noun, settings, onChange }: ShrinkOptionsProps) 
         disallowEmptySelection
         selectedKeys={[settings.mode]}
         onSelectionChange={(keys) => onChange({ mode: [...keys][0] as ShrinkSettings["mode"] })}
-        className="[&>*]:flex-1"
+        // A narrow panel, such as a phone turned sideways, wraps the labels instead of cutting them off.
+        className="[&>*]:h-auto [&>*]:min-h-9 [&>*]:flex-1 [&>*]:py-1.5 [&>*]:whitespace-normal"
       >
         <ToggleButton id="limit">{t("shrink.limit")}</ToggleButton>
         <ToggleButton id="smaller">{t("shrink.smaller")}</ToggleButton>

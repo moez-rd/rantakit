@@ -6,6 +6,7 @@ import { fileName } from "@/features/compress/imageApi";
 import { useT } from "@/i18n";
 import type { JobItem } from "@/features/compress/useCompressJob";
 import { formatBytes } from "@/lib/format";
+import { isAndroidApp } from "@/lib/platform";
 import { useFileInfo, useThumbnail, type FileInfo } from "./fileInfo";
 import { unchangedNote } from "./unchanged";
 
@@ -39,7 +40,8 @@ export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: 
         </span>
         <Button onPress={onPick}>{t(`files.pick.${noun}`)}</Button>
         <div className="flex flex-col gap-1">
-          <p>{t("files.dropHere")}</p>
+          {/* Nothing is dragged into an app on a phone. */}
+          {!isAndroidApp && <p>{t("files.dropHere")}</p>}
           <p className="text-small text-text-muted">{t(`formats.${noun}`)}</p>
         </div>
       </div>
@@ -80,7 +82,7 @@ export function FilesColumn({ noun, paths, items, skipNote, onPick, onRemove }: 
         <Button variant="secondary" size="row" onPress={onPick}>
           <Plus aria-hidden className="size-5" /> {t(`files.add.${noun}`)}
         </Button>
-        <span className="text-small text-text-muted">{t(`files.dropMore.${noun}`)}</span>
+        {!isAndroidApp && <span className="text-small text-text-muted">{t(`files.dropMore.${noun}`)}</span>}
       </div>
     </div>
   );

@@ -210,6 +210,7 @@ export const id = {
   "result.open": "Buka",
   "result.openName": "Buka {name}",
   "result.share": "Bagikan",
+  "result.shareAll": "Bagikan semua",
   "result.another": "Proses file lain",
   "result.list": "Hasil",
   "task.file.failed": "Belum berhasil",

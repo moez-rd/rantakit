@@ -7,7 +7,7 @@ import {
 } from "@keyline-icons/react/fill";
 
 export type Page = "home" | "history";
-/** Where a navigation item leads: a page, or the Settings dialog over it. */
+/** Where a navigation item leads: a page, or Settings (a dialog over the page, or a page on a phone). */
 export type NavTarget = Page | "settings";
 
 type Icon = ComponentType<IconProps>;
