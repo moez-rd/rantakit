@@ -6,7 +6,38 @@ on:
       - "v*"
 
 jobs:
+  # One release for the tag, made before the builds. When each build made its
+  # own, the two jobs raced and one tag got two drafts (#7).
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+    steps:
+      - name: Create the draft release, or reuse it when the workflow is re-run
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ startsWith(github.ref_name, 'v0.') || contains(github.ref_name, '-') }}
+        run: |
+          # Drafts have no tag yet, so look them up in the list, not by tag.
+          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq ".[] | select(.tag_name == \"$TAG\") | .id" | sed -n 1p)
+          if [ -z "$id" ]; then
+            id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" \
+              -f tag_name="$TAG" \
+              -f name="Rantakit $TAG" \
+              -f body="See the assets below to download and install." \
+              -F draft=true \
+              -F prerelease="$PRERELEASE" \
+              --jq .id)
+          fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
   publish-tauri:
+    needs: create-release
     permissions:
       contents: write
     strategy:
@@ -49,8 +80,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tauriScript: bun tauri
-          tagName: ${{ github.ref_name }}
-          releaseName: "Rantakit ${{ github.ref_name }}"
-          releaseBody: "See the assets below to download and install."
-          releaseDraft: true
-          prerelease: ${{ startsWith(github.ref_name, 'v0.') || contains(github.ref_name, '-') }}
+          # Upload into the release create-release made; never make another.
+          releaseId: ${{ needs.create-release.outputs.release_id }}
