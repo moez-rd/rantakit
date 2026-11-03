@@ -44,6 +44,7 @@ pub fn run() {
     builder
         .invoke_handler(tauri::generate_handler![
             commands::files::file_info,
+            commands::files::pick_files,
             commands::files::file_names,
             commands::files::thumbnail,
             commands::files::open_path,

@@ -4,6 +4,7 @@ import { currentTranslator } from "@/i18n";
 import { isAndroidApp } from "@/lib/platform";
 
 export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
+export const IMAGE_MIME_TYPES = ["image/jpeg", "image/png"];
 
 /** Names of files chosen on Android, by their `content://` address. */
 const chosenNames = new Map<string, string>();
@@ -15,16 +16,25 @@ export const fileName = (path: string) => chosenNames.get(path) ?? path.split(/[
  * Looks up the names of files chosen on Android, whose `content://`
  * addresses do not contain them, so that `fileName` can show them.
  */
-export async function withNames(paths: string[]): Promise<string[]> {
-  if (!isAndroidApp || paths.length === 0) return paths;
+async function withNames(paths: string[]): Promise<string[]> {
+  if (paths.length === 0) return paths;
   const names = await invoke<(string | null)[]>("file_names", { paths }).catch(() => []);
   paths.forEach((path, i) => names[i] && chosenNames.set(path, names[i]));
   return paths;
 }
 
+/**
+ * Android's system file picker, which keeps each file's real name. The
+ * dialog plugin would open the Photo Picker for photos, which hides them.
+ */
+export async function pickOnAndroid(mimeTypes: string[]): Promise<string[]> {
+  return withNames(await invoke<string[]>("pick_files", { mimeTypes }).catch(() => []));
+}
+
 /** Ask the user for photos. Returns an empty list when cancelled or outside Tauri. */
 export async function pickImages(): Promise<string[]> {
   if (!isTauri()) return import.meta.env.DEV ? (await import("@/lib/devMocks")).devPick("photo") : [];
+  if (isAndroidApp) return pickOnAndroid(IMAGE_MIME_TYPES);
 
   const { t } = currentTranslator();
   const selected = await open({
@@ -33,5 +43,5 @@ export async function pickImages(): Promise<string[]> {
     directory: false,
     filters: [{ name: t("picker.photos.filter"), extensions: IMAGE_EXTENSIONS }],
   });
-  return withNames(selected ?? []);
+  return selected ?? [];
 }

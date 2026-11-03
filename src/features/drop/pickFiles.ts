@@ -1,7 +1,8 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import { IMAGE_EXTENSIONS, withNames } from "@/features/compress/imageApi";
+import { IMAGE_EXTENSIONS, IMAGE_MIME_TYPES, pickOnAndroid } from "@/features/compress/imageApi";
 import { currentTranslator } from "@/i18n";
+import { isAndroidApp } from "@/lib/platform";
 
 /**
  * Ask the user for any file a Tool can take, for the sidebar's "Buka" button.
@@ -10,6 +11,7 @@ import { currentTranslator } from "@/i18n";
  */
 export async function pickAnyFiles(): Promise<string[]> {
   if (!isTauri()) return import.meta.env.DEV ? (await import("@/lib/devMocks")).devPick("photo") : [];
+  if (isAndroidApp) return pickOnAndroid([...IMAGE_MIME_TYPES, "application/pdf"]);
 
   const { t } = currentTranslator();
   const selected = await open({
@@ -18,5 +20,5 @@ export async function pickAnyFiles(): Promise<string[]> {
     directory: false,
     filters: [{ name: t("picker.files.filter"), extensions: [...IMAGE_EXTENSIONS, "pdf"] }],
   });
-  return withNames(selected ?? []);
+  return selected ?? [];
 }

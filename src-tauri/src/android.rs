@@ -31,6 +31,21 @@ pub fn name(app: &AppHandle, path: &Path) -> Option<String> {
     Some(name.replace('/', "_"))
 }
 
+/// Opens the system file picker for `mime_types` and returns the chosen
+/// files' addresses, or none when cancelled. Unlike the Photo Picker, which
+/// hands over names like `33.jpg`, it keeps each file's real name.
+pub async fn pick(app: &AppHandle, mime_types: &[String]) -> Vec<PathBuf> {
+    let mime_types: Vec<&str> = mime_types.iter().map(String::as_str).collect();
+    let picker = app.android_fs_async().picker();
+    match picker.pick_files(None, &mime_types, false).await {
+        Ok(uris) => uris.into_iter().map(|uri| uri.uri.into()).collect(),
+        Err(err) => {
+            eprintln!("picker failed: {err}");
+            Vec::new()
+        }
+    }
+}
+
 /// `rantakit_tasks::file_info` for a `content://` Original, read through
 /// its open file so that nothing is copied.
 pub fn file_info(app: &AppHandle, path: &Path) -> FileInfo {

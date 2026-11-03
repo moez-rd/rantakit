@@ -45,6 +45,20 @@ fn info(app: &AppHandle, path: &Path) -> rantakit_tasks::FileInfo {
     read_info(path)
 }
 
+/// Android's system file picker for "Pilih foto", "Pilih PDF", and "Buka".
+/// The dialog plugin would open the Photo Picker for photos, which hides
+/// their names. Picks nothing elsewhere; desktop uses the dialog plugin.
+#[tauri::command]
+pub async fn pick_files(app: AppHandle, mime_types: Vec<String>) -> Vec<PathBuf> {
+    #[cfg(target_os = "android")]
+    return android::pick(&app, &mime_types).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = (app, mime_types);
+        Vec::new()
+    }
+}
+
 /// The names of files chosen on Android, whose `content://` addresses do not
 /// contain them. `None` for a plain path, which ends in its name.
 #[tauri::command]
