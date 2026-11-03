@@ -323,7 +323,9 @@ pub fn start_task(
                 eprintln!("task {id}: could not reach the frontend: {err}");
             }
         };
-        let outcomes = run_task(
+        let outcomes = run(
+            &app,
+            id,
             &task,
             &mut |event| match event {
                 TaskEvent::Progress { file, progress } => send(TaskMessage::Progress {
@@ -352,6 +354,65 @@ pub fn start_task(
     });
 
     id
+}
+
+/// Runs `task` where the platform keeps its files: as it is on desktop.
+#[cfg(not(target_os = "android"))]
+fn run(
+    _app: &AppHandle,
+    _id: u64,
+    task: &Task,
+    on_event: &mut dyn FnMut(TaskEvent),
+    cancel: &CancelToken,
+) -> Vec<FileOutcome> {
+    run_task(task, on_event, cancel)
+}
+
+/// Runs `task` where the platform keeps its files: on Android each Original
+/// is copied into the cache when its turn comes, and each Result is saved to
+/// `Download/Rantakit/`.
+#[cfg(target_os = "android")]
+fn run(
+    app: &AppHandle,
+    id: u64,
+    task: &Task,
+    on_event: &mut dyn FnMut(TaskEvent),
+    cancel: &CancelToken,
+) -> Vec<FileOutcome> {
+    use crate::android;
+
+    let workspace = android::Workspace::new(app, id);
+    let mut outcomes = Vec::with_capacity(task.originals.len());
+    for (file, original) in task.originals.iter().enumerate() {
+        let outcome = match &workspace {
+            _ if cancel.is_cancelled() => Err(ErrorKind::Cancelled),
+            Err(err) => Err(ErrorKind::writing(err)),
+            Ok(workspace) => workspace.copy_in(app, file, original).and_then(|copy| {
+                let one = Task {
+                    tool: task.tool.clone(),
+                    originals: vec![copy.clone()],
+                    results_folder: Some(workspace.results()),
+                };
+                let mut progress = |event: TaskEvent| {
+                    if let TaskEvent::Progress { progress, .. } = event {
+                        on_event(TaskEvent::Progress { file, progress });
+                    }
+                };
+                let result = run_task(&one, &mut progress, cancel).pop();
+                let saved = result
+                    .expect("one Original")
+                    .and_then(|result| android::save(app, &copy, task.tool.suffix(), result));
+                workspace.remove(file);
+                saved
+            }),
+        };
+        on_event(TaskEvent::FileDone {
+            file,
+            outcome: &outcome,
+        });
+        outcomes.push(outcome);
+    }
+    outcomes
 }
 
 /// Stops a running Task. Finished Results stay; the file being worked on

@@ -1,4 +1,5 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
+import { isAndroidApp } from "@/lib/platform";
 
 /** Mirrors `OptionsRequest` in `src-tauri/src/commands/task.rs`. */
 export type ToolOptions =
@@ -87,4 +88,14 @@ export function startTask(request: TaskRequest, onMessage: (message: TaskMessage
 /** Finished Results stay; the file being worked on leaves nothing behind. */
 export function cancelTask(id: number) {
   return invoke<void>("cancel_task", { id });
+}
+
+/** Whether Results can be saved now. Only Android 8 and 9 need the storage permission first. */
+export function canSaveResults() {
+  return isAndroidApp ? invoke<boolean>("can_save_results").catch(() => false) : Promise.resolve(true);
+}
+
+/** Shows Android's storage permission prompt; resolves with whether it was allowed. */
+export function askToSaveResults() {
+  return invoke<boolean>("ask_to_save_results").catch(() => false);
 }

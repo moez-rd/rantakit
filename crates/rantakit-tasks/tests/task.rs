@@ -7,7 +7,7 @@ use lopdf::{Document, Object, Stream, dictionary};
 use rantakit_tasks::{
     Availability, CATALOGUE, CancelToken, Details, ErrorKind, FileOutcome, ImageFormat,
     ImageOptions, OutputFormat, PdfOptions, Platform, Target, Task, TaskEvent, ToolId, ToolOptions,
-    WHITE, detect_kind, run_task, tools_for_files,
+    WHITE, detect_kind, file_info, file_info_of, run_task, tools_for_files,
 };
 
 /// A noisy 600x400 photo, so compressing it really makes it smaller.
@@ -395,4 +395,18 @@ fn photo_sizes_are_plain_longest_sides() {
         [PhotoSize::Large, PhotoSize::Medium, PhotoSize::Small].map(PhotoSize::side),
         [1920, 1280, 800]
     );
+}
+
+#[test]
+fn an_open_file_tells_as_much_as_its_path() {
+    // Android hands over chosen files as open files without a path.
+    let dir = scratch("open-file-info");
+    for (name, bytes) in [("foto.jpg", photo_jpg()), ("scan.pdf", scan_pdf())] {
+        let path = dir.join(name);
+        fs::write(&path, bytes).unwrap();
+
+        let info = file_info_of(fs::File::open(&path).unwrap());
+        assert_eq!(info, file_info(&path), "{name}");
+        assert!(info.pages.is_some() || info.longest_side.is_some(), "{name}");
+    }
 }

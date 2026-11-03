@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - "Versi baru" (New version): at launch Rantakit checks GitHub for a newer version and shows a quiet button in the title bar. On Windows and the Linux AppImage one click installs it; the .deb and .rpm open the download page. It can be turned off in Settings, under "Tentang" (About)
+- Android: photos and PDFs are chosen with the system file picker, keep their real names, are read where they are, and every Result is saved as a new file in `Download/Rantakit/`, where Gallery and Files find it. Android 8 and 9 ask for the storage permission at the first Task, after saying why
 
 ### Changed
 

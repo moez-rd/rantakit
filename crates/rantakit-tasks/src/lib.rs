@@ -20,9 +20,9 @@ pub use catalogue::{
 };
 pub use compression::{Compression, Level, dpi_to_side};
 pub use history::{Entry, EntryFile, History, HistoryError};
-pub use info::{FileInfo, file_info};
-pub use kinds::{FileKind, detect_kind};
-pub use names::result_path;
+pub use info::{FileInfo, file_info, file_info_of};
+pub use kinds::{FileKind, detect_kind, read_kind};
+pub use names::{result_name, result_path};
 pub use presets::{Preset, Presets};
 pub use recent::{RECENT_LIMITS, RECENT_TOOLS, Recent, RecentLimits, RecentTools};
 pub use settings::{Settings, SettingsStore};

@@ -4,16 +4,21 @@ use std::path::{Path, PathBuf};
 /// `<folder>/ijazah (compressed).pdf`, then `ijazah (compressed) (2).pdf`, …
 /// when the name is taken, so no file is ever written over.
 pub fn result_path(original: &Path, folder: &Path, suffix: &str, extension: &str) -> PathBuf {
-    let stem = original.file_stem().unwrap_or_default().to_string_lossy();
-    let name = |n: u32| match n {
-        1 => format!("{stem} ({suffix}).{extension}"),
-        n => format!("{stem} ({suffix}) ({n}).{extension}"),
-    };
-
     (1..)
-        .map(|n| folder.join(name(n)))
+        .map(|n| folder.join(result_name(original, suffix, extension, n)))
         .find(|path| !path.try_exists().unwrap_or(true))
         .expect("some name is always free")
+}
+
+/// The `n`th name `result_path` tries, counting from 1: `ijazah (compressed).pdf`,
+/// then `ijazah (compressed) (2).pdf`. For folders the app cannot look into
+/// through a path, such as `Download/` on Android.
+pub fn result_name(original: &Path, suffix: &str, extension: &str, n: u32) -> String {
+    let stem = original.file_stem().unwrap_or_default().to_string_lossy();
+    match n {
+        1 => format!("{stem} ({suffix}).{extension}"),
+        n => format!("{stem} ({suffix}) ({n}).{extension}"),
+    }
 }
 
 #[cfg(test)]

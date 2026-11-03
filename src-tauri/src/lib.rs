@@ -1,3 +1,5 @@
+#[cfg(target_os = "android")]
+mod android;
 mod commands;
 mod error;
 #[cfg(target_os = "macos")]
@@ -27,6 +29,10 @@ pub fn run() {
             Ok(())
         });
 
+    // Chosen files and saved Results go through `content://` addresses on Android.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_android_fs::init());
+
     // Stores update the mobile apps.
     #[cfg(desktop)]
     let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
@@ -38,8 +44,12 @@ pub fn run() {
     builder
         .invoke_handler(tauri::generate_handler![
             commands::files::file_info,
+            commands::files::pick_files,
+            commands::files::file_names,
             commands::files::thumbnail,
             commands::files::open_path,
+            commands::files::can_save_results,
+            commands::files::ask_to_save_results,
             commands::share::share_files,
             commands::menu::set_menu_language,
             commands::tools::list_tools,
