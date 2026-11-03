@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { AlertDialog } from "@/components/ui/AlertDialog";
+import { Modal } from "@/components/ui/Modal";
 import type { NavTarget, Page } from "@/components/layout/navigation";
 import type { ToolOptions } from "@/features/compress/taskApi";
 import { useCompressJob } from "@/features/compress/useCompressJob";
@@ -17,7 +19,6 @@ import { ToolPage } from "@/features/tool/ToolPage";
 import { isShipped, toolDef, type ShippedTool } from "@/features/tool/tools";
 import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useFileDrop } from "@/lib/fileDrop";
-import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
 import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
 import { useNavHistory } from "@/lib/navHistory";
 import { isMacApp } from "@/lib/platform";
@@ -130,16 +131,27 @@ function App() {
   const [layout, updateLayout] = useStoredState("rantakit.layout", parseLayout);
   const toggleSidebar = () => updateLayout({ sidebar: !layout.sidebar });
 
-  /** Files dropped on the window or chosen with "Buka": ask for a Tool, or add them to the open one. */
+  /**
+   * Files dropped on the window or chosen with "Buka": ask for a Tool, or add
+   * them to the open one. Files that don't fit come back with the reason, in
+   * the drop overlay's words.
+   */
   const receiveFiles = async (received: string[]) => {
-    if (job.isRunning || received.length === 0) return;
+    if (job.isRunning || received.length === 0) return null;
     const match = await matchFiles(received);
-    if (match.status !== "fits") return;
+    const hint = dropHint(tr, { busy: false, openTool: pageTool, match, count: received.length });
+    if (!hint.canDrop || match.status !== "fits") return hint;
     if (!pageTool) setDropped({ paths: received, match });
-    else if (match.tools.includes(pageTool)) addFiles(received);
+    else addFiles(received);
+    return null;
   };
 
-  const dragging = useFileDrop(receiveFiles);
+  /** A drop that doesn't fit was already explained by the overlay while dragging. */
+  const dragging = useFileDrop((dropPaths) => void receiveFiles(dropPaths));
+
+  /** Why the files chosen with "Buka" were not taken. */
+  const [refused, setRefused] = useState<{ title: string; detail?: string } | null>(null);
+  const openFiles = async () => setRefused(await receiveFiles(await pickAnyFiles()));
   const draggedMatch = useDropMatch(dragging);
 
   const chooseDropTool = (id: ToolId) => {
@@ -178,7 +190,7 @@ function App() {
     };
   });
 
-  /** Commands from the macOS menu bar, the in-app menu and the Ctrl shortcuts. */
+  /** Commands from the macOS menu bar and the keyboard shortcuts. */
   const runCommand = (command: AppCommand) => {
     switch (command) {
       case "go_home":
@@ -187,16 +199,10 @@ function App() {
         return navigate("history");
       case "open_settings":
         return navigate("settings");
-      case "open_about":
-        return navigate("settings", "about");
       case "compress_image":
         return startTool("kompres-foto");
       case "compress_pdf":
         return startTool("kompres-pdf");
-      case "open_source":
-        return openExternal(SOURCE_URL);
-      case "open_license":
-        return openExternal(LICENSE_URL);
       case "go_back":
         return goHistory(-1);
       case "go_forward":
@@ -217,7 +223,7 @@ function App() {
     <AppShell
       page={page}
       onNavigate={(next) => navigate(next)}
-      onOpen={async () => receiveFiles(await pickAnyFiles())}
+      onOpen={openFiles}
       titleBar={{
         canBack: history.canBack,
         canForward: history.canForward,
@@ -262,6 +268,18 @@ function App() {
           onChoose={chooseDropTool}
           onClose={() => setDropped(null)}
         />
+      )}
+      {refused && (
+        <Modal isOpen isDismissable onOpenChange={(open) => !open && setRefused(null)}>
+          <AlertDialog
+            title={refused.title}
+            actionLabel={t("drop.pickAgain")}
+            cancelLabel={t("common.close")}
+            onAction={openFiles}
+          >
+            {refused.detail}
+          </AlertDialog>
+        </Modal>
       )}
       {leaving && (
         <LeaveDialog

@@ -1,5 +1,5 @@
-//! Native menu bar, macOS only. Windows and Linux get an in-app menu instead,
-//! see `src/components/layout/AppMenu.tsx`.
+//! Native menu bar, macOS only. Windows and Linux have keyboard shortcuts and
+//! the title bar instead, see `src/lib/appCommands.ts`.
 //!
 //! Links are opened here; the other items are forwarded to the main window as
 //! a `menu` event carrying the item id. The labels follow the UI language:

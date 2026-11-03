@@ -2,7 +2,7 @@ import type { Messages } from "./index";
 
 /** Every string the user reads, in English. Same tone and keys as `id.ts`. */
 export const en: Messages = {
-  // Navigation and menu
+  // Navigation
   "common.close": "Close",
   "nav.label": "Main navigation",
   "nav.home": "Home",
@@ -13,12 +13,6 @@ export const en: Messages = {
   "nav.forward": "Forward",
   "nav.sidebar.show": "Show navigation",
   "nav.sidebar.hide": "Hide navigation",
-  "menu.label": "Menu",
-  "menu.kompresFoto": "Compress Photo…",
-  "menu.kompresPdf": "Compress PDF…",
-  "menu.source": "Source code",
-  "menu.license": "License",
-  "menu.about": "About Rantakit",
 
   // Tools
   "tool.kompres-foto": "Compress Photo",
@@ -118,6 +112,7 @@ export const en: Messages = {
   "drop.busy": "Wait until the files are done",
   "drop.unsupported": "Rantakit can't open this kind of file yet",
   "drop.accepted": "It can open: JPG, PNG, PDF",
+  "drop.pickAgain": "Choose other files",
   "drop.mixed": "Photos and PDFs can't be processed together",
   "drop.mixed.hint": "Drag only photos or only PDFs",
   "drop.ask.single": "What should we do with this {noun}?",
