@@ -154,7 +154,7 @@ On desktop, steps 1 and 2 sit side by side on one screen. On a phone they are st
 | **MVP** | Windows, Android, Linux |
 | **Later** | macOS, then iOS (each needs a paid Apple developer account) |
 
-**Lowest supported:** Windows 10+, Android 8.0+, current Ubuntu LTS and Fedora. Rantakit must work well on a low-end Android phone with about 3 GB of RAM.
+**Lowest supported:** Windows 10+, Android 8.0+ with an up-to-date Android System WebView (Chrome 111 or later, updated through the Play Store), current Ubuntu LTS and Fedora. Rantakit must work well on a low-end Android phone with about 3 GB of RAM.
 
 ### One Rantakit, two layouts
 

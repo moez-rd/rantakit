@@ -9,6 +9,78 @@
 
   <body>
     <div id="root"></div>
+    <!--
+      Rantakit's styles need a web view from 2023 or later (Chrome 111, Safari 16.2):
+      color-mix() is the test. An older one, such as Android 8's factory WebView,
+      gets a plain message instead of a blank screen. This script and its styles
+      must stay old JavaScript and CSS, since they run where nothing modern does.
+      The strings live here, not in src/i18n, because the app never loads.
+    -->
+    <script>
+      (function () {
+        if (window.CSS && CSS.supports && CSS.supports("color", "color-mix(in srgb, red, blue)")) return;
+        window.__RANTAKIT_UNSUPPORTED__ = true;
+
+        var language = "";
+        try {
+          language = JSON.parse(localStorage.getItem("rantakit.preferences") || "{}").language || "";
+        } catch (e) {}
+        if (language !== "id" && language !== "en") {
+          language = /^id/i.test(navigator.language || "") ? "id" : "en";
+        }
+        var android = /Android/i.test(navigator.userAgent);
+        var text = {
+          id: {
+            title: "Rantakit perlu WebView yang lebih baru",
+            body: android
+              ? "Buka Play Store, perbarui “Android System WebView” dan “Google Chrome”, lalu buka Rantakit lagi."
+              : "Perbarui sistem operasimu, lalu buka Rantakit lagi.",
+            button: "Buka Play Store"
+          },
+          en: {
+            title: "Rantakit needs a newer WebView",
+            body: android
+              ? "Open the Play Store, update “Android System WebView” and “Google Chrome”, then open Rantakit again."
+              : "Update your operating system, then open Rantakit again.",
+            button: "Open Play Store"
+          }
+        }[language];
+        document.documentElement.lang = language;
+
+        var style = document.createElement("style");
+        style.textContent =
+          "body{margin:0;background:#fff;color:#111827;font-family:sans-serif}" +
+          ".unsupported{box-sizing:border-box;min-height:100vh;padding:32px 24px;display:flex;flex-direction:column;justify-content:center;max-width:28rem;margin:0 auto}" +
+          ".unsupported h1{font-size:22px;line-height:1.3;margin:0 0 12px}" +
+          ".unsupported p{font-size:16px;line-height:1.5;margin:0 0 24px;color:#4b5563}" +
+          ".unsupported button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:14px 20px;background:#0f766e;color:#fff}" +
+          "@media (prefers-color-scheme: dark){body{background:#121212;color:#f5f5f5}.unsupported p{color:#a3a3a3}.unsupported button{background:#2dd4bf;color:#042f2e}}";
+        document.head.appendChild(style);
+
+        var box = document.createElement("main");
+        box.className = "unsupported";
+        var title = document.createElement("h1");
+        title.textContent = text.title;
+        var body = document.createElement("p");
+        body.textContent = text.body;
+        box.appendChild(title);
+        box.appendChild(body);
+
+        // The Play Store link opens through the opener plugin, when its bridge loaded.
+        var tauri = window.__TAURI_INTERNALS__;
+        if (android && tauri && tauri.invoke) {
+          var button = document.createElement("button");
+          button.textContent = text.button;
+          button.onclick = function () {
+            tauri.invoke("plugin:opener|open_url", {
+              url: "https://play.google.com/store/apps/details?id=com.google.android.webview"
+            });
+          };
+          box.appendChild(button);
+        }
+        document.getElementById("root").appendChild(box);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
