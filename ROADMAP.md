@@ -13,6 +13,7 @@ Related documents:
 - **Small releases.** Every release is usable on its own and ships through the existing release workflow.
 - **No dates.** Only the order and the contents of releases are planned.
 - **Both platforms from v0.4.** v0.2 is desktop only and v0.3 brings Android up to the same level. From v0.4 on, every Tool ships on Windows, Linux, and Android in the same release.
+- **One usability test, at the beta.** Five people from the primary audience test the beta of v0.11, before 1.0 (RANTAKIT.md §9). Releases before it do not wait for a usability test.
 - **Every Tool epic starts with a short grilling** that decides that Tool's Advanced options and its error messages, before any work on it.
 - **The size gate.** Heavy formats (photo formats, office documents, audio, video, Word/Excel to PDF) are measured before they are planned in detail; see [The size gate](#the-size-gate).
 - **1.0** means the full catalogue of v0.2 to v0.11 works on Windows, Android, and Linux. Whether 1.0 also requires the store and distribution channels is not decided yet.
@@ -73,7 +74,6 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - CI passes on Windows and Linux, and the product rules (Result names, the Original untouched, History) are tested in `rantakit-tasks`.
 - All strings exist in Indonesian and English, and no jargon from the GLOSSARY.md list appears outside Advanced options.
 - Text and buttons meet WCAG AA contrast in light and dark themes.
-- Usability test with 5 people from the primary audience passes (RANTAKIT.md §9).
 
 **Open decisions:** none. The light and dark color values come from the design board (a Claude Artifact) and are recorded in story N1.
 
@@ -95,7 +95,6 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 - Compressing a 10-page scanned PDF on a ~3 GB RAM Android phone takes under 5 seconds.
 - Works on Android 8.0 and later.
 - The APK is published on GitHub Releases.
-- Usability test with 5 people passes on Android.
 
 **Open decisions:** none yet.
 
@@ -183,11 +182,11 @@ Users download Rantakit over prepaid mobile data, so the app must stay small ([R
 
 **Goal:** everything planned for 1.0 is stable, accessible, and small.
 
-**Epics:** bug fixes; accessibility pass (screen reader, keyboard, tap targets); app size pass on every platform.
+**Epics:** bug fixes; accessibility pass (screen reader, keyboard, tap targets); app size pass on every platform; a beta release on Windows, Linux, and Android for the usability test.
 
 **Done when:**
 
-- Usability test with 5 people passes on every core scenario.
+- The beta passes the usability test with 5 people on every core scenario, on desktop and Android.
 - The app makes no network calls besides the update check and language downloads.
 - The Android build has 0 trackers in an Exodus Privacy report.
 
