@@ -16,7 +16,8 @@ import { ToggleButton } from "@/components/ui/ToggleButton";
 import { ToggleButtonGroup } from "@/components/ui/ToggleButtonGroup";
 import { useT } from "@/i18n";
 import { LICENSE_URL, openExternal, SOURCE_URL } from "@/lib/links";
-import { pickResultsFolder, setKeepHistory, setResultsFolder, useAppSettings } from "./appSettings";
+import { isDesktopApp } from "@/lib/platform";
+import { pickResultsFolder, setCheckUpdates, setKeepHistory, setResultsFolder, useAppSettings } from "./appSettings";
 import { systemLanguage, usePreferences, type Language, type LanguageChoice, type TextSize, type Theme } from "./preferences";
 
 export type SettingsTab = "appearance" | "language" | "results" | "history" | "about";
@@ -233,8 +234,10 @@ function HistoryPanel() {
   );
 }
 
+/** "Tentang", with "Cek versi baru" on desktop; stores update the mobile apps. */
 function AboutPanel() {
   const { t } = useT();
+  const settings = useAppSettings();
   const [version, setVersion] = useState<string>();
   useEffect(() => {
     if (isTauri()) getVersion().then(setVersion).catch(() => {});
@@ -254,6 +257,20 @@ function AboutPanel() {
         <Link onPress={() => openExternal(LICENSE_URL)}>{t("about.viewLicense")}</Link>
         <Link onPress={() => openExternal(SOURCE_URL)}>{t("about.source")}</Link>
       </div>
+      {(isDesktopApp || !isTauri()) && (
+        <div className="mt-4 flex w-full items-start justify-between gap-6 border-t border-border pt-6 text-start">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-label">{t("settings.checkUpdates")}</span>
+            <span className="text-small text-text-muted">{t("settings.checkUpdates.description")}</span>
+          </div>
+          <Switch
+            aria-label={t("settings.checkUpdates")}
+            isDisabled={settings === null}
+            isSelected={settings?.checkUpdates ?? true}
+            onChange={(check) => setCheckUpdates(check).catch(() => {})}
+          />
+        </div>
+      )}
     </div>
   );
 }

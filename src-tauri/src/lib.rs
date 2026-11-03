@@ -19,12 +19,17 @@ pub fn run() {
             app.manage(SettingsStore::new(data.join("settings.json")));
             app.manage(Presets::new(data.join("presets.json")));
             app.manage(commands::task::RunningTasks::default());
+            app.manage(commands::update::PendingUpdate::default());
             #[cfg(windows)]
             if let Some(window) = app.get_webview_window("main") {
                 round_corners(&window);
             }
             Ok(())
         });
+
+    // Stores update the mobile apps.
+    #[cfg(desktop)]
+    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
 
     // Only macOS gets a native menu bar; Windows and Linux use the in-app menu.
     #[cfg(target_os = "macos")]
@@ -48,6 +53,9 @@ pub fn run() {
             commands::settings::get_settings,
             commands::settings::set_keep_history,
             commands::settings::set_results_folder,
+            commands::settings::set_check_updates,
+            commands::update::check_update,
+            commands::update::install_update,
             commands::presets::list_presets,
             commands::presets::save_preset,
             commands::presets::rename_preset,

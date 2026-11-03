@@ -332,4 +332,18 @@ export const en: Messages = {
   "window.maximize": "Maximize",
   "window.restore": "Restore",
   "window.close": "Close",
+
+  // New version
+  "update.notice": "New version",
+  "update.title": "Rantakit {version} is out",
+  "update.body": "The new version is downloaded and installed, then Rantakit opens again. Your files aren't affected.",
+  "update.body.download": "Download the new version from Rantakit's download page, then install it as usual.",
+  "update.busy": "Wait for the running task to finish first.",
+  "update.failed": "The new version couldn't be installed. Try again later, or download it from the download page.",
+  "update.install": "Update now",
+  "update.download": "Open download page",
+  "update.later": "Later",
+  "settings.checkUpdates": "Check for new versions",
+  "settings.checkUpdates.description":
+    "Each time it opens, Rantakit asks GitHub whether a new version is out. Your files are never sent.",
 };

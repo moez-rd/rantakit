@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- "Versi baru" (New version): at launch Rantakit checks GitHub for a newer version and shows a quiet button in the title bar. On Windows and the Linux AppImage one click installs it; the .deb and .rpm open the download page. It can be turned off in Settings, under "Tentang" (About)
+
+### Changed
+
+- Only release candidates, such as `v0.3.0-rc.1`, are marked as pre-releases on GitHub, so the "Versi baru" check finds every final version
+
 ## [0.2.0] - 2026-11-03
 
 Rantakit 0.2.0 for Windows and Linux: everything in 0.2.0-rc.1 and 0.2.0-rc.2, plus the changes below. Rantakit is in early development and is not stable yet.

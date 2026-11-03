@@ -15,6 +15,10 @@ pub struct Settings {
     /// "Di folder pilihan": where every Result is saved. `None` saves each
     /// Result next to its Original.
     pub results_folder: Option<PathBuf>,
+    /// "Cek versi baru": whether the app asks GitHub for a newer version at
+    /// launch. On by default, since most people never change defaults and
+    /// still need fixes (ADR 0001).
+    pub check_updates: bool,
 }
 
 impl Default for Settings {
@@ -22,6 +26,7 @@ impl Default for Settings {
         Self {
             keep_history: true,
             results_folder: None,
+            check_updates: true,
         }
     }
 }
@@ -65,5 +70,17 @@ mod tests {
                 .unwrap()
                 .keep_history
         );
+    }
+
+    #[test]
+    fn update_check_is_on_by_default_even_in_older_files() {
+        let dir = std::env::temp_dir().join("rantakit-settings-update-tests");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        // A settings file from 0.2.0, written before the switch existed.
+        std::fs::write(dir.join("settings.json"), r#"{"keepHistory":false}"#).unwrap();
+        let settings = SettingsStore::new(dir.join("settings.json")).get().unwrap();
+        assert!(settings.check_updates);
+        assert!(!settings.keep_history);
     }
 }
