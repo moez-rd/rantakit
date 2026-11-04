@@ -318,6 +318,11 @@ pub fn start_task(
     let id = running.add(cancel.clone());
 
     tauri::async_runtime::spawn_blocking(move || {
+        // The Kotlin side runs on the main thread, so it is called from
+        // here; the app is still on screen, as Android requires.
+        #[cfg(target_os = "android")]
+        let mut notice =
+            crate::task_notice::Notice::start(&app, task.tool.id(), task.originals.len());
         let send = |message| {
             if let Err(err) = on_event.send(message) {
                 eprintln!("task {id}: could not reach the frontend: {err}");
@@ -328,10 +333,12 @@ pub fn start_task(
             id,
             &task,
             &mut |event| match event {
-                TaskEvent::Progress { file, progress } => send(TaskMessage::Progress {
-                    file,
-                    fraction: fraction(progress),
-                }),
+                TaskEvent::Progress { file, progress } => {
+                    let fraction = fraction(progress);
+                    #[cfg(target_os = "android")]
+                    notice.progress(file, fraction);
+                    send(TaskMessage::Progress { file, fraction })
+                }
                 TaskEvent::FileDone {
                     file,
                     outcome: done,
@@ -349,11 +356,43 @@ pub fn start_task(
         {
             eprintln!("task {id}: could not record history: {err}");
         }
-        app.state::<RunningTasks>().remove(id);
+        let running = app.state::<RunningTasks>();
+        running.remove(id);
+        // The service stays while another Task still runs.
+        #[cfg(target_os = "android")]
+        if running.tokens().is_empty() {
+            notice.finish(&outcomes);
+        }
         send(TaskMessage::Finished);
     });
 
     id
+}
+
+/// Whether Task notifications may be shown: "granted", "ask" before the
+/// first Task on Android 13 and later, or "refused". Always "granted" elsewhere.
+#[tauri::command]
+pub async fn notification_permission(app: AppHandle) -> String {
+    #[cfg(target_os = "android")]
+    return crate::task_notice::permission(&app).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        "granted".into()
+    }
+}
+
+/// Shows Android's notification prompt, after the app has said why. A Task
+/// runs whatever the answer; only its notification is hidden.
+#[tauri::command]
+pub async fn ask_notification_permission(app: AppHandle) -> bool {
+    #[cfg(target_os = "android")]
+    return crate::task_notice::ask_permission(&app).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        true
+    }
 }
 
 /// Runs `task` where the platform keeps its files: as it is on desktop.

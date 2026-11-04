@@ -357,4 +357,7 @@ export const id = {
   "saving.refused.body":
     "Buka Setelan HP, pilih Aplikasi, lalu Rantakit. Di Izin, nyalakan Penyimpanan, lalu coba lagi.",
   "saving.refused.retry": "Coba lagi",
+  "notifying.title": "Izinkan Rantakit menampilkan notifikasi",
+  "notifying.body": "Supaya kamu bisa melihat kemajuan saat Rantakit ditinggal.",
+  "notifying.continue": "Lanjut",
 } as const;

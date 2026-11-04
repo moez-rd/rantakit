@@ -113,6 +113,18 @@ pub async fn ask_to_save(app: &AppHandle) -> bool {
     storage.request_permission().await.unwrap_or(false)
 }
 
+fn workspaces(app: &AppHandle) -> io::Result<PathBuf> {
+    let cache = app.path().app_cache_dir().map_err(io::Error::other)?;
+    Ok(cache.join("tasks"))
+}
+
+/// Removes what Tasks that Android cut short left in the cache; called at launch.
+pub fn clear_workspaces(app: &AppHandle) {
+    if let Ok(dir) = workspaces(app) {
+        let _ = fs::remove_dir_all(dir);
+    }
+}
+
 /// The copies one Task works on, in the app's cache. Removed when dropped.
 pub struct Workspace {
     dir: PathBuf,
@@ -120,14 +132,7 @@ pub struct Workspace {
 
 impl Workspace {
     pub fn new(app: &AppHandle, task: u64) -> io::Result<Self> {
-        let dir = app
-            .path()
-            .app_cache_dir()
-            .map_err(io::Error::other)?
-            .join("tasks")
-            .join(task.to_string());
-        // A Task cut short by the app closing may have left its copies.
-        let _ = fs::remove_dir_all(&dir);
+        let dir = workspaces(app)?.join(task.to_string());
         fs::create_dir_all(dir.join("results"))?;
         Ok(Self { dir })
     }
@@ -207,8 +212,10 @@ pub fn save(
         .unwrap_or_else(|| result_name(original, suffix, &extension, 1));
 
     let cannot_write = |err: tauri_plugin_android_fs::Error| ErrorKind::writing(&err.into());
+    // Pending until it is whole: other apps don't see it, and if Android
+    // stops the Task halfway, Android 10 and later remove it after a week.
     let uri = storage
-        .create_new_file(
+        .create_new_file_with_pending(
             None,
             PublicGeneralPurposeDir::Download,
             Path::new(RESULTS_FOLDER).join(&name),
@@ -221,7 +228,8 @@ pub fn save(
         .and_then(|mut to| {
             io::copy(&mut File::open(&result.path)?, &mut to)?;
             to.sync_all()
-        });
+        })
+        .and_then(|()| storage.set_pending(&uri, false).map_err(io::Error::from));
     if let Err(err) = written {
         let _ = fs.remove_file(&uri);
         return Err(ErrorKind::writing(&err));

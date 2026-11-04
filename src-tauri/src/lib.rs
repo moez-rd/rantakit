@@ -4,6 +4,9 @@ mod commands;
 mod error;
 #[cfg(target_os = "macos")]
 mod menu;
+mod notice_words;
+#[cfg(target_os = "android")]
+mod task_notice;
 
 use rantakit_tasks::{History, Presets, RecentLimits, RecentTools, SettingsStore};
 use tauri::Manager;
@@ -22,6 +25,10 @@ pub fn run() {
             app.manage(Presets::new(data.join("presets.json")));
             app.manage(commands::task::RunningTasks::default());
             app.manage(commands::update::PendingUpdate::default());
+            app.manage(commands::language::Language::default());
+            // Copies left by a Task that Android cut short.
+            #[cfg(target_os = "android")]
+            android::clear_workspaces(app.handle());
             #[cfg(windows)]
             if let Some(window) = app.get_webview_window("main") {
                 round_corners(&window);
@@ -32,6 +39,10 @@ pub fn run() {
     // Chosen files and saved Results go through `content://` addresses on Android.
     #[cfg(target_os = "android")]
     let builder = builder.plugin(tauri_plugin_android_fs::init());
+
+    // Tasks keep running in a foreground service when the user switches apps.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(task_notice::init());
 
     // Stores update the mobile apps.
     #[cfg(desktop)]
@@ -51,11 +62,13 @@ pub fn run() {
             commands::files::can_save_results,
             commands::files::ask_to_save_results,
             commands::share::share_files,
-            commands::menu::set_menu_language,
+            commands::language::set_language,
             commands::tools::list_tools,
             commands::tools::match_files,
             commands::task::start_task,
             commands::task::cancel_task,
+            commands::task::notification_permission,
+            commands::task::ask_notification_permission,
             commands::history::list_history,
             commands::history::clear_history,
             commands::recent::recent_limits,

@@ -1,6 +1,6 @@
 pub mod files;
 pub mod history;
-pub mod menu;
+pub mod language;
 pub mod presets;
 pub mod recent;
 pub mod settings;
