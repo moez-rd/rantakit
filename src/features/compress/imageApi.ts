@@ -6,17 +6,17 @@ import { isAndroidApp } from "@/lib/platform";
 export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 export const IMAGE_MIME_TYPES = ["image/jpeg", "image/png"];
 
-/** Names of files chosen on Android, by their `content://` address. */
+/** Names of files chosen or shared on Android, by their `content://` address. */
 const chosenNames = new Map<string, string>();
 
 /** A file's name: the last segment of a Windows or POSIX path, or the name Android gave a chosen file. */
 export const fileName = (path: string) => chosenNames.get(path) ?? path.split(/[\\/]/).pop() ?? path;
 
 /**
- * Looks up the names of files chosen on Android, whose `content://`
+ * Looks up the names of files chosen or shared on Android, whose `content://`
  * addresses do not contain them, so that `fileName` can show them.
  */
-async function withNames(paths: string[]): Promise<string[]> {
+export async function withNames(paths: string[]): Promise<string[]> {
   if (paths.length === 0) return paths;
   const names = await invoke<(string | null)[]>("file_names", { paths }).catch(() => []);
   paths.forEach((path, i) => names[i] && chosenNames.set(path, names[i]));

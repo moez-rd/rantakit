@@ -117,6 +117,7 @@ export const id = {
   "drop.pickAgain": "Pilih file lain",
   "drop.mixed": "Foto dan PDF tidak bisa diproses bersamaan",
   "drop.mixed.hint": "Seret foto saja atau PDF saja",
+  "drop.mixed.choose": "Pilih foto saja atau PDF saja",
   "drop.ask.single": "Mau diapakan {noun} ini?",
   "drop.ask.many": "Mau diapakan {files} ini?",
   "drop.files": "File yang diseret",
@@ -360,4 +361,6 @@ export const id = {
   "notifying.title": "Izinkan Rantakit menampilkan notifikasi",
   "notifying.body": "Supaya kamu bisa melihat kemajuan saat Rantakit ditinggal.",
   "notifying.continue": "Lanjut",
+  "share.busy.title": "File belum bisa diterima",
+  "share.busy.body": "Tunggu tugas yang sedang berjalan selesai dulu.",
 } as const;

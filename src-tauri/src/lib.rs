@@ -6,6 +6,8 @@ mod error;
 mod menu;
 mod notice_words;
 #[cfg(target_os = "android")]
+mod share_in;
+#[cfg(target_os = "android")]
 mod task_notice;
 
 use rantakit_tasks::{History, Presets, RecentLimits, RecentTools, SettingsStore};
@@ -44,6 +46,10 @@ pub fn run() {
     #[cfg(target_os = "android")]
     let builder = builder.plugin(task_notice::init());
 
+    // Photos and PDFs shared from other apps.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(share_in::init());
+
     // Stores update the mobile apps.
     #[cfg(desktop)]
     let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
@@ -57,6 +63,7 @@ pub fn run() {
             commands::files::file_info,
             commands::files::pick_files,
             commands::files::file_names,
+            commands::files::take_shared_files,
             commands::files::thumbnail,
             commands::files::open_path,
             commands::files::can_save_results,

@@ -115,6 +115,7 @@ export const en: Messages = {
   "drop.pickAgain": "Choose other files",
   "drop.mixed": "Photos and PDFs can't be processed together",
   "drop.mixed.hint": "Drag only photos or only PDFs",
+  "drop.mixed.choose": "Choose only photos or only PDFs",
   "drop.ask.single": "What should we do with this {noun}?",
   "drop.ask.many": "What should we do with these {files}?",
   "drop.files": "Dragged files",
@@ -357,4 +358,6 @@ export const en: Messages = {
   "notifying.title": "Let Rantakit show notifications",
   "notifying.body": "So you can see the progress while you're away from Rantakit.",
   "notifying.continue": "Continue",
+  "share.busy.title": "Can't take these files yet",
+  "share.busy.body": "Wait for the running task to finish first.",
 };

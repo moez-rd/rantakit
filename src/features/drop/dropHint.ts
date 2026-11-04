@@ -11,10 +11,12 @@ interface DropState {
   /** Null while the dragged files are being checked. */
   match: DropMatch | null;
   count: number;
+  /** Chosen with "Buka" or shared rather than dragged, so a hint says to choose. */
+  chosen?: boolean;
 }
 
 /** What the drop overlay says while files are dragged over the window. */
-export function dropHint({ t, count }: Translator, { busy, openTool, match, count: n }: DropState) {
+export function dropHint({ t, count }: Translator, { busy, openTool, match, count: n, chosen }: DropState) {
   if (busy) return { canDrop: false, title: t("drop.busy") };
   if (!match) return { canDrop: true, title: t("drop.here") };
 
@@ -36,7 +38,7 @@ export function dropHint({ t, count }: Translator, { busy, openTool, match, coun
     case "fits":
       return { canDrop: true, title: t("drop.here"), detail: files };
     case "mixed":
-      return { canDrop: false, title: t("drop.mixed"), detail: t("drop.mixed.hint") };
+      return { canDrop: false, title: t("drop.mixed"), detail: t(chosen ? "drop.mixed.choose" : "drop.mixed.hint") };
     case "unsupported":
       return { canDrop: false, title: t("drop.unsupported"), detail: t("drop.accepted") };
   }
