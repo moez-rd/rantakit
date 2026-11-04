@@ -16,6 +16,7 @@ import { dropHint } from "@/features/drop/dropHint";
 import { matchFiles, useDropMatch, type DropMatch } from "@/features/drop/dropMatch";
 import { DropOverlay } from "@/features/drop/DropOverlay";
 import { pickAnyFiles } from "@/features/drop/pickFiles";
+import { useSharedFiles } from "@/features/drop/sharedFiles";
 import { HomePage } from "@/features/home/HomePage";
 import type { ToolId } from "@/features/home/tools";
 import { HistoryPage } from "@/features/history/HistoryPage";
@@ -176,7 +177,8 @@ function App() {
   const receiveFiles = async (received: string[]) => {
     if (job.isRunning || received.length === 0) return null;
     const match = await matchFiles(received);
-    const hint = dropHint(tr, { busy: false, openTool: pageTool, match, count: received.length });
+    // Only "Buka" shows the hint; a drop was explained while dragging.
+    const hint = dropHint(tr, { busy: false, openTool: pageTool, match, count: received.length, chosen: true });
     if (!hint.canDrop || match.status !== "fits") return hint;
     if (!pageTool) setDropped({ paths: received, match });
     else addFiles(received);
@@ -190,6 +192,26 @@ function App() {
   const [refused, setRefused] = useState<{ title: string; detail?: string } | null>(null);
   const openFiles = async () => setRefused(await receiveFiles(await pickAnyFiles()));
   const draggedMatch = useDropMatch(dragging);
+
+  /** A share that came while a Task was running, and was not taken. */
+  const [shareBusy, setShareBusy] = useState(false);
+
+  /**
+   * Files shared from another app on Android: the Tools that fit, as for
+   * "Buka" on Home, after asking if files on a Tool page would be lost.
+   */
+  const shareFiles = (shared: string[]) => {
+    if (job.isRunning) return setShareBusy(true);
+    leaveTool(async () => {
+      setSettingsTab(null);
+      closeTool();
+      const match = await matchFiles(shared);
+      const hint = dropHint(tr, { busy: false, openTool: null, match, count: shared.length, chosen: true });
+      if (!hint.canDrop || match.status !== "fits") setRefused(hint);
+      else setDropped({ paths: shared, match });
+    });
+  };
+  useSharedFiles(shareFiles);
 
   const chooseDropTool = (id: ToolId) => {
     if (isShipped(id) && dropped) openTool(id, dropped.paths);
@@ -337,6 +359,13 @@ function App() {
             onAction={openFiles}
           >
             {refused.detail}
+          </AlertDialog>
+        </Modal>
+      )}
+      {shareBusy && (
+        <Modal isOpen isDismissable onOpenChange={(open) => !open && setShareBusy(false)}>
+          <AlertDialog title={t("share.busy.title")} cancelLabel={t("common.close")}>
+            {t("share.busy.body")}
           </AlertDialog>
         </Modal>
       )}

@@ -60,6 +60,19 @@ pub async fn pick_files(app: AppHandle, mime_types: Vec<String>) -> Vec<PathBuf>
     }
 }
 
+/// Photos and PDFs shared to Rantakit from another app on Android, since the
+/// last call; "shared-files" says when more arrive. None elsewhere.
+#[tauri::command]
+pub async fn take_shared_files(app: AppHandle) -> Vec<PathBuf> {
+    #[cfg(target_os = "android")]
+    return crate::share_in::take(&app).await;
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        Vec::new()
+    }
+}
+
 /// The names of files chosen on Android, whose `content://` addresses do not
 /// contain them. `None` for a plain path, which ends in its name.
 #[tauri::command]

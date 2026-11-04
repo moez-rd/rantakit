@@ -1,7 +1,13 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-use rantakit_tasks::{Availability, FileKind, FileMatch, Platform, ToolId, tools_for};
+use rantakit_tasks::{
+    Availability, FileKind, FileMatch, Platform, ToolId, detect_kind, match_kinds, tools_for,
+};
 use serde::Serialize;
+use tauri::AppHandle;
+
+#[cfg(target_os = "android")]
+use crate::android;
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -38,8 +44,13 @@ pub enum DropMatch {
 /// Which shipped Tools can take every one of `paths`, judged by content.
 /// Asked while files are dragged over the window, so it runs off the main thread.
 #[tauri::command]
-pub async fn match_files(paths: Vec<PathBuf>) -> DropMatch {
-    match rantakit_tasks::match_files(&paths, Platform::current()) {
+pub async fn match_files(app: AppHandle, paths: Vec<PathBuf>) -> DropMatch {
+    let kinds: Option<Vec<FileKind>> = paths.iter().map(|path| kind(&app, path)).collect();
+    let matched = match kinds {
+        Some(kinds) => match_kinds(&kinds, Platform::current()),
+        None => FileMatch::Unsupported,
+    };
+    match matched {
         FileMatch::Fits { kinds, tools } => DropMatch::Fits {
             kinds: kinds.into_iter().map(FileKind::as_str).collect(),
             tools: tools.into_iter().map(ToolId::as_str).collect(),
@@ -47,4 +58,14 @@ pub async fn match_files(paths: Vec<PathBuf>) -> DropMatch {
         FileMatch::Unsupported => DropMatch::Unsupported,
         FileMatch::Mixed => DropMatch::Mixed,
     }
+}
+
+/// Android's chosen and shared files are `content://` addresses, which can't be opened as paths.
+fn kind(app: &AppHandle, path: &Path) -> Option<FileKind> {
+    #[cfg(target_os = "android")]
+    if android::is_content(path) {
+        return android::kind(app, path);
+    }
+    let _ = app;
+    detect_kind(path)
 }

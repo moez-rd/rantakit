@@ -7,7 +7,7 @@ use std::fs::{self, File};
 use std::io;
 use std::path::{Path, PathBuf};
 
-use rantakit_tasks::{ErrorKind, FileInfo, ResultFile, result_name};
+use rantakit_tasks::{ErrorKind, FileInfo, FileKind, ResultFile, result_name};
 use tauri::{AppHandle, Manager};
 use tauri_plugin_android_fs::{AndroidFsExt, FsUri, ImageFormat, PublicGeneralPurposeDir, Size};
 
@@ -62,6 +62,12 @@ pub fn file_info(app: &AppHandle, path: &Path) -> FileInfo {
             .or_else(|| fs.get_len(&uri).ok()),
         ..info
     }
+}
+
+/// What a `content://` file is, judged by its content like `detect_kind`.
+pub fn kind(app: &AppHandle, path: &Path) -> Option<FileKind> {
+    let mut file = app.android_fs().open_file_readable(&uri(path)).ok()?;
+    rantakit_tasks::read_kind(&mut file)
 }
 
 /// A small JPG of a `content://` photo, made by the system.

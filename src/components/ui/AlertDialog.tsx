@@ -11,7 +11,8 @@ interface AlertDialogProps extends Omit<DialogProps, 'children'> {
   title: string;
   children: ReactNode;
   variant?: 'info' | 'danger';
-  actionLabel: string;
+  /** Without one, the dialog only tells something and has just the cancel button. */
+  actionLabel?: string;
   cancelLabel: string;
   onAction?: () => void;
 }
@@ -38,15 +39,17 @@ export function AlertDialog({
           </div>
           <p className="mt-3 text-text-muted">{children}</p>
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" autoFocus={variant === 'danger'} onPress={close}>
+            <Button variant="secondary" autoFocus={variant === 'danger' || !actionLabel} onPress={close}>
               {cancelLabel}
             </Button>
-            <Button
-              variant={variant === 'danger' ? 'danger' : 'primary'}
-              autoFocus={variant !== 'danger'}
-              onPress={chain(onAction, close)}>
-              {actionLabel}
-            </Button>
+            {actionLabel && (
+              <Button
+                variant={variant === 'danger' ? 'danger' : 'primary'}
+                autoFocus={variant !== 'danger'}
+                onPress={chain(onAction, close)}>
+                {actionLabel}
+              </Button>
+            )}
           </div>
         </>
       )}
