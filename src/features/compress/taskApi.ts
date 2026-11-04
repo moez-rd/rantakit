@@ -99,3 +99,15 @@ export function canSaveResults() {
 export function askToSaveResults() {
   return invoke<boolean>("ask_to_save_results").catch(() => false);
 }
+
+/** Whether a Task's progress notification may show: Android 13 and later ask once, at the first Task. */
+export function notificationPermission(): Promise<"granted" | "ask" | "refused"> {
+  return isAndroidApp
+    ? invoke<"granted" | "ask" | "refused">("notification_permission").catch(() => "granted" as const)
+    : Promise.resolve("granted");
+}
+
+/** Shows Android's notification prompt. The Task runs whatever the answer; only its notification is hidden. */
+export function askNotificationPermission() {
+  return invoke<boolean>("ask_notification_permission").catch(() => false);
+}

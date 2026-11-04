@@ -3,7 +3,7 @@
 //!
 //! Links are opened here; the other items are forwarded to the main window as
 //! a `menu` event carrying the item id. The labels follow the UI language:
-//! the main window calls the `set_menu_language` command on start and on every change.
+//! the main window calls the `set_language` command on start and on every change.
 
 use tauri::menu::{AboutMetadata, Menu, MenuEvent, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{AppHandle, Emitter, Runtime};

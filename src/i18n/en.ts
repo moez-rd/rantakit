@@ -354,4 +354,7 @@ export const en: Messages = {
   "saving.refused.body":
     "Open your phone's Settings, choose Apps, then Rantakit. Under Permissions, turn on Storage, then try again.",
   "saving.refused.retry": "Try again",
+  "notifying.title": "Let Rantakit show notifications",
+  "notifying.body": "So you can see the progress while you're away from Rantakit.",
+  "notifying.continue": "Continue",
 };

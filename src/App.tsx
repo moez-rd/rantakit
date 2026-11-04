@@ -3,7 +3,13 @@ import { AppShell } from "@/components/layout/AppShell";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Modal } from "@/components/ui/Modal";
 import type { NavTarget, Page } from "@/components/layout/navigation";
-import { askToSaveResults, canSaveResults, type ToolOptions } from "@/features/compress/taskApi";
+import {
+  askNotificationPermission,
+  askToSaveResults,
+  canSaveResults,
+  notificationPermission,
+  type ToolOptions,
+} from "@/features/compress/taskApi";
 import { useCompressJob } from "@/features/compress/useCompressJob";
 import { DropDialog } from "@/features/drop/DropDialog";
 import { dropHint } from "@/features/drop/dropHint";
@@ -21,7 +27,7 @@ import { isShipped, toolDef, type ShippedTool } from "@/features/tool/tools";
 import { useShortcuts, type AppCommand } from "@/lib/appCommands";
 import { useBackButton } from "@/lib/backButton";
 import { useFileDrop } from "@/lib/fileDrop";
-import { useMenuEvents, useMenuLanguage } from "@/lib/menuEvents";
+import { useMenuEvents, useNativeLanguage } from "@/lib/menuEvents";
 import { useNavHistory } from "@/lib/navHistory";
 import { isAndroidApp, isMacApp } from "@/lib/platform";
 import { useStoredState } from "@/lib/storedState";
@@ -118,14 +124,24 @@ function App() {
   /** Android 8 and 9: why the storage permission is asked for, or that it was refused, before a Task. */
   const [saving, setSaving] = useState<{ status: "ask" | "refused"; options: ToolOptions } | null>(null);
 
+  /** Android 13 and later: why notifications are asked for, once, before the first Task. */
+  const [notifying, setNotifying] = useState<ToolOptions | null>(null);
+
   const startJob = async (options: ToolOptions) => {
-    if (await canSaveResults()) job.start(paths, options);
-    else setSaving({ status: "ask", options });
+    if (!(await canSaveResults())) setSaving({ status: "ask", options });
+    else if ((await notificationPermission()) === "ask") setNotifying(options);
+    else job.start(paths, options);
   };
 
   const askToSave = async (options: ToolOptions) => {
     if (await askToSaveResults()) job.start(paths, options);
     else setSaving({ status: "refused", options });
+  };
+
+  /** The Task starts whatever the answer; without the permission only its notification is hidden. */
+  const askToNotify = async (options: ToolOptions) => {
+    await askNotificationPermission();
+    job.start(paths, options);
   };
 
   const [dropped, setDropped] = useState<Dropped | null>(null);
@@ -241,7 +257,7 @@ function App() {
   };
 
   useMenuEvents(runCommand);
-  useMenuLanguage();
+  useNativeLanguage();
   // On macOS the menu bar handles these as Cmd shortcuts; Android has none.
   useShortcuts(runCommand, !isMacApp && !isAndroidApp);
 
@@ -333,6 +349,18 @@ function App() {
             onAction={() => askToSave(saving.options)}
           >
             {t(`saving.${saving.status}.body`)}
+          </AlertDialog>
+        </Modal>
+      )}
+      {notifying && (
+        <Modal isOpen isDismissable onOpenChange={(open) => !open && setNotifying(null)}>
+          <AlertDialog
+            title={t("notifying.title")}
+            actionLabel={t("notifying.continue")}
+            cancelLabel={t("common.cancel")}
+            onAction={() => askToNotify(notifying)}
+          >
+            {t("notifying.body")}
           </AlertDialog>
         </Modal>
       )}
