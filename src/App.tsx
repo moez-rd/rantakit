@@ -326,7 +326,10 @@ function App() {
             }}
           />
         ) : (
-          <HomePage onOpenTool={(id) => isShipped(id) && openTool(id)} />
+          <HomePage
+            onOpenTool={(id) => isShipped(id) && openTool(id)}
+            notice={isAndroidApp && <UpdateNotice busy={false} className="-mb-5 h-9 self-end px-3" />}
+          />
         ))}
       {page === "history" && <HistoryPage />}
       </div>

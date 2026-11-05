@@ -1,6 +1,6 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
-import { isTauri } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import {
   ArrowLeft,
   ChevronRight,
@@ -302,13 +302,15 @@ function HistoryPanel() {
   );
 }
 
-/** "Tentang", with "Cek versi baru" on desktop; stores update the mobile apps. */
+/** "Tentang", with "Cek versi baru" on desktop and in the APK from GitHub; a store updates the others. */
 function AboutPanel() {
   const { t } = useT();
   const settings = useAppSettings();
   const [version, setVersion] = useState<string>();
+  const [canCheck, setCanCheck] = useState(isDesktopApp || !isTauri());
   useEffect(() => {
     if (isTauri()) getVersion().then(setVersion).catch(() => {});
+    if (isAndroidApp) invoke<boolean>("can_check_updates").then(setCanCheck).catch(() => {});
   }, []);
   return (
     <div className="flex flex-col items-center gap-4 py-6 text-center">
@@ -325,7 +327,7 @@ function AboutPanel() {
         <Link onPress={() => openExternal(LICENSE_URL)}>{t("about.viewLicense")}</Link>
         <Link onPress={() => openExternal(SOURCE_URL)}>{t("about.source")}</Link>
       </div>
-      {(isDesktopApp || !isTauri()) && (
+      {canCheck && (
         <div className="mt-4 flex w-full items-start justify-between gap-6 border-t border-border pt-6 text-start">
           <div className="flex flex-col gap-0.5">
             <span className="text-label">{t("settings.checkUpdates")}</span>

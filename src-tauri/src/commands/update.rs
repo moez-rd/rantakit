@@ -1,7 +1,8 @@
 //! "Versi baru": asks GitHub's latest release whether a newer Rantakit is out,
 //! and installs it when the user agrees. The request carries nothing but the
 //! app's version and platform, and is never made while the user has the check
-//! turned off (ADR 0001). Stores update the mobile apps, so there it finds nothing.
+//! turned off (ADR 0001). The APK from GitHub only learns of the new version
+//! (`apk_update.rs`); its user installs it from the release page.
 
 use rantakit_tasks::SettingsStore;
 use serde::Serialize;
@@ -15,8 +16,8 @@ use crate::error::Result;
 pub struct NewVersion {
     version: String,
     /// False where Rantakit can't replace itself (the Linux .deb and .rpm,
-    /// which belong to the package manager): the notice links to the
-    /// download page instead.
+    /// which belong to the package manager, and Android): the notice links
+    /// to the download page instead.
     can_install: bool,
 }
 
@@ -24,8 +25,17 @@ pub struct NewVersion {
 #[derive(Default)]
 pub struct PendingUpdate(#[cfg(desktop)] std::sync::Mutex<Option<tauri_plugin_updater::Update>>);
 
-/// Called once at launch. `None` when the check is off, nothing is newer, or
-/// on mobile.
+/// Whether this build checks for new versions, so Settings shows "Cek versi
+/// baru": not on iOS, nor in Android builds for a store.
+#[tauri::command]
+pub fn can_check_updates() -> bool {
+    #[cfg(target_os = "android")]
+    return crate::apk_update::AVAILABLE;
+    #[cfg(not(target_os = "android"))]
+    cfg!(desktop)
+}
+
+/// Called once at launch. `None` when the check is off or nothing is newer.
 #[tauri::command]
 pub async fn check_update(
     app: AppHandle,
@@ -72,7 +82,20 @@ async fn install(app: &AppHandle, pending: &PendingUpdate) -> Result<()> {
     app.restart()
 }
 
-#[cfg(mobile)]
+#[cfg(target_os = "android")]
+async fn find(app: &AppHandle, _: &PendingUpdate) -> Result<Option<NewVersion>> {
+    if !crate::apk_update::AVAILABLE {
+        return Ok(None);
+    }
+    Ok(crate::apk_update::newer_version(app)
+        .await
+        .map(|version| NewVersion {
+            version,
+            can_install: false,
+        }))
+}
+
+#[cfg(target_os = "ios")]
 async fn find(_: &AppHandle, _: &PendingUpdate) -> Result<Option<NewVersion>> {
     Ok(None)
 }

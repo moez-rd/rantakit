@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { SearchX } from "@keyline-icons/react";
 import { ToolCard } from "@/components/blocks/ToolCard";
 import { useT } from "@/i18n";
@@ -8,13 +8,15 @@ import { JOBS, TOOL_ICONS, useRecentTools, useTools, type ToolId } from "./tools
 
 interface HomePageProps {
   onOpenTool: (id: ToolId) => void;
+  /** "Versi baru" on Android, which has no title bar; nothing until a newer version is found. */
+  notice?: ReactNode;
 }
 
 /**
  * Search, Recent tools, then every Tool grouped by Job, on one scrolling page.
  * Coming soon Tools follow the shipped ones.
  */
-export function HomePage({ onOpenTool }: HomePageProps) {
+export function HomePage({ onOpenTool, notice }: HomePageProps) {
   const { t } = useT();
   const [query, setQuery] = useState("");
   const searching = query.trim() !== "";
@@ -30,6 +32,7 @@ export function HomePage({ onOpenTool }: HomePageProps) {
   return (
     <div className="flex flex-1 flex-col gap-9 px-12 pt-10 pb-12">
       <h1 className="sr-only">{t("nav.home")}</h1>
+      {notice}
       <SearchBox value={query} onChange={setQuery} />
 
       {searching && found.length === 0 && (

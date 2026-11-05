@@ -3091,6 +3091,7 @@ name = "rantakit"
 version = "0.2.0"
 dependencies = [
  "rantakit-tasks",
+ "semver",
  "serde",
  "serde_json",
  "tauri",

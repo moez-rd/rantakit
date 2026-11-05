@@ -343,6 +343,7 @@ export const id = {
   "update.title": "Rantakit {version} sudah ada",
   "update.body": "Versi baru akan diunduh dan dipasang, lalu Rantakit dibuka lagi. File kamu tidak terpengaruh.",
   "update.body.download": "Unduh versi baru dari halaman unduhan Rantakit, lalu pasang seperti biasa.",
+  "update.body.apk": "Unduh APK yang baru, lalu pasang. Riwayat dan pengaturanmu tetap ada.",
   "update.busy": "Tunggu tugas yang sedang berjalan selesai dulu.",
   "update.failed": "Versi baru gagal dipasang. Coba lagi nanti, atau unduh dari halaman unduhan.",
   "update.install": "Perbarui sekarang",
