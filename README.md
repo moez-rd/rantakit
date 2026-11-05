@@ -26,6 +26,8 @@ Everything runs on your device. That means it works with no internet connection.
 
 ## Screenshots
 
+### Windows and Linux
+
 <table>
   <tr>
     <td width="50%"><img src="docs/readme/screenshots/en/home.png" alt="Home" /><br /><sub><b>Home</b>: every tool in one place, recent tools first</sub></td>
@@ -38,6 +40,17 @@ Everything runs on your device. That means it works with no internet connection.
   <tr>
     <td width="50%"><img src="docs/readme/screenshots/en/settings.png" alt="Settings" /><br /><sub><b>Settings</b>: theme, text size, language, where results are saved</sub></td>
     <td width="50%"><img src="docs/readme/screenshots/en/home-dark.png" alt="Home in dark theme" /><br /><sub><b>Dark theme</b></sub></td>
+  </tr>
+</table>
+
+### Android
+
+<table>
+  <tr>
+    <td width="25%"><img src="docs/readme/screenshots/en/android-home.png" alt="Home on Android" /><br /><sub><b>Home</b></sub></td>
+    <td width="25%"><img src="docs/readme/screenshots/en/android-tool.png" alt="Compress Photo on Android" /><br /><sub><b>A tool</b>: photos from your phone, with a size limit</sub></td>
+    <td width="25%"><img src="docs/readme/screenshots/en/android-result.png" alt="Result on Android" /><br /><sub><b>Result</b>: share to any app</sub></td>
+    <td width="25%"><img src="docs/readme/screenshots/en/android-history.png" alt="History on Android" /><br /><sub><b>History</b></sub></td>
   </tr>
 </table>
 
