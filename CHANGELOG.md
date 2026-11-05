@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- "Kompres PDF" (Compress PDF) works on several pages at once and tries fewer qualities for a Size limit. A 10-page scan takes about 3 seconds instead of 7 on an Android 8 emulator, and about 7 seconds instead of 39 with a 1 MB limit, using about 150 MB more memory while it runs
 - Only release candidates, such as `v0.3.0-rc.1`, are marked as pre-releases on GitHub, so the "Versi baru" check finds every final version
 
 ## [0.2.0] - 2026-11-03
