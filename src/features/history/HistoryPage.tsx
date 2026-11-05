@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { ChevronRight, FolderOpen, History, SquareArrowOutUpRight, TriangleAlert } from "@keyline-icons/react";
+import { ChevronRight, FolderOpen, History, Share2, SquareArrowOutUpRight, TriangleAlert } from "@keyline-icons/react";
 import { DialogTrigger } from "react-aria-components";
 import { AlertDialog } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
@@ -10,9 +10,9 @@ import { TOOL_ICONS, type ToolId } from "@/features/home/tools";
 import { setKeepHistory, useAppSettings } from "@/features/settings/appSettings";
 import { useT } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
-import { openPath } from "@/lib/files";
+import { openPath, shareFiles } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
-import { canShowInFolder } from "@/lib/platform";
+import { canShare, canShowInFolder } from "@/lib/platform";
 import { clearHistory, listHistory, type HistoryFile, type HistoryItem } from "./historyApi";
 
 /** "Riwayat": every Task with a Result, grouped by day, newest first. */
@@ -35,6 +35,13 @@ export function HistoryPage() {
 
   useEffect(load, [load]);
 
+  // Results may have been moved or deleted while Rantakit was out of sight.
+  useEffect(() => {
+    const onVisible = () => document.visibilityState === "visible" && load();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [load]);
+
   const clear = () => {
     setItems([]);
     clearHistory().catch(load);
@@ -50,7 +57,7 @@ export function HistoryPage() {
   if (items === null) return null;
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-10 pt-6 pb-10">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 pt-6 pb-10 md:px-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="font-display text-title">{t("history.title")}</h1>
@@ -163,7 +170,7 @@ function HistoryEntry({ entry }: { entry: HistoryItem }) {
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="flex items-baseline gap-2">
             <span className="text-label font-semibold">{known ? t(`tool.${entry.tool as ToolId}`) : entry.tool}</span>
-            <span className="text-small text-text-muted">{time}</span>
+            <span className="text-small whitespace-nowrap text-text-muted">{time}</span>
           </span>
           <span className="truncate" title={first.resultPath}>
             {names}
@@ -179,11 +186,22 @@ function HistoryEntry({ entry }: { entry: HistoryItem }) {
           </span>
         </span>
         {!missing && (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
+          // On a phone the buttons go on their own line, under the file names.
+          <div className="flex w-full shrink-0 flex-wrap items-center gap-2 ps-16 md:w-auto md:ps-0">
             {entry.files.length === 1 && <OpenButton file={first} />}
             {canShowInFolder && (
               <Button variant="secondary" size="row" onPress={() => revealItemInDir(existing[0].resultPath)}>
                 <FolderOpen aria-hidden className="size-[18px]" /> {t("task.showInFolder")}
+              </Button>
+            )}
+            {canShare && (
+              <Button
+                variant="secondary"
+                size="row"
+                onPress={() => shareFiles(existing.map((file) => file.resultPath))}
+              >
+                <Share2 aria-hidden className="size-[18px]" />{" "}
+                {t(entry.files.length === 1 ? "result.share" : "result.shareAll")}
               </Button>
             )}
             {entry.files.length > 1 && (

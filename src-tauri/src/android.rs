@@ -91,6 +91,18 @@ fn result_uri(app: &AppHandle, path: &Path) -> tauri_plugin_android_fs::Result<F
     app.android_fs().public_storage().scan_by_path(path, None)
 }
 
+/// Whether a Result is still where it was saved, for History. Android 11 and
+/// later show the app the files it saved in `Download/` by path, as do 8 and
+/// 9 with the storage permission; Android 10 shows them only through
+/// MediaStore, so there it asks MediaStore.
+pub fn result_exists(app: &AppHandle, path: &Path) -> bool {
+    if path.exists() {
+        return true;
+    }
+    let android_10 = app.android_fs().api_level().is_ok_and(|level| level == 29);
+    android_10 && result_uri(app, path).is_ok()
+}
+
 /// "Buka": the system asks which app opens the Result.
 pub fn open(app: &AppHandle, path: &Path) -> tauri_plugin_android_fs::Result<()> {
     let uri = result_uri(app, path)?;

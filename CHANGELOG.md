@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Bagikan semua" (Share all) above a list of Results, on Windows and Android
 - Android Tasks keep going when you switch apps, with a notification such as "Kompres Foto · 3 dari 12 file" (Compress Photo · 3 of 12 files). If Rantakit is out of sight when the Task ends, "Selesai" (Done) says how many Results are in `Download/Rantakit/` and how many files failed, and tapping it shows the Result. Android 13 and later ask once, at the first Task, whether Rantakit may show notifications, after saying why
 - Android share sheet: photos and PDFs shared from WhatsApp, Gallery, Files, or any other app open in Rantakit, which shows the Tools that fit them or why none does. Rantakit can be closed, in the background, or open; while a Task runs it asks you to wait for it first
+- History on Android and Windows has "Bagikan" (Share) for a Result and "Bagikan semua" (Share all) for a Task with several, next to "Buka". On a phone each entry's buttons sit under its file names, and a Result moved or deleted in another app is marked as missing as soon as you come back to Rantakit
 
 ### Changed
 
