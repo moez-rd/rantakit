@@ -1,5 +1,9 @@
+use std::borrow::Cow;
 use std::io::Write;
+use std::num::NonZero;
 use std::path::Path;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::thread;
 
 use ::image::codecs::jpeg::JpegEncoder;
 use ::image::{DynamicImage, ExtendedColorType, ImageEncoder, ImageFormat as RawFormat};
@@ -19,6 +23,13 @@ const REPACKED: f32 = 0.9;
 
 /// Lowest image quality tried for a Size limit.
 const MIN_QUALITY: u8 = 10;
+/// Qualities closer than this look the same, so the Size limit search stops there.
+const QUALITY_STEP: u8 = 5;
+/// Images decoded or encoded at once, one per core on a typical phone.
+const MAX_THREADS: usize = 4;
+/// Images shrunk at once. Shrinking one page holds about 90 MB of working
+/// memory, so more at once would cost a low-end phone more than it has spare.
+const RESIZE_THREADS: usize = 2;
 
 /// Longest image sides tried, in order, when a Size limit can't be reached at
 /// the original resolution: 300, 200, 150, 100 and 72 dpi on an A4 page.
@@ -81,7 +92,8 @@ pub fn compress_pdf(
 
     let packed = match opts.max_bytes {
         None => {
-            let packed = pack(doc, &candidates, quality, opts.max_dimension)?;
+            let images = at_side(&candidates, opts.max_dimension);
+            let packed = pack(doc, &candidates, &images, quality)?;
             tracker.step(REPACKED)?;
             packed
         }
@@ -140,19 +152,27 @@ fn decode_images(doc: &Document, tracker: &mut Tracker<'_>) -> Result<Vec<Candid
         .map(|(id, _)| *id)
         .collect();
     let mut candidates = Vec::new();
-    for (done, id) in ids.iter().enumerate() {
+    // A few at a time, so progress still moves and Cancel is heard between them.
+    for (chunk, ids_now) in ids.chunks(MAX_THREADS).enumerate() {
+        let done = chunk * MAX_THREADS;
         tracker.step(LOADED + (DECODED - LOADED) * done as f32 / ids.len() as f32)?;
-        if let Some(Object::Stream(stream)) = doc.objects.get(id)
-            && let Some((image, gray)) = decode_jpeg(stream)
-        {
-            candidates.push(Candidate {
-                id: *id,
-                image,
-                gray,
-                masked: stream.dict.has(b"SMask") || stream.dict.has(b"Mask"),
-                original_len: stream.content.len(),
-            });
-        }
+        candidates.extend(
+            each_at_once(ids_now, MAX_THREADS, |id| {
+                let Some(Object::Stream(stream)) = doc.objects.get(id) else {
+                    return None;
+                };
+                let (image, gray) = decode_jpeg(stream)?;
+                Some(Candidate {
+                    id: *id,
+                    image,
+                    gray,
+                    masked: stream.dict.has(b"SMask") || stream.dict.has(b"Mask"),
+                    original_len: stream.content.len(),
+                })
+            })
+            .into_iter()
+            .flatten(),
+        );
     }
     tracker.step(DECODED)?;
     Ok(candidates)
@@ -163,29 +183,82 @@ struct Packed {
     recompressed: usize,
 }
 
-/// The whole PDF with every candidate re-encoded at `quality` and
-/// `max_dimension`, wherever that makes the image smaller.
+/// Each candidate's image with its longest side at most `max_dimension`, made
+/// once for every quality tried at that size. Masked images keep their size.
+fn at_side(candidates: &[Candidate], max_dimension: Option<u32>) -> Vec<Cow<'_, DynamicImage>> {
+    let Some(max) = max_dimension else {
+        return candidates.iter().map(|c| Cow::Borrowed(&c.image)).collect();
+    };
+    each_at_once(candidates, RESIZE_THREADS, |candidate| {
+        if candidate.masked {
+            Cow::Borrowed(&candidate.image)
+        } else {
+            fit_within(&candidate.image, max)
+        }
+    })
+}
+
+/// `work` on every item, up to `max_threads` at once, in the items' order.
+/// Images are independent of each other, so a phone's cores share them.
+fn each_at_once<'a, T: Sync, R: Send>(
+    items: &'a [T],
+    max_threads: usize,
+    work: impl Fn(&'a T) -> R + Sync,
+) -> Vec<R> {
+    let threads = thread::available_parallelism()
+        .map_or(1, NonZero::get)
+        .min(max_threads)
+        .min(items.len());
+    if threads <= 1 {
+        return items.iter().map(work).collect();
+    }
+    // Each thread takes the next item when it is free, since pages differ in size.
+    let next = AtomicUsize::new(0);
+    let mut done: Vec<(usize, R)> = thread::scope(|scope| {
+        let workers: Vec<_> = (0..threads)
+            .map(|_| {
+                scope.spawn(|| {
+                    let mut done = Vec::new();
+                    loop {
+                        let index = next.fetch_add(1, Ordering::Relaxed);
+                        let Some(item) = items.get(index) else {
+                            return done;
+                        };
+                        done.push((index, work(item)));
+                    }
+                })
+            })
+            .collect();
+        workers
+            .into_iter()
+            .flat_map(|worker| worker.join().expect("image worker panicked"))
+            .collect()
+    });
+    done.sort_by_key(|(index, _)| *index);
+    done.into_iter().map(|(_, result)| result).collect()
+}
+
+/// The whole PDF with every candidate's image, from `at_side`, re-encoded at
+/// `quality`, wherever that makes the image smaller.
 fn pack(
     mut doc: Document,
     candidates: &[Candidate],
+    images: &[Cow<'_, DynamicImage>],
     quality: u8,
-    max_dimension: Option<u32>,
 ) -> Result<Packed> {
+    let pairs: Vec<_> = candidates.iter().zip(images).collect();
+    let encoded = each_at_once(&pairs, MAX_THREADS, |(candidate, image)| {
+        encode_jpeg(image, quality, candidate.gray)
+            .filter(|bytes| bytes.len() < candidate.original_len)
+    });
     let mut recompressed = 0;
-    for candidate in candidates {
+    for ((candidate, image), bytes) in pairs.into_iter().zip(encoded) {
+        let Some(bytes) = bytes else {
+            continue;
+        };
         let Some(Object::Stream(stream)) = doc.objects.get_mut(&candidate.id) else {
             continue;
         };
-        let image = match max_dimension {
-            Some(max) if !candidate.masked => fit_within(candidate.image.clone(), max),
-            _ => candidate.image.clone(),
-        };
-        let Some(bytes) = encode_jpeg(&image, quality, candidate.gray) else {
-            continue;
-        };
-        if bytes.len() >= candidate.original_len {
-            continue;
-        }
         stream.dict.set("Width", image.width() as i64);
         stream.dict.set("Height", image.height() as i64);
         stream.dict.set("BitsPerComponent", 8);
@@ -221,11 +294,18 @@ fn fit_limit(
 ) -> Result<Packed> {
     let fits = |packed: &Packed| packed.bytes.len() as u64 <= limit;
     let min_quality = MIN_QUALITY.min(max_quality);
+    // A step that shrinks no image would only repeat the attempt before it.
+    let largest = candidates
+        .iter()
+        .filter(|c| !c.masked)
+        .map(|c| c.image.width().max(c.image.height()))
+        .max()
+        .unwrap_or(0);
     let mut sides = vec![max_dimension];
     sides.extend(
         SHRINK_STEPS
             .iter()
-            .filter(|&&side| max_dimension.is_none_or(|max| side < max))
+            .filter(|&&side| max_dimension.is_none_or(|max| side < max) && side < largest)
             .map(|&side| Some(side)),
     );
     // Without images to work on, every attempt gives the same file.
@@ -236,18 +316,19 @@ fn fit_limit(
     let mut best = u64::MAX;
     for (step, side) in sides.iter().enumerate() {
         tracker.step(DECODED + (REPACKED - DECODED) * step as f32 / sides.len() as f32)?;
-        let smallest = pack(doc.clone(), candidates, min_quality, *side)?;
+        let images = at_side(candidates, *side);
+        let smallest = pack(doc.clone(), candidates, &images, min_quality)?;
         best = best.min(smallest.bytes.len() as u64);
         if !fits(&smallest) {
             continue;
         }
 
-        // The highest quality that still fits; `found` always fits at `low`.
+        // About the highest quality that still fits; `found` always fits at `low`.
         let (mut low, mut high, mut found) = (min_quality, max_quality, smallest);
-        while low < high {
+        while high - low >= QUALITY_STEP {
             tracker.check()?;
             let mid = low + (high - low).div_ceil(2);
-            let packed = pack(doc.clone(), candidates, mid, *side)?;
+            let packed = pack(doc.clone(), candidates, &images, mid)?;
             if fits(&packed) {
                 low = mid;
                 found = packed;
@@ -302,10 +383,20 @@ fn decode_jpeg(stream: &Stream) -> Option<(DynamicImage, bool)> {
 }
 
 fn encode_jpeg(img: &DynamicImage, quality: u8, gray: bool) -> Option<Vec<u8>> {
-    let (raw, color) = if gray {
-        (img.to_luma8().into_raw(), ExtendedColorType::L8)
-    } else {
-        (img.to_rgb8().into_raw(), ExtendedColorType::Rgb8)
+    // Converted only when the pixels aren't already in the encoder's layout,
+    // so that several images at once don't each hold a second copy.
+    let (raw, color): (Cow<'_, [u8]>, _) = match (img, gray) {
+        (DynamicImage::ImageLuma8(luma), true) => {
+            (Cow::Borrowed(luma.as_raw()), ExtendedColorType::L8)
+        }
+        (_, true) => (Cow::Owned(img.to_luma8().into_raw()), ExtendedColorType::L8),
+        (DynamicImage::ImageRgb8(rgb), false) => {
+            (Cow::Borrowed(rgb.as_raw()), ExtendedColorType::Rgb8)
+        }
+        (_, false) => (
+            Cow::Owned(img.to_rgb8().into_raw()),
+            ExtendedColorType::Rgb8,
+        ),
     };
 
     let mut buf = Vec::new();
