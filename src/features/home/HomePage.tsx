@@ -30,7 +30,7 @@ export function HomePage({ onOpenTool, notice }: HomePageProps) {
   }).filter((group) => group.tools.length > 0);
 
   return (
-    <div className="flex flex-1 flex-col gap-9 px-12 pt-10 pb-12">
+    <div className="flex flex-1 flex-col gap-9 px-5 pt-6 pb-10 md:px-12 md:pt-10 md:pb-12">
       <h1 className="sr-only">{t("nav.home")}</h1>
       {notice}
       <SearchBox value={query} onChange={setQuery} />

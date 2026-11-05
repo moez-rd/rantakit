@@ -79,7 +79,7 @@ export const en: Messages = {
   "home.all": "All tools",
   "home.comingSoon": "Coming soon",
   "home.search": "Search tools",
-  "home.search.placeholder": "Search tools, for example “compress”",
+  "home.search.placeholder": "Search tools, like “compress”",
   "home.search.clear": "Clear search",
   "home.search.results": "Search results",
   "home.search.none": "No tool found",
