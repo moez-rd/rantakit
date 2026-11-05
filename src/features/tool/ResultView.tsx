@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import {
   CircleCheck,
@@ -18,7 +17,7 @@ import { limitOf, type TaskResult } from "@/features/compress/taskApi";
 import type { CompressJob, JobItem } from "@/features/compress/useCompressJob";
 import { useT, type Translator } from "@/i18n";
 import { errorMessage } from "@/lib/errorMessages";
-import { openPath } from "@/lib/files";
+import { openPath, shareFiles } from "@/lib/files";
 import { formatBytes } from "@/lib/format";
 import { canShare, canShowInFolder, isAndroidApp } from "@/lib/platform";
 import { tv } from "@/lib/react-aria-utils";
@@ -114,7 +113,7 @@ export function ResultList({ job, noun }: { job: CompressJob; noun: "photo" | "p
           <Button
             variant="secondary"
             size="row"
-            onPress={() => shareResults(done.map((item) => item.result.outputPath))}
+            onPress={() => shareFiles(done.map((item) => item.result.outputPath))}
           >
             <Share2 aria-hidden className="size-[18px]" /> {t("result.shareAll")}
           </Button>
@@ -147,10 +146,6 @@ export function ResultList({ job, noun }: { job: CompressJob; noun: "photo" | "p
 
 type DoneItem = Extract<JobItem, { status: "done" }>;
 
-function shareResults(paths: string[]) {
-  invoke("share_files", { paths }).catch(() => {});
-}
-
 /** Buka, then Tampilkan di folder on desktop and Bagikan on Windows and Android. */
 function ResultActions({ result, name }: { result: TaskResult; name: string }) {
   const { t } = useT();
@@ -170,7 +165,7 @@ function ResultActions({ result, name }: { result: TaskResult; name: string }) {
         </Button>
       )}
       {canShare && (
-        <Button variant="secondary" size="row" onPress={() => shareResults([result.outputPath])}>
+        <Button variant="secondary" size="row" onPress={() => shareFiles([result.outputPath])}>
           <Share2 aria-hidden className="size-[18px]" /> {t("result.share")}
         </Button>
       )}

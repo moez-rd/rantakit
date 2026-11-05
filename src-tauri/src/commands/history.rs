@@ -1,9 +1,11 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use rantakit_tasks::{EntryFile, History};
 use serde::Serialize;
-use tauri::State;
+use tauri::{AppHandle, State};
 
+#[cfg(target_os = "android")]
+use crate::android;
 use crate::error::Result;
 
 /// Mirrors `Entry`, with whether each Result is still where it was saved.
@@ -27,10 +29,10 @@ pub struct HistoryFile {
     pub exists: bool,
 }
 
-impl From<EntryFile> for HistoryFile {
-    fn from(file: EntryFile) -> Self {
+impl HistoryFile {
+    fn new(app: &AppHandle, file: EntryFile) -> Self {
         Self {
-            exists: file.result_path.exists(),
+            exists: exists(app, &file.result_path),
             original_path: file.original_path,
             result_path: file.result_path,
             original_bytes: file.original_bytes,
@@ -39,9 +41,20 @@ impl From<EntryFile> for HistoryFile {
     }
 }
 
-/// History entries, one per Task, newest first.
+fn exists(app: &AppHandle, path: &Path) -> bool {
+    #[cfg(target_os = "android")]
+    return android::result_exists(app, path);
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = app;
+        path.exists()
+    }
+}
+
+/// History entries, one per Task, newest first. Looks for every Result, so
+/// it runs off the main thread.
 #[tauri::command]
-pub fn list_history(history: State<'_, History>) -> Result<Vec<HistoryItem>> {
+pub async fn list_history(app: AppHandle, history: State<'_, History>) -> Result<Vec<HistoryItem>> {
     Ok(history
         .list()?
         .into_iter()
@@ -49,7 +62,11 @@ pub fn list_history(history: State<'_, History>) -> Result<Vec<HistoryItem>> {
             id: entry.id,
             tool: entry.tool,
             created_at: entry.created_at,
-            files: entry.files.into_iter().map(HistoryFile::from).collect(),
+            files: entry
+                .files
+                .into_iter()
+                .map(|file| HistoryFile::new(&app, file))
+                .collect(),
         })
         .collect())
 }
