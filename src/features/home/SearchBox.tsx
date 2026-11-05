@@ -30,7 +30,7 @@ export function SearchBox({ value, onChange }: SearchBoxProps) {
         <Label className="sr-only">{t("home.search")}</Label>
         <Input
           placeholder={t("home.search.placeholder")}
-          className="h-11 min-w-0 flex-1 bg-transparent text-text outline-none placeholder:text-text-muted [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 min-w-0 flex-1 bg-transparent text-ellipsis text-text outline-none placeholder:text-text-muted [&::-webkit-search-cancel-button]:hidden"
         />
         {value !== "" && (
           <Button aria-label={t("home.search.clear")} className={(renderProps) => clear(renderProps)}>
