@@ -1,5 +1,7 @@
 #[cfg(target_os = "android")]
 mod android;
+#[cfg(target_os = "android")]
+mod apk_update;
 mod commands;
 mod error;
 #[cfg(target_os = "macos")]
@@ -50,7 +52,11 @@ pub fn run() {
     #[cfg(target_os = "android")]
     let builder = builder.plugin(share_in::init());
 
-    // Stores update the mobile apps.
+    // "Versi baru" for the APK from GitHub.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(apk_update::init());
+
+    // Installs new versions on desktop; the APK only learns of them (apk_update.rs).
     #[cfg(desktop)]
     let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
 
@@ -84,6 +90,7 @@ pub fn run() {
             commands::settings::set_keep_history,
             commands::settings::set_results_folder,
             commands::settings::set_check_updates,
+            commands::update::can_check_updates,
             commands::update::check_update,
             commands::update::install_update,
             commands::presets::list_presets,

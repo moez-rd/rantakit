@@ -340,6 +340,7 @@ export const en: Messages = {
   "update.title": "Rantakit {version} is out",
   "update.body": "The new version is downloaded and installed, then Rantakit opens again. Your files aren't affected.",
   "update.body.download": "Download the new version from Rantakit's download page, then install it as usual.",
+  "update.body.apk": "Download the new APK, then install it. Your History and settings stay.",
   "update.busy": "Wait for the running task to finish first.",
   "update.failed": "The new version couldn't be installed. Try again later, or download it from the download page.",
   "update.install": "Update now",

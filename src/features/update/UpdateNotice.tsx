@@ -7,23 +7,26 @@ import { Dialog, Heading } from "@/components/ui/Dialog";
 import { Modal } from "@/components/ui/Modal";
 import { useT } from "@/i18n";
 import { DOWNLOAD_URL, openExternal } from "@/lib/links";
+import { isAndroidApp } from "@/lib/platform";
 import { focusRing, tv } from "@/lib/react-aria-utils";
 
 /** Mirrors `NewVersion` in src-tauri/src/commands/update.rs. */
 interface NewVersion {
   version: string;
-  /** False for the Linux .deb and .rpm, which update through the download page. */
+  /** False for the Linux .deb and .rpm and for Android, which update through the download page. */
   canInstall: boolean;
 }
 
-/** Asks once per launch; null until a newer version is found. */
+/** The launch's one check; on Android the notice is on Home, which mounts again after each Tool page. */
+let check: Promise<NewVersion | null> | undefined;
+
+/** Null until a newer version is found. */
 function useNewVersion() {
   const [found, setFound] = useState<NewVersion | null>(null);
   useEffect(() => {
     // Offline, or the check is off: say nothing. There is always the next launch.
-    invoke<NewVersion | null>("check_update")
-      .then(setFound)
-      .catch(() => {});
+    check ??= invoke<NewVersion | null>("check_update").catch(() => null);
+    check.then(setFound);
   }, []);
   return found;
 }
@@ -38,17 +41,18 @@ const notice = tv({
 });
 
 /**
- * "Versi baru": a quiet button in the title bar once a newer Rantakit is out,
- * opening a dialog to install it. `busy` holds the install back while a Task
- * runs, since installing restarts the app.
+ * "Versi baru": a quiet button once a newer Rantakit is out, in the title bar
+ * on desktop and at the top of Home on Android, opening a dialog to install
+ * it. `busy` holds the install back while a Task runs, since installing
+ * restarts the app.
  */
-export function UpdateNotice({ busy }: { busy: boolean }) {
+export function UpdateNotice({ busy, className }: { busy: boolean; className?: string }) {
   const { t } = useT();
   const found = useNewVersion();
   if (!found) return null;
   return (
     <DialogTrigger>
-      <AriaButton className={(rp) => notice(rp)}>
+      <AriaButton className={(rp) => notice({ ...rp, className })}>
         <CircleArrowDown aria-hidden className="size-4" />
         {t("update.notice")}
       </AriaButton>
@@ -68,7 +72,14 @@ function UpdateDialog({ found, busy }: { found: NewVersion; busy: boolean }) {
     invoke("install_update").catch(() => setState("failed"));
   };
   const viaDownloadPage = !found.canInstall || state === "failed";
-  const body = state === "failed" ? "update.failed" : found.canInstall ? "update.body" : "update.body.download";
+  const body =
+    state === "failed"
+      ? "update.failed"
+      : found.canInstall
+        ? "update.body"
+        : isAndroidApp
+          ? "update.body.apk"
+          : "update.body.download";
 
   return (
     <Dialog>
