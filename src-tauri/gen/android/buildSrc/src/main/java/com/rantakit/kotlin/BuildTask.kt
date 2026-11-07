@@ -23,7 +23,9 @@ abstract class BuildTask : DefaultTask() {
 
     @TaskAction
     fun assemble() {
-        val executable = """C:\Users\slowi\.bun\bin\bun""";
+        // `tauri android init` writes the absolute path of the machine it ran on,
+        // which breaks the build anywhere else, CI included. Find bun on PATH.
+        val executable = "bun";
         try {
             runTauriCli(executable)
         } catch (e: Exception) {
