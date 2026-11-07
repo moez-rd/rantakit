@@ -6,7 +6,7 @@
 
   <p>
     <img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="license" />
-    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey" alt="platform" />
+    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20Android-lightgrey" alt="platform" />
   </p>
 </div>
 
