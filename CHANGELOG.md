@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-07
+
+Rantakit 0.3.0 brings Rantakit to Android, with the same four Tools as on Windows and Linux, and adds "Versi baru" (New version) on every platform. Rantakit is in early development and is not stable yet.
+
 ### Added
 
 - "Versi baru" (New version): at launch Rantakit checks GitHub for a newer version and shows a quiet button in the title bar. On Windows and the Linux AppImage one click installs it; the .deb and .rpm open the download page. It can be turned off in Settings, under "Tentang" (About)
@@ -112,7 +116,8 @@ First public release, for Windows and Linux. Rantakit is in early development an
 - Settings for theme (light, dark, system) and UI zoom
 - Interface in Indonesian
 
-[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/moez-rd/rantakit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/moez-rd/rantakit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.2...v0.2.0
 [0.2.0-rc.2]: https://github.com/moez-rd/rantakit/compare/v0.2.0-rc.1...v0.2.0-rc.2
 [0.2.0-rc.1]: https://github.com/moez-rd/rantakit/compare/v0.1.0...v0.2.0-rc.1
